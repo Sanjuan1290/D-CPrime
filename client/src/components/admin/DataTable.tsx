@@ -10,7 +10,7 @@ function DataTable({ headers, rows }: DataTableProps) {
   const [sortIndex, setSortIndex] = useState<number | null>(null)
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
   const [page, setPage] = useState(1)
-  const pageSize = 20
+  const pageSize = Number(localStorage.getItem('dcprime_page_size') ?? 20)
   const totalPages = Math.max(1, Math.ceil(rows.length / pageSize))
 
   const sortedRows = useMemo(() => {

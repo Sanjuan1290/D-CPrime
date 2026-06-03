@@ -23,7 +23,7 @@ function ClientsPage() {
             key={item}
             onClick={() => setFilter(item)}
             className={`rounded-md border px-3 py-2 text-sm font-semibold ${
-              filter === item ? 'border-zinc-950 bg-zinc-950 text-white' : 'border-zinc-300 bg-white text-zinc-700'
+              filter === item ? 'border-[#C9A84C] bg-[#C9A84C]/10 text-[#C9A84C]' : 'border-white/10 bg-[#111111] text-zinc-300'
             }`}
           >
             {item}

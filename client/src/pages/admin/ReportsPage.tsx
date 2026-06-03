@@ -19,7 +19,7 @@ function ReportsPage() {
       <Panel title="Available Reports" subtitle="Admin-only report shortcuts">
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {['Sales Report', 'Collection Report', 'Commission Report', 'Agent Performance Report', 'Project Summary Report'].map((report) => (
-            <button key={report} className="rounded-lg border border-zinc-200 bg-zinc-50 p-4 text-left text-sm font-bold hover:border-amber-400">
+            <button key={report} className="rounded-lg border border-white/10 bg-[#111111] p-4 text-left text-sm font-bold text-zinc-200 hover:border-[#C9A84C]">
               {report}
             </button>
           ))}

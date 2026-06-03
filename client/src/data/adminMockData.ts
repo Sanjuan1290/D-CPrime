@@ -298,3 +298,139 @@ export const auditLogs = [
   ['06/03/2026 09:46 PM', 'Admin User', 'Loaded CLIENT MASTERLIST sample rows', 'Data Import'],
   ['06/03/2026 09:47 PM', 'Admin User', 'Reviewed Pantihan 4 sample computation images', 'Computation'],
 ]
+
+export const projects = [
+  { id: 'project-1', name: 'Luntiang Aguinaldo', location: 'Gen. Emilio Aguinaldo, Cavite', status: 'Active', description: 'LA inventory from the provided masterlist.', coverImage: '', totalLots: 72 },
+  { id: 'project-2', name: 'Pantihan 4', location: 'Maragondon, Cavite', status: 'Active', description: 'Pantihan 4 sample computation project.', coverImage: '', totalLots: 48 },
+  { id: 'project-3', name: 'Gentry', location: 'TBD', status: 'Active', description: 'Mock project for phase 1 coverage.', coverImage: '', totalLots: 36 },
+]
+
+export const agents = [
+  { id: 'agent-1', fullName: 'SARTE, JOHN CHRISTOPHER', email: 'sarte.john@dcprime.com', phone: '0917-111-0001', assignedProjects: ['project-1'], status: 'Active' },
+  { id: 'agent-2', fullName: 'MOJICA, JONATHAN', email: 'mojica.jonathan@dcprime.com', phone: '0917-111-0002', assignedProjects: ['project-1'], status: 'Active' },
+  { id: 'agent-3', fullName: 'HERNANDEZ, JULIE ANN', email: 'hernandez.julie@dcprime.com', phone: '0917-111-0003', assignedProjects: ['project-1', 'project-2'], status: 'Active' },
+  { id: 'agent-4', fullName: 'GERO, STANLEY', email: 'gero.stanley@dcprime.com', phone: '0917-111-0004', assignedProjects: ['project-1'], status: 'Active' },
+]
+
+export const listingsV2 = Array.from({ length: 15 }, (_, index) => {
+  const source = listings[index % listings.length]
+  const status = index < 8 ? 'Available' : index < 12 ? 'Reserved' : 'Sold'
+  return {
+    id: `listing-${index + 1}`,
+    unitId: index < listings.length ? source.unitId : `PT4-${String(index + 1).padStart(3, '0')}`,
+    projectId: index < 7 ? 'project-1' : index < 12 ? 'project-2' : 'project-3',
+    areaSqm: source.area,
+    sellingPrice: source.totalContractPrice,
+    status,
+    assignedClientId: status === 'Available' ? null : `client-${(index % 10) + 1}`,
+    images: [],
+  }
+})
+
+export const clientsV2 = clients.concat([
+  { reservationDate: '02/10/2025', buyer: 'CAMANTIGUE, ESTELISA V.', unitId: 'LA-0201 (1.1)', agent: 'RONIO, ALVIN', manager: 'HERNANDEZ, JULIE ANN', area: 300, pricePerSqm: 1200, totalContractPrice: 396000, paymentMode: 'INSTALLMENT', paymentMade: 241998, balance: 154002, paymentPercentage: 0.6722166667, documentStatus: 'INC', contactNo: '0997-118-0563', email: 'evcamantigue87@gmail.com', address: 'KAWIT CAVITE', accountStatus: 'PARTIALLY PAID', salesStatus: 'GOOD SALE' },
+  { reservationDate: '02/13/2025', buyer: 'PRADEZ, JACKIELOU RIA G.', unitId: 'LA-0408', agent: 'SARTE, JOHN CHRISTOPHER', manager: 'SARTE, JOHN CHRISTOPHER', area: 300, pricePerSqm: 1000, totalContractPrice: 330000, paymentMode: 'CASH', paymentMade: 330000, balance: 0, paymentPercentage: 1.1, documentStatus: 'INC', contactNo: '0917-590-3452', email: 'pradezjg@bsp.gov.ph', address: 'GEN. TRI CAVITE', accountStatus: 'COMPLETE PAID', salesStatus: 'GOOD SALE' },
+  { reservationDate: '02/16/2025', buyer: 'OCAMPO, RACQUEL', unitId: 'LA-0412 & LA-0414 COMBINED', agent: 'DAGALE, ROY', manager: 'DAGALE, ROY', area: 600, pricePerSqm: 1200, totalContractPrice: 792000, paymentMode: 'INSTALLMENT', paymentMade: 446598, balance: 345402, paymentPercentage: 0.620275, documentStatus: 'INC', contactNo: '0939-934-3253', email: 'ocampo.racquel@gmail.com', address: 'IMUS, CAVITE', accountStatus: 'PARTIALLY PAID', salesStatus: 'GOOD SALE' },
+  { reservationDate: '02/18/2025', buyer: 'DE LEON, CARMINA VICTORIA', unitId: 'LA-0407', agent: 'SARTE, JOHN CHRISTOPHER', manager: 'SARTE, JOHN CHRISTOPHER', area: 300, pricePerSqm: 1200, totalContractPrice: 396000, paymentMode: 'INSTALLMENT', paymentMade: 288198, balance: 107802, paymentPercentage: 0.80055, documentStatus: 'INC', contactNo: '???', email: 'carminavictoriatdeleon@gmail.com', address: 'QUEZON CITY', accountStatus: 'PARTIALLY PAID', salesStatus: 'GOOD SALE' },
+  { reservationDate: '02/20/2025', buyer: 'TUBORO, MARILOU GRIMALDO', unitId: 'LA-0411', agent: 'SARTE, JOHN CHRISTOPHER', manager: 'SARTE, JOHN CHRISTOPHER', area: 300, pricePerSqm: 1000, totalContractPrice: 330000, paymentMode: 'CASH', paymentMade: 330000, balance: 0, paymentPercentage: 1.1, documentStatus: 'INC', contactNo: '0908-874-1609', email: 'malou.taburo@yahoo.com', address: 'QUEZON CITY', accountStatus: 'COMPLETE PAID', salesStatus: 'GOOD SALE' },
+])
+
+export const payments = Array.from({ length: 20 }, (_, index) => {
+  const client = clientsV2[index % clientsV2.length]
+  const amount = index === 0 ? 10000 : index < 4 ? 15400 : 28875 + index * 250
+  const runningBalance = Math.max(0, client.totalContractPrice - client.paymentMade + amount * (index % 3))
+  return {
+    id: `payment-${index + 1}`,
+    clientId: `client-${(index % clientsV2.length) + 1}`,
+    clientName: client.buyer,
+    unitId: client.unitId,
+    projectId: index % 3 === 0 ? 'project-1' : index % 3 === 1 ? 'project-2' : 'project-3',
+    description: index === 0 ? 'Reservation Fee' : index < 4 ? `${index}st Downpayment` : `${index - 3}th Monthly Payment`,
+    bank: index % 2 === 0 ? 'CASH' : 'BDO',
+    accountNumber: index % 2 === 0 ? 'OFFICE' : `00${index}-123-456`,
+    date: `05/${String((index % 28) + 1).padStart(2, '0')}/2026`,
+    referenceNumber: index % 2 === 0 ? 'CASH' : `IP-090125-RQGY${index}`,
+    amount,
+    penalty: index % 6 === 0 ? 500 : 0,
+    status: index % 5 === 0 ? 'Pending Verification' : 'Verified',
+    runningBalance,
+  }
+})
+
+export const commissionsV2 = Array.from({ length: 8 }, (_, index) => {
+  const client = clientsV2[index % clientsV2.length]
+  const sellingPrice = client.totalContractPrice
+  const grossCommission = sellingPrice * 0.05
+  const withholdingTax = grossCommission * 0.05
+  return {
+    id: `commission-${index + 1}`,
+    agentId: `agent-${(index % agents.length) + 1}`,
+    agentName: agents[index % agents.length].fullName,
+    clientId: `client-${(index % clientsV2.length) + 1}`,
+    clientName: client.buyer,
+    unitId: client.unitId,
+    projectId: index % 3 === 0 ? 'project-1' : index % 3 === 1 ? 'project-2' : 'project-3',
+    sellingPrice,
+    commissionRate: 0.05,
+    grossCommission,
+    withholdingTax,
+    netCommission: grossCommission - withholdingTax,
+    eligibility: {
+      reservationFeePaid: true,
+      requiredDocsSubmitted: index % 3 !== 0,
+      dpThresholdReached: index % 2 === 0,
+      contractSigned: index % 4 !== 0,
+      managementApproval: index > 2,
+    },
+    status: index < 3 ? 'Pending' : index < 6 ? 'Approved' : 'Released',
+  }
+})
+
+const requiredDocumentTypes = [
+  "Client Registration Form (Seller's Copy)",
+  'Client Registration Form (Administrator Copy)',
+  "Buyer's Information Form",
+  'Intent to Buy',
+  "Offer to Buy & Buyer's Profile",
+  'Deed of Absolute Sale',
+  'Contract to Sell (Undivided Share)',
+]
+
+export const clientDocuments = clientsV2.flatMap((client, clientIndex) =>
+  requiredDocumentTypes.map((documentType, docIndex) => ({
+    id: `doc-${clientIndex + 1}-${docIndex + 1}`,
+    clientId: `client-${clientIndex + 1}`,
+    clientName: client.buyer,
+    unitId: client.unitId,
+    documentType,
+    status: docIndex < 2 ? 'Approved' : docIndex === 2 ? 'Submitted' : docIndex === 3 && clientIndex % 2 === 0 ? 'Rejected' : 'Not Submitted',
+    submittedDate: docIndex < 3 ? `05/${String(docIndex + 10).padStart(2, '0')}/2026` : '',
+    rejectionRemark: docIndex === 3 && clientIndex % 2 === 0 ? 'Needs corrected signature.' : '',
+  })),
+)
+
+export const usersV2 = [
+  { id: 'user-1', fullName: 'Admin', email: 'admin@dcprime.com', role: 'admin', status: 'Active', dateCreated: '01/01/2026', lastLogin: '06/03/2026', permissions: featureKeys.reduce((acc, key) => ({ ...acc, [key]: true }), {}) },
+  { id: 'user-2', fullName: 'Treasury One', email: 'treasury1@dcprime.com', role: 'treasury', status: 'Active', dateCreated: '01/05/2026', lastLogin: '06/02/2026', permissions: rolePresets.treasury },
+  { id: 'user-3', fullName: 'Treasury Two', email: 'treasury2@dcprime.com', role: 'treasury', status: 'Active', dateCreated: '01/08/2026', lastLogin: '06/01/2026', permissions: rolePresets.treasury },
+  ...agents.map((agent, index) => ({ id: `user-${index + 4}`, fullName: agent.fullName, email: agent.email, role: 'agent', status: 'Active', dateCreated: '02/01/2026', lastLogin: '06/01/2026', permissions: rolePresets.agent })),
+  { id: 'user-8', fullName: clientsV2[0].buyer, email: clientsV2[0].email ?? 'client1@dcprime.com', role: 'client', status: 'Active', dateCreated: '02/14/2026', lastLogin: '05/29/2026', permissions: rolePresets.client },
+  { id: 'user-9', fullName: clientsV2[2].buyer, email: clientsV2[2].email ?? 'client2@dcprime.com', role: 'client', status: 'Active', dateCreated: '02/18/2026', lastLogin: '05/28/2026', permissions: rolePresets.client },
+]
+
+const auditActions = ['Payment recorded', 'Document approved', 'Commission released', 'Admin logged in', 'Listing updated', 'Client registered']
+
+export const auditLogsV2 = Array.from({ length: 50 }, (_, index) => {
+  const client = clientsV2[index % clientsV2.length]
+  const action = auditActions[index % auditActions.length]
+  return {
+    id: `audit-${index + 1}`,
+    timestamp: `05/${String((index % 30) + 1).padStart(2, '0')}/2026 ${String((index % 12) + 1).padStart(2, '0')}:15 PM`,
+    userId: index % 4 === 0 ? 'user-1' : `user-${(index % 8) + 1}`,
+    userName: index % 4 === 0 ? 'Admin' : agents[index % agents.length].fullName,
+    role: index % 4 === 0 ? 'admin' : 'agent',
+    action,
+    details: `${action} - ${client.buyer} (${client.unitId})`,
+    ipAddress: `192.168.1.${(index % 90) + 1}`,
+  }
+})

@@ -5,12 +5,18 @@ import Panel from '../../components/admin/Panel'
 import { formatCurrency, formatPercent } from '../../components/admin/formatters'
 import { company, paymentTracker, soaRecords } from '../../data/adminMockData'
 
-function PaymentsPage() {
+type PaymentsPageProps = {
+  initialTab?: 'all' | 'due' | 'overdue'
+}
+
+function PaymentsPage({ initialTab = 'all' }: PaymentsPageProps) {
   const soa = soaRecords[0]
+  const title =
+    initialTab === 'due' ? 'Due Payments' : initialTab === 'overdue' ? 'Overdue Accounts' : 'Payment Made Tracker'
 
   return (
     <div className="space-y-6">
-      <Panel title="Payment Made Tracker" subtitle="Payment totals from workbook">
+      <Panel title={title} subtitle="Payment totals from workbook">
         <DataTable
           headers={['Unit ID', 'Buyer', 'Mode', 'Due', 'Payment Made', 'TCP', 'Balance', 'Payment %', 'Commission Released']}
           rows={paymentTracker.map((payment) => [
@@ -29,8 +35,8 @@ function PaymentsPage() {
 
       <div className="grid gap-6 xl:grid-cols-[1.25fr_0.75fr]">
         <Panel title="Statement Of Account" subtitle="From SOA INSTALLMENT.xlsx">
-          <div className="rounded-lg border border-zinc-300 bg-white p-5">
-            <div className="flex flex-col gap-3 border-b border-zinc-200 pb-4 md:flex-row md:items-start md:justify-between">
+          <div className="rounded-lg border border-white/10 bg-black p-5">
+            <div className="flex flex-col gap-3 border-b border-white/10 pb-4 md:flex-row md:items-start md:justify-between">
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.25em] text-amber-600">{company.name}</p>
                 <h2 className="mt-2 text-xl font-bold">Statement of Account</h2>
@@ -75,7 +81,7 @@ function PaymentsPage() {
         </Panel>
 
         <Panel title="Acknowledgement Receipt" subtitle="Receipt preview">
-          <div className="rounded-lg border border-zinc-300 bg-white p-5 text-sm leading-7">
+          <div className="rounded-lg border border-white/10 bg-black p-5 text-sm leading-7">
             <p className="text-xs font-bold uppercase tracking-[0.25em] text-amber-600">{company.name}</p>
             <h2 className="mt-2 text-xl font-bold">Acknowledgement Receipt</h2>
             <p className="mt-5">

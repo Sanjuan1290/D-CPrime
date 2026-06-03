@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { ReactNode } from 'react'
-import { company } from '../data/adminMockData'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { company } from '../data/mockData'
 
 export type AdminPageKey =
   | 'dashboard'
@@ -63,19 +64,32 @@ const navGroups: { title: string; items: { key: AdminPageKey; label: string; ico
 
 const navItems = navGroups.flatMap((group) => group.items)
 
-type AdminLayoutProps = {
-  activePage: AdminPageKey
-  onNavigate: (page: AdminPageKey) => void
-  children: ReactNode
+const routeByKey: Record<AdminPageKey, string> = {
+  dashboard: '/admin/dashboard',
+  users: '/admin/users',
+  projects: '/admin/projects',
+  listings: '/admin/listings',
+  clients: '/admin/clients',
+  payments: '/admin/payments',
+  commissions: '/admin/commissions',
+  documents: '/admin/documents',
+  reports: '/admin/records/reports',
+  viewClients: '/admin/records/clients',
+  balances: '/admin/records/balances',
+  auditLogs: '/admin/audit-logs',
+  settings: '/admin/settings',
 }
 
-function AdminLayout({ activePage, onNavigate, children }: AdminLayoutProps) {
+function AdminLayout() {
+  const location = useLocation()
+  const navigate = useNavigate()
+  const activePage = getActivePage(location.pathname)
   const activeLabel = navItems.find((item) => item.key === activePage)?.label ?? 'Dashboard'
   const [isMobileOpen, setIsMobileOpen] = useState(false)
   const adminName = localStorage.getItem('dcprime_name') ?? 'Admin'
 
   function handleNavigate(page: AdminPageKey) {
-    onNavigate(page)
+    navigate(routeByKey[page])
     setIsMobileOpen(false)
   }
 
@@ -126,11 +140,21 @@ function AdminLayout({ activePage, onNavigate, children }: AdminLayoutProps) {
             </div>
           </header>
 
-          <section className="px-4 py-6 md:px-8">{children}</section>
+          <section className="px-4 py-6 md:px-8">
+            <Outlet />
+          </section>
         </main>
       </div>
     </div>
   )
+}
+
+function getActivePage(pathname: string): AdminPageKey {
+  const match = Object.entries(routeByKey)
+    .sort((a, b) => b[1].length - a[1].length)
+    .find(([, route]) => pathname.startsWith(route))
+
+  return (match?.[0] as AdminPageKey | undefined) ?? 'dashboard'
 }
 
 function SidebarContent({ activePage, onNavigate }: { activePage: AdminPageKey; onNavigate: (page: AdminPageKey) => void }) {

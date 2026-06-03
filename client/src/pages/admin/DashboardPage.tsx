@@ -22,8 +22,8 @@ function DashboardPage() {
         <StatCard label="SOA Prepared By" value="Kirsten Rioja" note="Administration Head from SOA file" />
       </div>
 
-      <section className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
-        <div className="mb-5 flex items-center justify-between border-b border-zinc-100 pb-4">
+      <section className="rounded-lg border border-white/10 bg-[#111111] p-5 shadow-sm shadow-black/20">
+        <div className="mb-5 flex items-center justify-between border-b border-white/10 pb-4">
           <h2 className="text-lg font-bold">Agent Performance</h2>
           <Badge>ACTIVE</Badge>
         </div>

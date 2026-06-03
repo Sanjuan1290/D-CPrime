@@ -1,14 +1,23 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Badge from '../../components/admin/Badge'
 import Field from '../../components/admin/Field'
 import Panel from '../../components/admin/Panel'
+import { useToast } from '../../components/admin/Toast'
 import { featureKeys, featureLabels, rolePresets, users as initialUsers } from '../../data/adminMockData'
 import type { AdminUser, Role, UserStatus } from '../../data/adminMockData'
 
 function UserManagementPage() {
-  const [users, setUsers] = useState<AdminUser[]>(initialUsers)
+  const toast = useToast()
+  const [users, setUsers] = useState<AdminUser[]>(() => {
+    const saved = localStorage.getItem('dcprime_users')
+    return saved ? JSON.parse(saved) as AdminUser[] : initialUsers
+  })
   const [selectedId, setSelectedId] = useState(initialUsers[1].id)
   const selectedUser = users.find((user) => user.id === selectedId) ?? users[0]
+
+  useEffect(() => {
+    localStorage.setItem('dcprime_users', JSON.stringify(users))
+  }, [users])
 
   function updateSelected(updates: Partial<AdminUser>) {
     setUsers((current) => current.map((user) => (user.id === selectedUser.id ? { ...user, ...updates } : user)))
@@ -32,12 +41,13 @@ function UserManagementPage() {
     }
     setUsers((current) => [...current, user])
     setSelectedId(nextId)
+    toast.success('User created successfully.')
   }
 
   return (
     <div className="grid gap-6 xl:grid-cols-[0.85fr_1.45fr]">
       <Panel title="Users" subtitle="Admin can create, edit, and deactivate">
-        <button onClick={addUser} className="mb-4 rounded-md bg-amber-400 px-4 py-2 text-sm font-bold text-zinc-950">
+        <button onClick={addUser} className="mb-4 rounded-md bg-[#C9A84C] px-4 py-2 text-sm font-bold text-black">
           Add User
         </button>
         <div className="space-y-3">
@@ -46,7 +56,7 @@ function UserManagementPage() {
               key={user.id}
               onClick={() => setSelectedId(user.id)}
               className={`w-full rounded-lg border p-4 text-left transition ${
-                selectedId === user.id ? 'border-amber-400 bg-amber-50' : 'border-zinc-200 bg-white hover:border-zinc-300'
+                selectedId === user.id ? 'border-[#C9A84C] bg-[#C9A84C]/10' : 'border-white/10 bg-black hover:border-white/20'
               }`}
             >
               <div className="flex items-start justify-between gap-3">
@@ -67,12 +77,12 @@ function UserManagementPage() {
           <Field label="Full Name" value={selectedUser.fullName} onChange={(value) => updateSelected({ fullName: value })} />
           <Field label="Email" value={selectedUser.email} onChange={(value) => updateSelected({ email: value })} />
           <Field label="Password" value={selectedUser.password} onChange={(value) => updateSelected({ password: value })} />
-          <label className="block text-sm font-semibold text-zinc-700">
+          <label className="block text-sm font-semibold text-zinc-300">
             Role
             <select
               value={selectedUser.role}
               onChange={(event) => updateSelected({ role: event.target.value as Role })}
-              className="mt-2 w-full rounded-md border border-zinc-300 bg-white px-3 py-3"
+              className="mt-2 w-full rounded-md border border-white/10 bg-black px-3 py-3 text-white"
             >
               <option value="admin">admin</option>
               <option value="agent">agent</option>
@@ -87,12 +97,12 @@ function UserManagementPage() {
               updateSelected({ assignedProjects: value.split(',').map((project) => project.trim()).filter(Boolean) })
             }
           />
-          <label className="block text-sm font-semibold text-zinc-700">
+          <label className="block text-sm font-semibold text-zinc-300">
             Status
             <select
               value={selectedUser.status}
               onChange={(event) => updateSelected({ status: event.target.value as UserStatus })}
-              className="mt-2 w-full rounded-md border border-zinc-300 bg-white px-3 py-3"
+              className="mt-2 w-full rounded-md border border-white/10 bg-black px-3 py-3 text-white"
             >
               <option>Active</option>
               <option>Inactive</option>
@@ -101,15 +111,15 @@ function UserManagementPage() {
         </div>
 
         <div className="mt-6 flex flex-wrap gap-2">
-          <button onClick={() => applyPreset('agent')} className="rounded-md border border-zinc-300 px-3 py-2 text-sm font-semibold">Apply Agent Defaults</button>
-          <button onClick={() => applyPreset('treasury')} className="rounded-md border border-zinc-300 px-3 py-2 text-sm font-semibold">Apply Treasury Defaults</button>
-          <button onClick={() => applyPreset('client')} className="rounded-md border border-zinc-300 px-3 py-2 text-sm font-semibold">Apply Client Defaults</button>
+          <button onClick={() => applyPreset('agent')} className="rounded-md border border-white/10 px-3 py-2 text-sm font-semibold text-zinc-200">Apply Agent Defaults</button>
+          <button onClick={() => applyPreset('treasury')} className="rounded-md border border-white/10 px-3 py-2 text-sm font-semibold text-zinc-200">Apply Treasury Defaults</button>
+          <button onClick={() => applyPreset('client')} className="rounded-md border border-white/10 px-3 py-2 text-sm font-semibold text-zinc-200">Apply Client Defaults</button>
         </div>
 
         <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {featureKeys.map((key) => (
-            <label key={key} className="flex min-h-14 items-center justify-between gap-3 rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3">
-              <span className="text-sm font-semibold text-zinc-700">{featureLabels[key]}</span>
+            <label key={key} className="flex min-h-14 items-center justify-between gap-3 rounded-lg border border-white/10 bg-black px-4 py-3">
+              <span className="text-sm font-semibold text-zinc-300">{featureLabels[key]}</span>
               <input
                 type="checkbox"
                 checked={selectedUser.permissions[key]}
@@ -120,6 +130,11 @@ function UserManagementPage() {
               />
             </label>
           ))}
+        </div>
+        <div className="sticky bottom-0 mt-6 border-t border-white/10 bg-[#111111] pt-4">
+          <button onClick={() => toast.success('User permissions saved.')} className="rounded-md bg-[#C9A84C] px-4 py-2 text-sm font-bold text-black">
+            Save Changes
+          </button>
         </div>
       </Panel>
     </div>

@@ -12,14 +12,14 @@ function ProjectsPage() {
       </div>
       <Panel title="Project Record" subtitle="Admin create/edit/archive placeholder">
         <div className="grid gap-4 lg:grid-cols-2">
-          <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-5">
+          <div className="rounded-lg border border-white/10 bg-black p-5">
             <p className="text-sm font-semibold text-zinc-500">Project Name</p>
             <h2 className="mt-2 text-2xl font-bold">D&C Prime Realty - LA Inventory</h2>
             <p className="mt-4 text-sm leading-6 text-zinc-600">
               This project record is based on the OLD LA, NEW LA, SOA, and Master List workbook tabs.
             </p>
           </div>
-          <div className="rounded-lg border border-dashed border-zinc-300 bg-white p-5">
+          <div className="rounded-lg border border-dashed border-white/20 bg-black p-5">
             <p className="text-sm font-semibold text-zinc-500">Cover Image</p>
             <p className="mt-2 text-sm text-zinc-600">Cloudinary upload placeholder for project media.</p>
           </div>
