@@ -2,89 +2,14 @@ import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { company } from '../data/mockData'
-
-export type AdminPageKey =
-  | 'dashboard'
-  | 'users'
-  | 'projects'
-  | 'listings'
-  | 'clients'
-  | 'payments'
-  | 'commissions'
-  | 'documents'
-  | 'reports'
-  | 'viewClients'
-  | 'balances'
-  | 'auditLogs'
-  | 'settings'
-
-const navGroups: { title: string; items: { key: AdminPageKey; label: string; icon: string }[] }[] = [
-  {
-    title: 'Overview',
-    items: [{ key: 'dashboard', label: 'Dashboard', icon: 'grid' }],
-  },
-  {
-    title: 'Management',
-    items: [
-      { key: 'projects', label: 'Projects', icon: 'building' },
-      { key: 'listings', label: 'Listings', icon: 'home' },
-      { key: 'clients', label: 'Clients', icon: 'users' },
-    ],
-  },
-  {
-    title: 'Finance',
-    items: [
-      { key: 'payments', label: 'Payments', icon: 'card' },
-      { key: 'commissions', label: 'Commissions', icon: 'percent' },
-    ],
-  },
-  {
-    title: 'Compliance',
-    items: [
-      { key: 'documents', label: 'Documents', icon: 'file' },
-      { key: 'auditLogs', label: 'Audit logs', icon: 'clipboard' },
-    ],
-  },
-  {
-    title: 'Records',
-    items: [
-      { key: 'viewClients', label: 'View clients', icon: 'id' },
-      { key: 'balances', label: 'Balances', icon: 'wallet' },
-      { key: 'reports', label: 'Reports', icon: 'chart' },
-    ],
-  },
-  {
-    title: 'Admin',
-    items: [
-      { key: 'users', label: 'User management', icon: 'userCog' },
-      { key: 'settings', label: 'Settings', icon: 'settings' },
-    ],
-  },
-]
-
-const navItems = navGroups.flatMap((group) => group.items)
-
-const routeByKey: Record<AdminPageKey, string> = {
-  dashboard: '/admin/dashboard',
-  users: '/admin/users',
-  projects: '/admin/projects',
-  listings: '/admin/listings',
-  clients: '/admin/clients',
-  payments: '/admin/payments',
-  commissions: '/admin/commissions',
-  documents: '/admin/documents',
-  reports: '/admin/records/reports',
-  viewClients: '/admin/records/clients',
-  balances: '/admin/records/balances',
-  auditLogs: '/admin/audit-logs',
-  settings: '/admin/settings',
-}
+import { adminNavGroups, getActiveAdminPage, getAdminRouteLabel, routeByKey } from '../routes/adminRoutes'
+import type { AdminPageKey } from '../routes/adminRoutes'
 
 function AdminLayout() {
   const location = useLocation()
   const navigate = useNavigate()
-  const activePage = getActivePage(location.pathname)
-  const activeLabel = navItems.find((item) => item.key === activePage)?.label ?? 'Dashboard'
+  const activePage = getActiveAdminPage(location.pathname)
+  const activeLabel = getAdminRouteLabel(activePage)
   const [isMobileOpen, setIsMobileOpen] = useState(false)
   const adminName = localStorage.getItem('dcprime_name') ?? 'Admin'
 
@@ -149,14 +74,6 @@ function AdminLayout() {
   )
 }
 
-function getActivePage(pathname: string): AdminPageKey {
-  const match = Object.entries(routeByKey)
-    .sort((a, b) => b[1].length - a[1].length)
-    .find(([, route]) => pathname.startsWith(route))
-
-  return (match?.[0] as AdminPageKey | undefined) ?? 'dashboard'
-}
-
 function SidebarContent({ activePage, onNavigate }: { activePage: AdminPageKey; onNavigate: (page: AdminPageKey) => void }) {
   return (
     <>
@@ -170,7 +87,7 @@ function SidebarContent({ activePage, onNavigate }: { activePage: AdminPageKey; 
         </div>
       </div>
       <nav className="flex-1 space-y-3 overflow-y-auto px-3 pb-5 pt-4">
-        {navGroups.map((group) => (
+        {adminNavGroups.map((group) => (
           <div key={group.title} className="border-b border-white/10 pb-2.5 last:border-b-0">
             <p className="mb-1.5 px-2 text-[10px] font-bold uppercase tracking-wide text-zinc-500">{group.title}</p>
             <div className="space-y-1">

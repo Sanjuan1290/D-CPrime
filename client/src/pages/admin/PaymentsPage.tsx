@@ -1,25 +1,69 @@
+import { useState } from 'react'
+import type { FormEvent } from 'react'
 import Badge from '../../components/admin/Badge'
 import DataTable from '../../components/admin/DataTable'
 import InfoRow from '../../components/admin/InfoRow'
+import Modal from '../../components/admin/Modal'
 import Panel from '../../components/admin/Panel'
+import { useToast } from '../../components/admin/Toast'
 import { formatCurrency, formatPercent } from '../../components/admin/formatters'
 import { company, paymentTracker, soaRecords } from '../../data/adminMockData'
+import type { Payment } from '../../data/adminMockData'
 
 type PaymentsPageProps = {
   initialTab?: 'all' | 'due' | 'overdue'
 }
 
 function PaymentsPage({ initialTab = 'all' }: PaymentsPageProps) {
+  const toast = useToast()
+  const [payments, setPayments] = useState(paymentTracker)
+  const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null)
+  const [isRecordModalOpen, setIsRecordModalOpen] = useState(false)
   const soa = soaRecords[0]
   const title =
     initialTab === 'due' ? 'Due Payments' : initialTab === 'overdue' ? 'Overdue Accounts' : 'Payment Made Tracker'
+  const visiblePayments = payments.filter((payment) => {
+    if (initialTab === 'due') return payment.balance > 0
+    if (initialTab === 'overdue') return payment.balance > 0 && payment.dueDay !== undefined
+    return true
+  })
+
+  function recordPayment(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    const formData = new FormData(event.currentTarget)
+    const buyer = String(formData.get('buyer'))
+    const unitId = String(formData.get('unitId'))
+    const amount = Number(formData.get('amount'))
+    const totalContractPrice = Number(formData.get('totalContractPrice'))
+    const balance = Math.max(0, totalContractPrice - amount)
+    const payment: Payment = {
+      buyer,
+      unitId,
+      mode: 'INSTALLMENT',
+      dueDay: String(formData.get('dueDay')),
+      paymentMade: amount,
+      totalContractPrice,
+      balance,
+      paymentPercentage: totalContractPrice > 0 ? amount / totalContractPrice : 0,
+      commissionReleasedPercent: 0,
+    }
+
+    setPayments((current) => [payment, ...current])
+    setIsRecordModalOpen(false)
+    toast.success('Mock payment recorded.')
+  }
 
   return (
     <div className="space-y-6">
       <Panel title={title} subtitle="Payment totals from workbook">
+        <div className="mb-5 flex justify-end">
+          <button onClick={() => setIsRecordModalOpen(true)} className="rounded-md bg-[#C9A84C] px-4 py-2 text-sm font-bold text-black">
+            Record Payment
+          </button>
+        </div>
         <DataTable
-          headers={['Unit ID', 'Buyer', 'Mode', 'Due', 'Payment Made', 'TCP', 'Balance', 'Payment %', 'Commission Released']}
-          rows={paymentTracker.map((payment) => [
+          headers={['Unit ID', 'Buyer', 'Mode', 'Due', 'Payment Made', 'TCP', 'Balance', 'Payment %', 'Action']}
+          rows={visiblePayments.map((payment) => [
             payment.unitId,
             payment.buyer,
             <Badge key={`${payment.unitId}-mode`}>{payment.mode}</Badge>,
@@ -28,7 +72,13 @@ function PaymentsPage({ initialTab = 'all' }: PaymentsPageProps) {
             formatCurrency(payment.totalContractPrice),
             formatCurrency(payment.balance),
             formatPercent(payment.paymentPercentage),
-            formatPercent(payment.commissionReleasedPercent),
+            <button
+              key={`${payment.unitId}-view`}
+              onClick={() => setSelectedPayment(payment)}
+              className="rounded-md border border-[#C9A84C]/40 px-3 py-1 text-xs font-semibold text-[#C9A84C] hover:bg-[#C9A84C]/10"
+            >
+              View
+            </button>,
           ])}
         />
       </Panel>
@@ -104,6 +154,55 @@ function PaymentsPage({ initialTab = 'all' }: PaymentsPageProps) {
           </div>
         </Panel>
       </div>
+      <Modal title="Payment Details" isOpen={selectedPayment !== null} onClose={() => setSelectedPayment(null)}>
+        {selectedPayment && (
+          <div className="grid gap-3 text-sm md:grid-cols-2">
+            <InfoRow label="Buyer" value={selectedPayment.buyer} />
+            <InfoRow label="Unit" value={selectedPayment.unitId} />
+            <InfoRow label="Mode" value={selectedPayment.mode} />
+            <InfoRow label="Due Day" value={selectedPayment.dueDay ?? '-'} />
+            <InfoRow label="Payment Made" value={formatCurrency(selectedPayment.paymentMade)} />
+            <InfoRow label="Total Contract Price" value={formatCurrency(selectedPayment.totalContractPrice)} />
+            <InfoRow label="Balance" value={formatCurrency(selectedPayment.balance)} />
+            <InfoRow label="Payment Progress" value={formatPercent(selectedPayment.paymentPercentage)} />
+            <InfoRow label="Commission Released" value={formatPercent(selectedPayment.commissionReleasedPercent)} />
+          </div>
+        )}
+      </Modal>
+      <Modal title="Record Payment" isOpen={isRecordModalOpen} onClose={() => setIsRecordModalOpen(false)}>
+        <form onSubmit={recordPayment} className="grid gap-4 text-sm md:grid-cols-2">
+          <label className="block font-semibold text-zinc-300">
+            Buyer
+            <input name="buyer" defaultValue="NEW MOCK CLIENT" className="mt-2 w-full rounded-md border border-white/10 bg-black px-3 py-2 text-white" />
+          </label>
+          <label className="block font-semibold text-zinc-300">
+            Unit ID
+            <input name="unitId" defaultValue="LA-MOCK-01" className="mt-2 w-full rounded-md border border-white/10 bg-black px-3 py-2 text-white" />
+          </label>
+          <label className="block font-semibold text-zinc-300">
+            Amount
+            <input name="amount" type="number" defaultValue="15000" className="mt-2 w-full rounded-md border border-white/10 bg-black px-3 py-2 text-white" />
+          </label>
+          <label className="block font-semibold text-zinc-300">
+            Total Contract Price
+            <input name="totalContractPrice" type="number" defaultValue="396000" className="mt-2 w-full rounded-md border border-white/10 bg-black px-3 py-2 text-white" />
+          </label>
+          <label className="block font-semibold text-zinc-300">
+            Due Day
+            <input name="dueDay" defaultValue="15th" className="mt-2 w-full rounded-md border border-white/10 bg-black px-3 py-2 text-white" />
+          </label>
+          <div className="flex items-end justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => setIsRecordModalOpen(false)}
+              className="rounded-md border border-white/10 px-4 py-2 font-semibold text-zinc-300"
+            >
+              Cancel
+            </button>
+            <button className="rounded-md bg-[#C9A84C] px-4 py-2 font-bold text-black">Save</button>
+          </div>
+        </form>
+      </Modal>
     </div>
   )
 }

@@ -1,15 +1,19 @@
 import { useState } from 'react'
 import Badge from '../../components/admin/Badge'
 import DataTable from '../../components/admin/DataTable'
+import InfoRow from '../../components/admin/InfoRow'
+import Modal from '../../components/admin/Modal'
 import Panel from '../../components/admin/Panel'
 import { formatCurrency, formatPercent } from '../../components/admin/formatters'
-import { clients } from '../../data/adminMockData'
+import { clientsV2 } from '../../data/adminMockData'
+import type { ClientRecord } from '../../data/adminMockData'
 
 type Filter = 'All' | 'CASH' | 'INSTALLMENT' | 'COMPLETE' | 'INC'
 
 function ClientsPage() {
   const [filter, setFilter] = useState<Filter>('All')
-  const visibleClients = clients.filter((client) => {
+  const [selectedClient, setSelectedClient] = useState<ClientRecord | null>(null)
+  const visibleClients = clientsV2.filter((client) => {
     if (filter === 'All') return true
     if (filter === 'CASH' || filter === 'INSTALLMENT') return client.paymentMode === filter
     return client.documentStatus === filter
@@ -31,7 +35,7 @@ function ClientsPage() {
         ))}
       </div>
       <DataTable
-        headers={['Buyer', 'Unit', 'Agent', 'Manager', 'TCP', 'Paid', 'Balance', 'Mode', 'Docs', 'Contact']}
+        headers={['Buyer', 'Unit', 'Agent', 'Manager', 'TCP', 'Paid', 'Balance', 'Mode', 'Docs', 'Action']}
         rows={visibleClients.map((client) => [
           client.buyer,
           client.unitId,
@@ -42,12 +46,36 @@ function ClientsPage() {
           formatCurrency(client.balance),
           <Badge key={`${client.unitId}-mode`}>{client.paymentMode}</Badge>,
           <Badge key={`${client.unitId}-docs`}>{client.documentStatus}</Badge>,
-          `${client.contactNo ?? '-'} / ${client.email ?? '-'}`,
+          <button
+            key={`${client.unitId}-view`}
+            onClick={() => setSelectedClient(client)}
+            className="rounded-md border border-[#C9A84C]/40 px-3 py-1 text-xs font-semibold text-[#C9A84C] hover:bg-[#C9A84C]/10"
+          >
+            View
+          </button>,
         ])}
       />
       <p className="mt-4 text-sm text-zinc-500">
         Payment percentages shown in the workbook range from {formatPercent(0.568425)} to {formatPercent(1.1)} in this sample.
       </p>
+      <Modal title="Client Record" isOpen={selectedClient !== null} onClose={() => setSelectedClient(null)}>
+        {selectedClient && (
+          <div className="grid gap-3 text-sm md:grid-cols-2">
+            <InfoRow label="Buyer" value={selectedClient.buyer} />
+            <InfoRow label="Spouse" value={selectedClient.spouse ?? '-'} />
+            <InfoRow label="Unit" value={selectedClient.unitId} />
+            <InfoRow label="Relocated Unit" value={selectedClient.relocatedUnit ?? '-'} />
+            <InfoRow label="Agent" value={selectedClient.agent} />
+            <InfoRow label="Manager" value={selectedClient.manager} />
+            <InfoRow label="Contact" value={selectedClient.contactNo ?? '-'} />
+            <InfoRow label="Email" value={selectedClient.email ?? '-'} />
+            <InfoRow label="Address" value={selectedClient.address ?? '-'} />
+            <InfoRow label="Total Contract Price" value={formatCurrency(selectedClient.totalContractPrice)} />
+            <InfoRow label="Payment Made" value={formatCurrency(selectedClient.paymentMade)} />
+            <InfoRow label="Balance" value={formatCurrency(selectedClient.balance)} />
+          </div>
+        )}
+      </Modal>
     </Panel>
   )
 }
