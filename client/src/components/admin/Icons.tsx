@@ -36,6 +36,10 @@ export function Users(props: IconProps) {
   return <Icon {...props}><path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2" /><circle cx="9.5" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" /></Icon>
 }
 
+export function UserGroup(props: IconProps) {
+  return <Icon {...props}><circle cx="8" cy="8" r="3" /><circle cx="16" cy="7" r="2.5" /><path d="M3 20v-1.5A4.5 4.5 0 0 1 7.5 14h1A4.5 4.5 0 0 1 13 18.5V20" /><path d="M14 14.5a4 4 0 0 1 7 2.6V20" /></Icon>
+}
+
 export function CreditCard(props: IconProps) {
   return <Icon {...props}><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 10h18" /></Icon>
 }
@@ -74,6 +78,7 @@ export function Plus(props: IconProps) { return <Icon {...props}><path d="M12 5v
 export function Check(props: IconProps) { return <Icon {...props}><path d="m5 12 4 4L19 6" /></Icon> }
 export function AlertCircle(props: IconProps) { return <Icon {...props}><circle cx="12" cy="12" r="9" /><path d="M12 8v4M12 16h.01" /></Icon> }
 export function Clock(props: IconProps) { return <Icon {...props}><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></Icon> }
+export function SpinnerIcon(props: IconProps) { return <Icon {...props}><path d="M21 12a9 9 0 1 1-6.2-8.6" /></Icon> }
 export function Eye(props: IconProps) { return <Icon {...props}><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" /><circle cx="12" cy="12" r="3" /></Icon> }
 export function Edit2(props: IconProps) { return <Icon {...props}><path d="M17 3a2.8 2.8 0 0 1 4 4L8 20l-5 1 1-5Z" /></Icon> }
 export function Trash2(props: IconProps) { return <Icon {...props}><path d="M3 6h18" /><path d="M8 6V4h8v2" /><path d="M19 6l-1 15H6L5 6" /><path d="M10 11v6M14 11v6" /></Icon> }

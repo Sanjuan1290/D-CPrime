@@ -2,7 +2,7 @@ export type Role = 'admin' | 'agent' | 'treasury' | 'client'
 export type UserStatus = 'Active' | 'Inactive'
 export type FeatureKey = keyof typeof featureLabels
 
-export const mockDataVersion = 'source-workbook-v5'
+export const mockDataVersion = 'source-workbook-v7'
 
 export function ensureMockDataVersion() {
   if (typeof localStorage === 'undefined') return
@@ -10,9 +10,16 @@ export function ensureMockDataVersion() {
   const versionKey = 'dcprime_data_version'
   if (localStorage.getItem(versionKey) === mockDataVersion) return
 
-  ;['dcprime_clients', 'dcprime_listings', 'dcprime_projects', 'dcprime_commission_rules', 'dcprime_users'].forEach((key) =>
-    localStorage.removeItem(key),
-  )
+  ;[
+    'dcprime_clients',
+    'dcprime_listings',
+    'dcprime_projects',
+    'dcprime_commission_rules',
+    'dcprime_users',
+    'dcprime_people_agents',
+    'dcprime_people_brokers',
+    'dcprime_people_employees',
+  ].forEach((key) => localStorage.removeItem(key))
   localStorage.setItem(versionKey, mockDataVersion)
 }
 
@@ -213,6 +220,58 @@ export type CommissionRule = {
   releaseThreshold: number
   retentionRate: number
   status: 'Active' | 'Paused'
+}
+
+export type AgentRecord = {
+  id: string
+  employeeId: string
+  fullName: string
+  licenseType: 'REB' | 'REA' | 'Accredited Seller' | 'None'
+  licenseNumber: string
+  prcNumber: string
+  contactNumber: string
+  email: string
+  address: string
+  assignedProjects: string[]
+  managerId: string | null
+  status: 'Active' | 'Inactive' | 'Suspended'
+  hireDate: string
+  commissionRate: number
+  linkedUserId: string | null
+  notes: string
+}
+
+export type BrokerRecord = {
+  id: string
+  employeeId: string
+  fullName: string
+  rebNumber: string
+  prcNumber: string
+  contactNumber: string
+  email: string
+  address: string
+  assignedAgents: string[]
+  assignedProjects: string[]
+  status: 'Active' | 'Inactive'
+  hireDate: string
+  commissionRate: number
+  linkedUserId: string | null
+  notes: string
+}
+
+export type EmployeeRecord = {
+  id: string
+  employeeId: string
+  fullName: string
+  position: string
+  department: 'Administration' | 'Treasury' | 'Sales' | 'Documentation'
+  contactNumber: string
+  email: string
+  address: string
+  status: 'Active' | 'Inactive' | 'On Leave'
+  hireDate: string
+  linkedUserId: string | null
+  notes: string
 }
 
 const canonicalListings: Listing[] = [
@@ -5262,6 +5321,18 @@ function splitUnitIds(unitId: string) {
   return Array.from(new Set(matches.map((unit) => unit.toUpperCase().replace(/LA[-\s]?(\d{4})/, 'LA-$1'))))
 }
 
+function getLotTypeFromUnitLabel(unitId: string) {
+  return unitId.match(/\((CORNER|INNER|END)\)/i)?.[1].toUpperCase()
+}
+
+function normalizeListings(records: Listing[]) {
+  return records.map((listing) => ({
+    ...listing,
+    unitId: splitUnitIds(listing.unitId)[0],
+    lotType: getLotTypeFromUnitLabel(listing.unitId) ?? listing.lotType,
+  }))
+}
+
 function splitNumber(value: number, count: number) {
   return count > 1 ? value / count : value
 }
@@ -5347,9 +5418,10 @@ function normalizeSoaRecords(records: SoaRecord[]) {
   })
 }
 
+const normalizedListingData = normalizeListings(canonicalListings)
 const normalizedClientData = normalizeClients(canonicalClients)
 
-export const listings = canonicalListings
+export const listings = normalizedListingData
 export const clients = normalizedClientData.records
 export const clientsV2 = clients
 export const paymentTracker = normalizeUnitRows(canonicalPaymentTracker, (payment, count) => ({
@@ -14078,6 +14150,146 @@ export const agents = [
     ],
     "status": "Active"
   }
+]
+
+export const agentRecords: AgentRecord[] = [
+  {
+    id: 'agent-001',
+    employeeId: 'AGT-001',
+    fullName: 'SARTE, CHRISTOPHER JOHN S.',
+    licenseType: 'REB',
+    licenseNumber: '0034891',
+    prcNumber: '0034891',
+    contactNumber: '09XX-XXX-XXXX',
+    email: 'cj.sarte@dcprime.com',
+    address: 'Indang, Cavite',
+    assignedProjects: ['project-1'],
+    managerId: 'broker-001',
+    status: 'Active',
+    hireDate: '01/01/2023',
+    commissionRate: 0.05,
+    linkedUserId: null,
+    notes: 'Head agent for Luntiang Aguinaldo.',
+  },
+  {
+    id: 'agent-002',
+    employeeId: 'AGT-002',
+    fullName: 'RIOJA, KIRSTEN JHOYCE A.',
+    licenseType: 'Accredited Seller',
+    licenseNumber: 'AS-2024-002',
+    prcNumber: '-',
+    contactNumber: '09XX-XXX-XXXX',
+    email: 'kj.rioja.sales@dcprime.com',
+    address: 'Indang, Cavite',
+    assignedProjects: ['project-1'],
+    managerId: 'broker-001',
+    status: 'Active',
+    hireDate: '02/15/2023',
+    commissionRate: 0.05,
+    linkedUserId: 'user-2',
+    notes: 'Administration lead who also supports buyer coordination.',
+  },
+  {
+    id: 'agent-003',
+    employeeId: 'AGT-003',
+    fullName: 'PARROCHO, JOSEPH',
+    licenseType: 'Accredited Seller',
+    licenseNumber: 'AS-2024-003',
+    prcNumber: '-',
+    contactNumber: '09XX-XXX-XXXX',
+    email: 'j.parrocho@dcprime.com',
+    address: 'Cavite',
+    assignedProjects: ['project-1'],
+    managerId: 'broker-001',
+    status: 'Active',
+    hireDate: '04/01/2023',
+    commissionRate: 0.05,
+    linkedUserId: null,
+    notes: 'Handles installment buyers and document follow-ups.',
+  },
+  {
+    id: 'agent-004',
+    employeeId: 'AGT-004',
+    fullName: 'TESORO, FRITZGERARD',
+    licenseType: 'None',
+    licenseNumber: '-',
+    prcNumber: '-',
+    contactNumber: '09XX-XXX-XXXX',
+    email: 'f.tesoro@dcprime.com',
+    address: 'Cavite',
+    assignedProjects: ['project-1'],
+    managerId: 'broker-001',
+    status: 'Inactive',
+    hireDate: '06/12/2023',
+    commissionRate: 0.045,
+    linkedUserId: null,
+    notes: 'Inactive mock record retained for reporting history.',
+  },
+]
+
+export const brokerRecords: BrokerRecord[] = [
+  {
+    id: 'broker-001',
+    employeeId: 'BRK-001',
+    fullName: 'SARTE, CHRISTOPHER JOHN S.',
+    rebNumber: '0034891',
+    prcNumber: '0034891',
+    contactNumber: '09XX-XXX-XXXX',
+    email: 'tj.sarte@dcprime.com',
+    address: 'Indang, Cavite',
+    assignedAgents: ['agent-001', 'agent-002', 'agent-003'],
+    assignedProjects: ['project-1'],
+    status: 'Active',
+    hireDate: '01/01/2022',
+    commissionRate: 0.02,
+    linkedUserId: null,
+    notes: 'Licensed Real Estate Broker.',
+  },
+]
+
+export const employeeRecords: EmployeeRecord[] = [
+  {
+    id: 'emp-001',
+    employeeId: 'EMP-001',
+    fullName: 'RIOJA, KIRSTEN JHOYCE A.',
+    position: 'Administration Head',
+    department: 'Administration',
+    contactNumber: '09XX-XXX-XXXX',
+    email: 'kj.rioja@dcprime.com',
+    address: 'Indang, Cavite',
+    status: 'Active',
+    hireDate: '01/15/2023',
+    linkedUserId: 'user-2',
+    notes: 'SOA Administration Head and receipt witness.',
+  },
+  {
+    id: 'emp-002',
+    employeeId: 'EMP-002',
+    fullName: 'DELA CRUZ, MARIA L.',
+    position: 'Treasury Officer',
+    department: 'Treasury',
+    contactNumber: '09XX-XXX-XXXX',
+    email: 'treasury.ops@dcprime.com',
+    address: 'Cavite',
+    status: 'Active',
+    hireDate: '03/01/2024',
+    linkedUserId: null,
+    notes: 'Handles payment verification and receipts.',
+  },
+  {
+    id: 'emp-003',
+    employeeId: 'EMP-003',
+    fullName: 'SANTOS, ELAINE M.',
+    position: 'Documentation Associate',
+    department: 'Documentation',
+    contactNumber: '09XX-XXX-XXXX',
+    email: 'docs@dcprime.com',
+    address: 'Cavite',
+    status: 'On Leave',
+    hireDate: '07/15/2024',
+    linkedUserId: null,
+    notes: 'Tracks buyer document completion.',
+  },
 ]
 
 export const listingsV2 = listings.map((listing, index) => ({

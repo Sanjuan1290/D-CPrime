@@ -7,7 +7,7 @@ import Modal from '../../components/admin/Modal'
 import Panel from '../../components/admin/Panel'
 import { useToast } from '../../components/admin/Toast'
 import { formatCurrency, formatPercent } from '../../components/admin/formatters'
-import { clientDocuments, clientsV2 } from '../../data/adminMockData'
+import { agentRecords, clientDocuments, clientsV2 } from '../../data/adminMockData'
 import type { ClientRecord } from '../../data/adminMockData'
 import { clientSourceDetails } from '../../data/sourceDetails'
 
@@ -17,6 +17,8 @@ function ClientsPage() {
   const toast = useToast()
   const [filter, setFilter] = useState<Filter>('All')
   const [buyerFilter, setBuyerFilter] = useState<string | null>(null)
+  const [agentFilter, setAgentFilter] = useState('All')
+  const [sortBy, setSortBy] = useState('Date Newest')
   const [clients, setClients] = useState<ClientRecord[]>(() => {
     const saved = localStorage.getItem('dcprime_clients')
     return saved ? (JSON.parse(saved) as ClientRecord[]) : clientsV2
@@ -34,12 +36,22 @@ function ClientsPage() {
     counts[client.buyerId] = (counts[client.buyerId] ?? 0) + 1
     return counts
   }, {})
-  const visibleClients = clients.filter((client) => {
-    if (buyerFilter && client.buyerId !== buyerFilter) return false
-    if (filter === 'All') return true
-    if (filter === 'CASH' || filter === 'INSTALLMENT') return client.paymentMode === filter
-    return client.documentStatus === filter
-  })
+  const activeFilterCount = [filter !== 'All', buyerFilter !== null, agentFilter !== 'All'].filter(Boolean).length
+  const visibleClients = clients
+    .filter((client) => {
+      if (buyerFilter && client.buyerId !== buyerFilter) return false
+      if (agentFilter !== 'All' && client.agent !== agentFilter) return false
+      if (filter === 'All') return true
+      if (filter === 'CASH' || filter === 'INSTALLMENT') return client.paymentMode === filter
+      return client.documentStatus === filter
+    })
+    .sort((a, b) => {
+      if (sortBy === 'Name A-Z') return a.buyer.localeCompare(b.buyer)
+      if (sortBy === 'Balance ↑') return a.balance - b.balance
+      if (sortBy === 'Balance ↓') return b.balance - a.balance
+      if (sortBy === 'Date Oldest') return a.reservationDate.localeCompare(b.reservationDate)
+      return b.reservationDate.localeCompare(a.reservationDate)
+    })
 
   useEffect(() => {
     localStorage.setItem('dcprime_clients', JSON.stringify(clients))
@@ -147,7 +159,21 @@ function ClientsPage() {
             </button>
           )}
         </div>
-        <button onClick={() => openClientForm()} className="rounded-md bg-[#C9A84C] px-4 py-2 text-sm font-bold text-black">
+        <div className="flex flex-wrap gap-2">
+          <select value={agentFilter} onChange={(event) => setAgentFilter(event.target.value)} className="rounded-lg border border-[#E8E4DC] bg-white px-3 py-2 text-sm text-[#111827]">
+            <option value="All">All Agents</option>
+            {Array.from(new Set(clients.map((client) => client.agent))).map((agent) => (
+              <option key={agent} value={agent}>{agent}</option>
+            ))}
+          </select>
+          <select value={sortBy} onChange={(event) => setSortBy(event.target.value)} className="rounded-lg border border-[#E8E4DC] bg-white px-3 py-2 text-sm text-[#111827]">
+            {['Date Newest', 'Date Oldest', 'Name A-Z', 'Balance ↑', 'Balance ↓'].map((item) => (
+              <option key={item}>{item}</option>
+            ))}
+          </select>
+          {activeFilterCount > 0 && <span className="rounded-full bg-[#C9A84C]/10 px-3 py-2 text-xs font-bold text-[#9A7A22]">{activeFilterCount} filters active</span>}
+        </div>
+        <button onClick={() => openClientForm()} className="rounded-lg bg-[#1A1A2E] px-4 py-2 text-sm font-bold text-white">
           Add Client
         </button>
       </div>
@@ -263,7 +289,14 @@ function ClientsPage() {
             <TextInput label="Buyer" name="buyer" value={editingClient.buyer} />
             <TextInput label="Spouse" name="spouse" value={editingClient.spouse ?? ''} />
             <TextInput label="Unit ID" name="unitId" value={editingClient.unitId} />
-            <TextInput label="Agent" name="agent" value={editingClient.agent} />
+            <label className="block font-semibold text-[#374151]">
+              Agent
+              <select name="agent" defaultValue={editingClient.agent} className="mt-2 w-full rounded-lg border border-[#E8E4DC] bg-white px-3 py-3 text-[#111827]">
+                {agentRecords.map((agent) => (
+                  <option key={agent.id} value={agent.fullName}>{agent.fullName}</option>
+                ))}
+              </select>
+            </label>
             <TextInput label="Manager" name="manager" value={editingClient.manager} />
             <TextInput label="Area" name="area" value={String(editingClient.area)} type="number" />
             <TextInput label="Price / SQM" name="pricePerSqm" value={String(editingClient.pricePerSqm)} type="number" />

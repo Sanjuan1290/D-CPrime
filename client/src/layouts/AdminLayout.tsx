@@ -14,9 +14,10 @@ import {
   Search,
   Settings,
   UserCog,
+  UserGroup,
   Users,
 } from '../components/admin/Icons'
-import { auditLogsV2, clientsV2, listingsV2, paymentTracker } from '../data/adminMockData'
+import { agentRecords, auditLogsV2, brokerRecords, clientsV2, employeeRecords, listingsV2, paymentTracker } from '../data/adminMockData'
 import { company } from '../data/mockData'
 import { adminNavGroups, getActiveAdminPage, getAdminRouteLabel, routeByKey } from '../routes/adminRoutes'
 import type { AdminPageKey } from '../routes/adminRoutes'
@@ -199,6 +200,12 @@ function AdminLayout() {
 }
 
 function SidebarContent({ activePage, onNavigate }: { activePage: AdminPageKey; onNavigate: (page: AdminPageKey) => void }) {
+  const peopleCount = agentRecords.length + brokerRecords.length + employeeRecords.length
+  const navCountByKey: Partial<Record<AdminPageKey, number>> = {
+    clients: clientsV2.length,
+    people: peopleCount,
+  }
+
   return (
     <>
       <div className="border-b border-white/10 p-5">
@@ -228,6 +235,11 @@ function SidebarContent({ activePage, onNavigate }: { activePage: AdminPageKey; 
                 >
                   <NavIcon name={item.icon} />
                   <span>{item.label}</span>
+                  {navCountByKey[item.key] !== undefined && (
+                    <span className="ml-auto rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-bold text-white/70">
+                      {navCountByKey[item.key]}
+                    </span>
+                  )}
                 </button>
               ))}
             </div>
@@ -249,6 +261,7 @@ const iconByName: Record<string, typeof LayoutGrid> = {
   chart: BarChart3,
   userCog: UserCog,
   settings: Settings,
+  userGroup: UserGroup,
 }
 
 function NavIcon({ name }: { name: string }) {

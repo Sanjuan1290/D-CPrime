@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Badge from '../../components/admin/Badge'
 import ConfirmModal from '../../components/admin/ConfirmModal'
 import DataTable from '../../components/admin/DataTable'
@@ -16,6 +17,7 @@ import type { CommissionDetail, CommissionPartyRelease } from '../../data/source
 
 function CommissionsPage() {
   const toast = useToast()
+  const navigate = useNavigate()
   const [tracker, setTracker] = useState(commissions)
   const [rules, setRules] = useState<CommissionRule[]>(() => {
     const saved = localStorage.getItem('dcprime_commission_rules')
@@ -171,7 +173,12 @@ function CommissionsPage() {
           rows={tracker.map((commission) => [
             commission.buyer,
             commission.unitId,
-            commission.agent,
+            <div key={`${commission.unitId}-agent`} className="flex items-center gap-2">
+              <span>{commission.agent}</span>
+              <button onClick={() => navigate('/admin/people')} className="rounded-md border border-gray-200 bg-gray-50 px-2 py-1 text-[11px] font-semibold text-[#374151] hover:bg-gray-100">
+                View Agent
+              </button>
+            </div>,
             commission.manager,
             formatCurrency(commission.netSellingPrice),
             formatCurrency(commission.agentCommission),

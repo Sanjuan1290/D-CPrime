@@ -1,10 +1,13 @@
 import Modal from './Modal'
+import { SpinnerIcon } from './Icons'
 
 type ConfirmModalProps = {
   title: string
   message: string
   confirmLabel?: string
+  loadingLabel?: string
   isOpen: boolean
+  isLoading?: boolean
   tone?: 'danger' | 'primary'
   onClose: () => void
   onConfirm: () => void
@@ -14,7 +17,9 @@ function ConfirmModal({
   title,
   message,
   confirmLabel = 'Confirm',
+  loadingLabel = 'Processing...',
   isOpen,
+  isLoading = false,
   tone = 'danger',
   onClose,
   onConfirm,
@@ -36,8 +41,14 @@ function ConfirmModal({
           >
             Cancel
           </button>
-          <button type="button" onClick={onConfirm} className={`rounded-lg px-4 py-2 text-sm font-bold ${confirmClass}`}>
-            {confirmLabel}
+          <button
+            type="button"
+            onClick={onConfirm}
+            disabled={isLoading}
+            className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-50 ${confirmClass}`}
+          >
+            {isLoading && <SpinnerIcon className="h-4 w-4 animate-spin" />}
+            {isLoading ? loadingLabel : confirmLabel}
           </button>
         </div>
       </div>

@@ -11,8 +11,8 @@ const DashboardPage = lazy(() => import('../pages/admin/DashboardPage'))
 const DocumentsPage = lazy(() => import('../pages/admin/DocumentsPage'))
 const ListingsPage = lazy(() => import('../pages/admin/ListingsPage'))
 const PaymentsPage = lazy(() => import('../pages/admin/PaymentsPage'))
+const PeoplePage = lazy(() => import('../pages/admin/PeoplePage'))
 const ProjectsPage = lazy(() => import('../pages/admin/ProjectsPage'))
-const ReceiptPage = lazy(() => import('../pages/admin/ReceiptPage'))
 const ReportsPage = lazy(() => import('../pages/admin/ReportsPage'))
 const SettingsPage = lazy(() => import('../pages/admin/SettingsPage'))
 const SoaPage = lazy(() => import('../pages/admin/SoaPage'))
@@ -25,6 +25,7 @@ export type AdminPageKey =
   | 'projects'
   | 'listings'
   | 'clients'
+  | 'people'
   | 'payments'
   | 'commissions'
   | 'documents'
@@ -64,11 +65,11 @@ export const adminRoutes: AdminRoute[] = [
   { path: 'projects', label: 'Projects', element: <ProjectsPage />, feature: 'projects', allowedRoles: adminOnly, activeKey: 'projects' },
   { path: 'listings', label: 'Listings', element: <ListingsPage />, feature: 'listings', allowedRoles: adminOnly, activeKey: 'listings' },
   { path: 'clients', label: 'Clients', element: <ClientsPage />, feature: 'clients_manage', allowedRoles: adminOnly, activeKey: 'clients' },
+  { path: 'people', label: 'People', element: <PeoplePage />, feature: 'clients_manage', allowedRoles: adminOnly, activeKey: 'people' },
   { path: 'payments', label: 'Payments', element: <PaymentsPage />, feature: 'payments_view', allowedRoles: adminOnly, activeKey: 'payments' },
   { path: 'payments/due', label: 'Due Payments', element: <PaymentsPage initialTab="due" />, feature: 'payments_view', allowedRoles: adminOnly, activeKey: 'payments' },
   { path: 'payments/overdue', label: 'Overdue Accounts', element: <PaymentsPage initialTab="overdue" />, feature: 'payments_view', allowedRoles: adminOnly, activeKey: 'payments' },
   { path: 'payments/soa/:clientId', label: 'Statement Of Account', element: <SoaPage />, feature: 'soa_view', allowedRoles: adminOnly, activeKey: 'payments' },
-  { path: 'payments/receipt/:paymentId', label: 'Receipt', element: <ReceiptPage />, feature: 'payments_view', allowedRoles: adminOnly, activeKey: 'payments' },
   { path: 'commissions', label: 'Commissions', element: <CommissionsPage />, feature: 'commissions_view', allowedRoles: adminOnly, activeKey: 'commissions' },
   { path: 'documents', label: 'Documents', element: <DocumentsPage />, feature: 'documents_view', allowedRoles: adminOnly, activeKey: 'documents' },
   { path: 'reports', label: 'Reports', element: <ReportsPage />, feature: 'reports_view', allowedRoles: adminOnly, activeKey: 'reports' },
@@ -92,6 +93,10 @@ export const adminNavGroups: AdminNavGroup[] = [
       navItem('listings', 'Listings', 'home', 'listings'),
       navItem('clients', 'Clients', 'users', 'clients_manage'),
     ],
+  },
+  {
+    title: 'People',
+    items: [navItem('people', 'People', 'userGroup', 'clients_manage')],
   },
   {
     title: 'Finance',

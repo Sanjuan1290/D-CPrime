@@ -46,12 +46,25 @@ function DataTable({ headers, rows, searchPlaceholder, searchable = true }: Data
   function handleSort(index: number) {
     setPage(1)
     if (sortIndex === index) {
-      setSortDirection((current) => (current === 'asc' ? 'desc' : 'asc'))
+      if (sortDirection === 'asc') {
+        setSortDirection('desc')
+      } else {
+        setSortIndex(null)
+        setSortDirection('asc')
+      }
       return
     }
     setSortIndex(index)
     setSortDirection('asc')
   }
+
+  function resetFilters() {
+    handleSearchChange('')
+  }
+
+  const paginationPages = Array.from({ length: totalPages }, (_, index) => index + 1).filter((pageNumber) => {
+    return pageNumber === 1 || pageNumber === totalPages || Math.abs(pageNumber - currentPage) <= 1
+  })
 
   return (
     <div className="space-y-3">
@@ -60,7 +73,7 @@ function DataTable({ headers, rows, searchPlaceholder, searchable = true }: Data
           search={search}
           onSearchChange={handleSearchChange}
           placeholder={searchPlaceholder}
-          onReset={() => handleSearchChange('')}
+          onReset={resetFilters}
         />
       )}
 
@@ -72,20 +85,29 @@ function DataTable({ headers, rows, searchPlaceholder, searchable = true }: Data
               <path d="m20 20-3.5-3.5" />
             </svg>
           </div>
-          <h3 className="mt-4 font-serif text-2xl text-[#1A1A2E]">No results found</h3>
+          <h3 className="mt-4 text-lg font-semibold text-[#374151]">
+            {search.trim() ? `No results for "${search.trim()}"` : 'No results found'}
+          </h3>
           <p className="mt-1 text-sm text-[#6B7280]">Try adjusting your search or filters.</p>
+          {search.trim() && (
+            <button onClick={resetFilters} className="mt-3 text-sm font-semibold text-[#9A7A22] hover:text-[#C9A84C]">
+              Clear filters
+            </button>
+          )}
         </div>
       ) : (
         <>
           <div className="overflow-x-auto rounded-xl border border-[#E8E4DC] bg-white">
             <table className="w-full min-w-[760px] text-left text-sm">
-              <thead className="bg-[#F3F0EB] text-[10px] uppercase tracking-widest text-[#6B7280]">
+              <thead className="bg-[#F3F0EB] text-[10px] uppercase tracking-widest text-[#374151]">
                 <tr>
                   {headers.map((header, index) => (
                     <th key={header} className="px-4 py-3.5 font-semibold">
                       <button onClick={() => handleSort(index)} className="flex items-center gap-1 text-left hover:text-[#1A1A2E]">
                         {header}
-                        {sortIndex === index && <span className="text-[#C9A84C]">{sortDirection === 'asc' ? 'Asc' : 'Desc'}</span>}
+                        <span className={sortIndex === index ? 'text-[#1A1A2E]' : 'text-gray-300'}>
+                          {sortIndex === index ? (sortDirection === 'asc' ? '↑' : '↓') : '↕'}
+                        </span>
                       </button>
                     </th>
                   ))}
@@ -104,22 +126,35 @@ function DataTable({ headers, rows, searchPlaceholder, searchable = true }: Data
               </tbody>
             </table>
           </div>
-          <div className="flex items-center justify-between text-xs text-[#6B7280]">
+          <div className="flex flex-col gap-3 text-xs text-[#6B7280] sm:flex-row sm:items-center sm:justify-between">
             <span>
-              Showing {(currentPage - 1) * pageSize + 1}-{Math.min(currentPage * pageSize, filteredRows.length)} of {filteredRows.length}
+              Showing {(currentPage - 1) * pageSize + 1}-{Math.min(currentPage * pageSize, filteredRows.length)} of {filteredRows.length} records
             </span>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-1">
               <button
                 onClick={() => setPage(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
-                className="rounded-lg border border-[#E8E4DC] px-3 py-1.5 font-semibold text-[#1A1A2E] disabled:cursor-not-allowed disabled:opacity-40"
+                className="rounded-md px-3 py-1.5 font-semibold text-[#374151] hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Previous
               </button>
+              {paginationPages.map((pageNumber, index) => (
+                <span key={pageNumber} className="flex items-center gap-1">
+                  {index > 0 && pageNumber - paginationPages[index - 1] > 1 && <span className="px-1 text-[#9CA3AF]">...</span>}
+                  <button
+                    onClick={() => setPage(pageNumber)}
+                    className={`rounded-md px-3 py-1.5 font-semibold ${
+                      pageNumber === currentPage ? 'bg-[#1A1A2E] text-white' : 'text-[#374151] hover:bg-gray-100'
+                    }`}
+                  >
+                    {pageNumber}
+                  </button>
+                </span>
+              ))}
               <button
                 onClick={() => setPage(Math.min(totalPages, currentPage + 1))}
                 disabled={currentPage === totalPages}
-                className="rounded-lg border border-[#E8E4DC] px-3 py-1.5 font-semibold text-[#1A1A2E] disabled:cursor-not-allowed disabled:opacity-40"
+                className="rounded-md px-3 py-1.5 font-semibold text-[#374151] hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Next
               </button>

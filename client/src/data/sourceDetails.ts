@@ -16,6 +16,8 @@ export type CommissionPartyRelease = {
 export type CommissionDetail = {
   buyer: string
   unitId: string
+  lotType?: string
+  unitVariant?: string
   mode: string
   area: number
   pricePerSqm: number
@@ -29,10 +31,19 @@ export type CommissionDetail = {
 
 export type PaymentDetail = {
   unitId: string
+  lotType?: string
+  unitVariant?: string
   buyer: string
   mode: string
   dueDay?: string
-  monthlyPayments: { period: string; amount: number }[]
+  monthlyPayments: {
+    period: string
+    amount: number
+    datePaid?: string
+    reference?: string
+    receiptImage?: string
+    receiptFileName?: string
+  }[]
   paymentMade: number
   totalContractPrice: number
   balance: number
@@ -43,6 +54,8 @@ export type PaymentDetail = {
 
 export type ListingInstallmentDetail = {
   unitId: string
+  lotType?: string
+  unitVariant?: string
   dp?: number
   spotDpDiscount?: number
   spotDp?: number
@@ -55,6 +68,8 @@ export type ListingInstallmentDetail = {
 export type ClientSourceDetail = {
   buyer: string
   unitId: string
+  lotType?: string
+  unitVariant?: string
   ld?: string
   kubo?: string
   number?: string
@@ -66,7 +81,7 @@ export type ClientSourceDetail = {
   team?: string
 }
 
-export const commissionDetails: CommissionDetail[] = [
+const canonicalCommissionDetails: CommissionDetail[] = [
   {
     "buyer": "SILVA, ISABEL LAYUG L.",
     "unitId": "LA-0204",
@@ -3266,7 +3281,8 @@ export const commissionDetails: CommissionDetail[] = [
     "date": ""
   }
 ]
-export const paymentDetails: PaymentDetail[] = [
+
+const canonicalPaymentDetails: PaymentDetail[] = [
   {
     "unitId": "LA-0204",
     "buyer": "SILVA, ISABEL LAYUG L.",
@@ -5618,7 +5634,7 @@ export const paymentDetails: PaymentDetail[] = [
     "fr": ""
   }
 ]
-export const listingInstallmentDetails: ListingInstallmentDetail[] = [
+const canonicalListingInstallmentDetails: ListingInstallmentDetail[] = [
   {
     "unitId": "LA-0101",
     "dp": 0,
@@ -7140,7 +7156,7 @@ export const listingInstallmentDetails: ListingInstallmentDetail[] = [
     "monthly10Years": 32175.0
   }
 ]
-export const clientSourceDetails: ClientSourceDetail[] = [
+const canonicalClientSourceDetails: ClientSourceDetail[] = [
   {
     "buyer": "SILVA, ISABEL LAYUG L.",
     "unitId": "LA-0204",
@@ -7967,3 +7983,86 @@ export const clientSourceDetails: ClientSourceDetail[] = [
     "team": "VENUS"
   }
 ]
+
+function splitUnitIds(unitId: string) {
+  const matches = unitId.match(/LA[-\s]?\d{4}/gi)
+  if (!matches) return [unitId.replace(/\bCOMBINED\b/gi, '').replace(/^COMBINED:\s*/i, '').trim()]
+
+  return Array.from(new Set(matches.map((unit) => unit.toUpperCase().replace(/LA[-\s]?(\d{4})/, 'LA-$1'))))
+}
+
+function getLotTypeFromUnitLabel(unitId: string) {
+  return unitId.match(/\((CORNER|INNER|END)\)/i)?.[1].toUpperCase()
+}
+
+function getUnitVariantFromUnitLabel(unitId: string) {
+  return unitId.match(/\)\s*\*?([A-Z])\b/i)?.[1]
+}
+
+function splitNumber(value: number | undefined, count: number) {
+  if (value === undefined) return undefined
+  return count > 1 ? value / count : value
+}
+
+function normalizeUnitRows<T extends { unitId: string }>(
+  records: T[],
+  splitValues?: (record: T, count: number) => Partial<T>,
+) {
+  return records.flatMap((record) => {
+    const units = splitUnitIds(record.unitId)
+    const lotType = getLotTypeFromUnitLabel(record.unitId)
+    const unitVariant = getUnitVariantFromUnitLabel(record.unitId)
+
+    return units.map((unitId) => ({
+      ...record,
+      ...splitValues?.(record, units.length),
+      unitId,
+      ...(lotType ? { lotType } : {}),
+      ...(unitVariant ? { unitVariant } : {}),
+    }))
+  })
+}
+
+function splitRelease(release: CommissionPartyRelease, count: number): CommissionPartyRelease {
+  return {
+    ...release,
+    commission: splitNumber(release.commission, count) ?? 0,
+    firstRelease20: splitNumber(release.firstRelease20, count) ?? 0,
+    secondRelease40: splitNumber(release.secondRelease40, count) ?? 0,
+    thirdRelease60: splitNumber(release.thirdRelease60, count) ?? 0,
+    fourthRelease75: splitNumber(release.fourthRelease75, count) ?? 0,
+    retention25: splitNumber(release.retention25, count) ?? 0,
+    totalRemaining: splitNumber(release.totalRemaining, count) ?? 0,
+    cashAdvance: splitNumber(release.cashAdvance, count) ?? 0,
+  }
+}
+
+export const commissionDetails = normalizeUnitRows(canonicalCommissionDetails, (detail, count) => ({
+  area: splitNumber(detail.area, count) ?? 0,
+  netSellingPrice: splitNumber(detail.netSellingPrice, count) ?? 0,
+  cashKaliwaan: splitNumber(detail.cashKaliwaan, count) ?? 0,
+  manager: splitRelease(detail.manager, count),
+  agent: splitRelease(detail.agent, count),
+}))
+
+export const paymentDetails = normalizeUnitRows(canonicalPaymentDetails, (payment, count) => ({
+  monthlyPayments: payment.monthlyPayments.map((monthly) => ({
+    ...monthly,
+    amount: splitNumber(monthly.amount, count) ?? 0,
+  })),
+  paymentMade: splitNumber(payment.paymentMade, count) ?? 0,
+  totalContractPrice: splitNumber(payment.totalContractPrice, count) ?? 0,
+  balance: splitNumber(payment.balance, count) ?? 0,
+}))
+
+export const listingInstallmentDetails = normalizeUnitRows(canonicalListingInstallmentDetails, (detail, count) => ({
+  dp: splitNumber(detail.dp, count),
+  spotDpDiscount: splitNumber(detail.spotDpDiscount, count),
+  spotDp: splitNumber(detail.spotDp, count),
+  balance: splitNumber(detail.balance, count),
+  monthly3Years: splitNumber(detail.monthly3Years, count),
+  monthly5Years: splitNumber(detail.monthly5Years, count),
+  monthly10Years: splitNumber(detail.monthly10Years, count),
+}))
+
+export const clientSourceDetails = normalizeUnitRows(canonicalClientSourceDetails)
