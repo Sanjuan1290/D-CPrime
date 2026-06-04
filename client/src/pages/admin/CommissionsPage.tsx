@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import Badge from '../../components/admin/Badge'
+import ConfirmModal from '../../components/admin/ConfirmModal'
 import DataTable from '../../components/admin/DataTable'
 import InfoRow from '../../components/admin/InfoRow'
 import Modal from '../../components/admin/Modal'
@@ -22,6 +23,7 @@ function CommissionsPage() {
   })
   const [selectedRule, setSelectedRule] = useState<CommissionRule | null>(null)
   const [selectedDetail, setSelectedDetail] = useState<CommissionDetail | null>(null)
+  const [rulePendingDelete, setRulePendingDelete] = useState<CommissionRule | null>(null)
   const totalCommissionPayable = commissionDetails.reduce((total, detail) => total + detail.manager.commission + detail.agent.commission, 0)
   const totalCommissionReleased = commissionDetails.reduce(
     (total, detail) =>
@@ -83,8 +85,11 @@ function CommissionsPage() {
     toast.success('Commission rule saved.')
   }
 
-  function deleteRule(rule: CommissionRule) {
-    setRules((current) => current.filter((item) => item.id !== rule.id))
+  function deleteRule() {
+    if (!rulePendingDelete) return
+
+    setRules((current) => current.filter((item) => item.id !== rulePendingDelete.id))
+    setRulePendingDelete(null)
     toast.success('Commission rule deleted.')
   }
 
@@ -128,7 +133,7 @@ function CommissionsPage() {
 
       <Panel title="Commission Settings" subtitle="Admin-controlled commission rules by project and agent">
         <div className="mb-5 flex justify-end">
-          <button onClick={() => openRule()} className="rounded-md bg-[#C9A84C] px-4 py-2 text-sm font-bold text-black">
+          <button onClick={() => openRule()} className="rounded-lg bg-[#C9A84C] px-4 py-2 text-sm font-bold text-[#1A1A2E] shadow-sm hover:bg-[#B9973C]">
             Add Rule
           </button>
         </div>
@@ -145,13 +150,13 @@ function CommissionsPage() {
             <div key={`${rule.id}-actions`} className="flex gap-2">
               <button
                 onClick={() => openRule(rule)}
-                className="rounded-md border border-[#C9A84C]/40 px-3 py-1 text-xs font-semibold text-[#C9A84C] hover:bg-[#C9A84C]/10"
+                className="rounded-lg border border-[#C9A84C]/40 px-3 py-1 text-xs font-semibold text-[#9A7A22] hover:bg-[#C9A84C]/10"
               >
                 Edit
               </button>
               <button
-                onClick={() => deleteRule(rule)}
-                className="rounded-md border border-rose-400/40 px-3 py-1 text-xs font-semibold text-rose-300 hover:bg-rose-400/10"
+                onClick={() => setRulePendingDelete(rule)}
+                className="rounded-lg border border-rose-200 px-3 py-1 text-xs font-semibold text-rose-600 hover:bg-rose-50"
               >
                 Delete
               </button>
@@ -177,19 +182,19 @@ function CommissionsPage() {
                   const detail = getCommissionDetail(commission.unitId, commission.buyer)
                   if (detail) setSelectedDetail(detail)
                 }}
-                className="rounded-md border border-white/20 px-3 py-1 text-xs font-semibold text-zinc-300 hover:bg-white/5"
+                className="rounded-lg border border-[#E8E4DC] px-3 py-1 text-xs font-semibold text-[#374151] hover:bg-[#F8F7F4]"
               >
                 Details
               </button>
               <button
                 onClick={() => approveCommission(commission.unitId)}
-                className="rounded-md border border-[#C9A84C]/40 px-3 py-1 text-xs font-semibold text-[#C9A84C] hover:bg-[#C9A84C]/10"
+                className="rounded-lg border border-[#C9A84C]/40 px-3 py-1 text-xs font-semibold text-[#9A7A22] hover:bg-[#C9A84C]/10"
               >
                 Approve
               </button>
               <button
                 onClick={() => releaseCommission(commission.unitId)}
-                className="rounded-md border border-emerald-400/40 px-3 py-1 text-xs font-semibold text-emerald-300 hover:bg-emerald-400/10"
+                className="rounded-lg border border-emerald-200 px-3 py-1 text-xs font-semibold text-emerald-700 hover:bg-emerald-50"
               >
                 Release
               </button>
@@ -201,12 +206,12 @@ function CommissionsPage() {
       <Modal title="Commission Rule" isOpen={selectedRule !== null} onClose={() => setSelectedRule(null)}>
         {selectedRule && (
           <form onSubmit={saveRule} className="grid gap-4 text-sm md:grid-cols-2">
-            <label className="block font-semibold text-zinc-300">
+            <label className="block font-semibold text-[#374151]">
               Project
               <select
                 name="projectId"
                 defaultValue={selectedRule.projectId}
-                className="mt-2 w-full rounded-md border border-white/10 bg-black px-3 py-3 text-white"
+                className="mt-2 w-full rounded-lg border border-[#E8E4DC] bg-white px-3 py-3 text-[#111827] outline-none focus:border-[#C9A84C]"
               >
                 {projects.map((project) => (
                   <option key={project.id} value={project.id}>
@@ -215,12 +220,12 @@ function CommissionsPage() {
                 ))}
               </select>
             </label>
-            <label className="block font-semibold text-zinc-300">
+            <label className="block font-semibold text-[#374151]">
               Agent
               <select
                 name="agentId"
                 defaultValue={selectedRule.agentId}
-                className="mt-2 w-full rounded-md border border-white/10 bg-black px-3 py-3 text-white"
+                className="mt-2 w-full rounded-lg border border-[#E8E4DC] bg-white px-3 py-3 text-[#111827] outline-none focus:border-[#C9A84C]"
               >
                 {agents.map((agent) => (
                   <option key={agent.id} value={agent.id}>
@@ -233,12 +238,12 @@ function CommissionsPage() {
             <PercentInput label="Manager Rate" name="managerRate" value={selectedRule.managerRate} />
             <PercentInput label="Release Threshold" name="releaseThreshold" value={selectedRule.releaseThreshold} />
             <PercentInput label="Retention Rate" name="retentionRate" value={selectedRule.retentionRate} />
-            <label className="block font-semibold text-zinc-300">
+            <label className="block font-semibold text-[#374151]">
               Status
               <select
                 name="status"
                 defaultValue={selectedRule.status}
-                className="mt-2 w-full rounded-md border border-white/10 bg-black px-3 py-3 text-white"
+                className="mt-2 w-full rounded-lg border border-[#E8E4DC] bg-white px-3 py-3 text-[#111827] outline-none focus:border-[#C9A84C]"
               >
                 <option>Active</option>
                 <option>Paused</option>
@@ -248,11 +253,11 @@ function CommissionsPage() {
               <button
                 type="button"
                 onClick={() => setSelectedRule(null)}
-                className="rounded-md border border-white/10 px-4 py-2 font-semibold text-zinc-300"
+                className="rounded-lg border border-[#E8E4DC] px-4 py-2 font-semibold text-[#374151] hover:bg-[#F8F7F4]"
               >
                 Cancel
               </button>
-              <button className="rounded-md bg-[#C9A84C] px-4 py-2 font-bold text-black">Save Rule</button>
+              <button className="rounded-lg bg-[#C9A84C] px-4 py-2 font-bold text-[#1A1A2E] hover:bg-[#B9973C]">Save Rule</button>
             </div>
           </form>
         )}
@@ -276,6 +281,15 @@ function CommissionsPage() {
           </div>
         )}
       </Modal>
+
+      <ConfirmModal
+        title="Delete Commission Rule"
+        message={`Delete the commission rule for ${rulePendingDelete ? getAgentName(rulePendingDelete.agentId) : 'this agent'}? This only changes the mock data in this browser.`}
+        confirmLabel="Delete Rule"
+        isOpen={rulePendingDelete !== null}
+        onClose={() => setRulePendingDelete(null)}
+        onConfirm={deleteRule}
+      />
     </div>
   )
 }
@@ -285,11 +299,11 @@ function ReleaseCard({ title, release }: { title: string; release: CommissionPar
     release.firstRelease20 + release.secondRelease40 + release.thirdRelease60 + release.fourthRelease75
 
   return (
-    <section className="rounded-lg border border-white/10 bg-black p-4">
-      <div className="mb-4 flex items-start justify-between gap-3 border-b border-white/10 pb-3">
+    <section className="rounded-lg border border-[#E8E4DC] bg-[#F8F7F4] p-4">
+      <div className="mb-4 flex items-start justify-between gap-3 border-b border-[#E8E4DC] pb-3">
         <div>
-          <h3 className="font-bold text-zinc-100">{title}</h3>
-          <p className="mt-1 text-xs text-zinc-500">{release.name || '-'}</p>
+          <h3 className="font-bold text-[#1A1A2E]">{title}</h3>
+          <p className="mt-1 text-xs text-[#6B7280]">{release.name || '-'}</p>
         </div>
         <Badge>{formatPercent(release.totalReceivedPercent)}</Badge>
       </div>
@@ -312,7 +326,7 @@ function ReleaseCard({ title, release }: { title: string; release: CommissionPar
 
 function PercentInput({ label, name, value }: { label: string; name: string; value: number }) {
   return (
-    <label className="block font-semibold text-zinc-300">
+    <label className="block font-semibold text-[#374151]">
       {label}
       <input
         name={name}
@@ -320,7 +334,7 @@ function PercentInput({ label, name, value }: { label: string; name: string; val
         min="0"
         step="0.01"
         defaultValue={(value * 100).toFixed(2)}
-        className="mt-2 w-full rounded-md border border-white/10 bg-black px-3 py-3 text-white"
+        className="mt-2 w-full rounded-lg border border-[#E8E4DC] bg-white px-3 py-3 text-[#111827] outline-none focus:border-[#C9A84C]"
       />
     </label>
   )

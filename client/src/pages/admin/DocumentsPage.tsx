@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import Badge from '../../components/admin/Badge'
+import ConfirmModal from '../../components/admin/ConfirmModal'
 import DataTable from '../../components/admin/DataTable'
 import InfoRow from '../../components/admin/InfoRow'
 import Modal from '../../components/admin/Modal'
@@ -20,13 +21,14 @@ function DocumentsPage() {
   const [requirements, setRequirements] = useState(initialRequirements)
   const [isRequirementModalOpen, setIsRequirementModalOpen] = useState(false)
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null)
-  const selectedClient = selectedClientId ? clientsV2[Number(selectedClientId.replace('client-', '')) - 1] : null
+  const [requirementPendingDelete, setRequirementPendingDelete] = useState<string | null>(null)
+  const selectedClient = selectedClientId ? clientsV2.find((client) => client.clientId === selectedClientId) : null
   const selectedDocuments = selectedClientId ? records.filter((document) => document.clientId === selectedClientId) : []
 
   const clientSummaries = useMemo(
     () =>
-      clientsV2.map((client, index) => {
-        const clientId = `client-${index + 1}`
+      clientsV2.map((client) => {
+        const clientId = client.clientId
         const docs = records.filter((document) => document.clientId === clientId)
         const passed = docs.filter((document) => passedStatuses.includes(document.status)).length
         const approved = docs.filter((document) => document.status === 'Approved').length
@@ -79,7 +81,7 @@ function DocumentsPage() {
       ...current,
       ...clientsV2.map((client, index) => ({
         id: `doc-custom-${Date.now()}-${index + 1}`,
-        clientId: `client-${index + 1}`,
+        clientId: client.clientId,
         clientName: client.buyer,
         unitId: client.unitId,
         documentType,
@@ -92,9 +94,12 @@ function DocumentsPage() {
     toast.success('Document requirement added.')
   }
 
-  function deleteRequirement(documentType: string) {
-    setRequirements((current) => current.filter((item) => item !== documentType))
-    setRecords((current) => current.filter((document) => document.documentType !== documentType))
+  function deleteRequirement() {
+    if (!requirementPendingDelete) return
+
+    setRequirements((current) => current.filter((item) => item !== requirementPendingDelete))
+    setRecords((current) => current.filter((document) => document.documentType !== requirementPendingDelete))
+    setRequirementPendingDelete(null)
     toast.success('Document requirement deleted.')
   }
 
@@ -102,7 +107,7 @@ function DocumentsPage() {
     <div className="space-y-6">
       <Panel title="Document Requirement Template" subtitle="Create or remove required document types">
         <div className="mb-5 flex justify-end">
-          <button onClick={() => setIsRequirementModalOpen(true)} className="rounded-md bg-[#C9A84C] px-4 py-2 text-sm font-bold text-black">
+          <button onClick={() => setIsRequirementModalOpen(true)} className="rounded-lg bg-[#C9A84C] px-4 py-2 text-sm font-bold text-[#1A1A2E] shadow-sm hover:bg-[#B9973C]">
             Add Requirement
           </button>
         </div>
@@ -113,8 +118,8 @@ function DocumentsPage() {
             records.filter((document) => document.documentType === requirement).length,
             <button
               key={`${requirement}-delete`}
-              onClick={() => deleteRequirement(requirement)}
-              className="rounded-md border border-rose-400/40 px-3 py-1 text-xs font-semibold text-rose-300 hover:bg-rose-400/10"
+              onClick={() => setRequirementPendingDelete(requirement)}
+              className="rounded-lg border border-rose-200 px-3 py-1 text-xs font-semibold text-rose-600 hover:bg-rose-50"
             >
               Delete
             </button>,
@@ -137,7 +142,7 @@ function DocumentsPage() {
             <button
               key={`${summary.clientId}-review`}
               onClick={() => setSelectedClientId(summary.clientId)}
-              className="rounded-md border border-[#C9A84C]/40 px-3 py-1 text-xs font-semibold text-[#C9A84C] hover:bg-[#C9A84C]/10"
+              className="rounded-lg border border-[#C9A84C]/40 px-3 py-1 text-xs font-semibold text-[#9A7A22] hover:bg-[#C9A84C]/10"
             >
               Checklist
             </button>,
@@ -157,7 +162,7 @@ function DocumentsPage() {
 
             <div className="space-y-3">
               {selectedDocuments.map((document) => (
-                <div key={document.id} className="grid gap-3 rounded-lg border border-white/10 bg-black p-4 md:grid-cols-[1fr_130px_150px] md:items-center">
+                <div key={document.id} className="grid gap-3 rounded-lg border border-[#E8E4DC] bg-[#F8F7F4] p-4 md:grid-cols-[1fr_130px_150px] md:items-center">
                   <label className="flex items-start gap-3">
                     <input
                       type="checkbox"
@@ -166,8 +171,8 @@ function DocumentsPage() {
                       className="mt-1 h-5 w-5 accent-amber-500"
                     />
                     <span>
-                      <span className="block font-semibold text-zinc-100">{document.documentType}</span>
-                      <span className="mt-1 block text-xs text-zinc-500">
+                      <span className="block font-semibold text-[#1A1A2E]">{document.documentType}</span>
+                      <span className="mt-1 block text-xs text-[#6B7280]">
                         {document.submittedDate ? `Submitted ${document.submittedDate}` : 'Not yet submitted'}
                       </span>
                     </span>
@@ -176,7 +181,7 @@ function DocumentsPage() {
                   <select
                     value={document.status}
                     onChange={(event) => updateDocument(document.id, event.target.value as DocumentStatus)}
-                    className="rounded-md border border-white/10 bg-[#111111] px-3 py-2 text-sm text-white"
+                    className="rounded-lg border border-[#E8E4DC] bg-white px-3 py-2 text-sm text-[#111827] outline-none focus:border-[#C9A84C]"
                   >
                     <option>Not Submitted</option>
                     <option>Submitted</option>
@@ -187,11 +192,11 @@ function DocumentsPage() {
               ))}
             </div>
 
-            <div className="flex justify-end gap-2 border-t border-white/10 pt-4">
-              <button onClick={() => setSelectedClientId(null)} className="rounded-md border border-white/10 px-4 py-2 text-sm font-semibold text-zinc-300">
+            <div className="flex justify-end gap-2 border-t border-[#F0EDE8] pt-4">
+              <button onClick={() => setSelectedClientId(null)} className="rounded-lg border border-[#E8E4DC] px-4 py-2 text-sm font-semibold text-[#374151] hover:bg-[#F8F7F4]">
                 Cancel
               </button>
-              <button onClick={saveChecklist} className="rounded-md bg-[#C9A84C] px-4 py-2 text-sm font-bold text-black">
+              <button onClick={saveChecklist} className="rounded-lg bg-[#C9A84C] px-4 py-2 text-sm font-bold text-[#1A1A2E] hover:bg-[#B9973C]">
                 Save Checklist
               </button>
             </div>
@@ -201,22 +206,31 @@ function DocumentsPage() {
 
       <Modal title="Add Required Document" isOpen={isRequirementModalOpen} onClose={() => setIsRequirementModalOpen(false)}>
         <form onSubmit={addRequirement} className="space-y-4 text-sm">
-          <label className="block font-semibold text-zinc-300">
+          <label className="block font-semibold text-[#374151]">
             Document Name
             <input
               name="documentType"
               placeholder="Example: Proof of Billing"
-              className="mt-2 w-full rounded-md border border-white/10 bg-black px-3 py-3 text-white"
+              className="mt-2 w-full rounded-lg border border-[#E8E4DC] bg-white px-3 py-3 text-[#111827] outline-none placeholder:text-[#9CA3AF] focus:border-[#C9A84C]"
             />
           </label>
           <div className="flex justify-end gap-2">
-            <button type="button" onClick={() => setIsRequirementModalOpen(false)} className="rounded-md border border-white/10 px-4 py-2 font-semibold text-zinc-300">
+            <button type="button" onClick={() => setIsRequirementModalOpen(false)} className="rounded-lg border border-[#E8E4DC] px-4 py-2 font-semibold text-[#374151] hover:bg-[#F8F7F4]">
               Cancel
             </button>
-            <button className="rounded-md bg-[#C9A84C] px-4 py-2 font-bold text-black">Add Requirement</button>
+            <button className="rounded-lg bg-[#C9A84C] px-4 py-2 font-bold text-[#1A1A2E] hover:bg-[#B9973C]">Add Requirement</button>
           </div>
         </form>
       </Modal>
+
+      <ConfirmModal
+        title="Delete Document Requirement"
+        message={`Remove ${requirementPendingDelete ?? 'this document'} from every client checklist? This only changes the mock data in this browser.`}
+        confirmLabel="Delete Requirement"
+        isOpen={requirementPendingDelete !== null}
+        onClose={() => setRequirementPendingDelete(null)}
+        onConfirm={deleteRequirement}
+      />
     </div>
   )
 }

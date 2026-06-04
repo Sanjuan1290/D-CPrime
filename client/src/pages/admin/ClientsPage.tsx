@@ -16,21 +16,26 @@ type Filter = 'All' | 'CASH' | 'INSTALLMENT' | 'COMPLETE' | 'INC'
 function ClientsPage() {
   const toast = useToast()
   const [filter, setFilter] = useState<Filter>('All')
+  const [buyerFilter, setBuyerFilter] = useState<string | null>(null)
   const [clients, setClients] = useState<ClientRecord[]>(() => {
     const saved = localStorage.getItem('dcprime_clients')
     return saved ? (JSON.parse(saved) as ClientRecord[]) : clientsV2
   })
   const [selectedClient, setSelectedClient] = useState<ClientRecord | null>(null)
   const [editingClient, setEditingClient] = useState<ClientRecord | null>(null)
-  const selectedClientIndex = selectedClient ? clients.findIndex((client) => client.buyer === selectedClient.buyer && client.unitId === selectedClient.unitId) : -1
-  const selectedClientId = selectedClientIndex >= 0 ? `client-${selectedClientIndex + 1}` : ''
+  const selectedClientId = selectedClient?.clientId ?? ''
   const selectedDocuments = clientDocuments.filter((document) => document.clientId === selectedClientId)
   const selectedSourceDetail = selectedClient
     ? clientSourceDetails.find((detail) => detail.buyer === selectedClient.buyer && detail.unitId === selectedClient.unitId)
     : undefined
   const submittedDocuments = selectedDocuments.filter((document) => document.status === 'Submitted' || document.status === 'Approved')
   const missingDocuments = selectedDocuments.filter((document) => document.status === 'Not Submitted' || document.status === 'Rejected')
+  const buyerUnitCounts = clients.reduce<Record<string, number>>((counts, client) => {
+    counts[client.buyerId] = (counts[client.buyerId] ?? 0) + 1
+    return counts
+  }, {})
   const visibleClients = clients.filter((client) => {
+    if (buyerFilter && client.buyerId !== buyerFilter) return false
     if (filter === 'All') return true
     if (filter === 'CASH' || filter === 'INSTALLMENT') return client.paymentMode === filter
     return client.documentStatus === filter
@@ -43,6 +48,8 @@ function ClientsPage() {
   function openClientForm(client?: ClientRecord) {
     setEditingClient(
       client ?? {
+        clientId: `client-${Date.now()}`,
+        buyerId: `buyer-${Date.now()}`,
         reservationDate: '06/03/2026',
         buyer: 'NEW MOCK CLIENT',
         unitId: 'LA-MOCK',
@@ -70,12 +77,16 @@ function ClientsPage() {
     if (!editingClient) return
 
     const formData = new FormData(event.currentTarget)
+    const buyer = String(formData.get('buyer'))
     const totalContractPrice = Number(formData.get('totalContractPrice'))
     const paymentMade = Number(formData.get('paymentMade'))
+    const existingBuyer = clients.find((item) => item.buyer.toLowerCase() === buyer.toLowerCase())
     const client: ClientRecord = {
       ...editingClient,
+      clientId: editingClient.clientId,
+      buyerId: editingClient.buyerId || existingBuyer?.buyerId || `buyer-${Date.now()}`,
       reservationDate: String(formData.get('reservationDate')),
-      buyer: String(formData.get('buyer')),
+      buyer,
       spouse: String(formData.get('spouse')) || undefined,
       unitId: String(formData.get('unitId')),
       agent: String(formData.get('agent')),
@@ -96,10 +107,8 @@ function ClientsPage() {
     }
 
     setClients((current) => {
-      const exists = current.some((item) => item.buyer === editingClient.buyer && item.unitId === editingClient.unitId)
-      return exists
-        ? current.map((item) => (item.buyer === editingClient.buyer && item.unitId === editingClient.unitId ? client : item))
-        : [client, ...current]
+      const exists = current.some((item) => item.clientId === editingClient.clientId)
+      return exists ? current.map((item) => (item.clientId === editingClient.clientId ? client : item)) : [client, ...current]
     })
     setEditingClient(null)
     toast.success('Client saved.')
@@ -108,7 +117,7 @@ function ClientsPage() {
   function archiveClient(client: ClientRecord) {
     setClients((current) =>
       current.map((item) =>
-        item.buyer === client.buyer && item.unitId === client.unitId ? { ...item, salesStatus: 'FOR REVIEW' } : item,
+        item.clientId === client.clientId ? { ...item, salesStatus: 'FOR REVIEW' } : item,
       ),
     )
     toast.success('Client marked for review.')
@@ -129,6 +138,14 @@ function ClientsPage() {
               {item}
             </button>
           ))}
+          {buyerFilter && (
+            <button
+              onClick={() => setBuyerFilter(null)}
+              className="rounded-md border border-[#1A1A2E]/20 bg-white px-3 py-2 text-sm font-semibold text-[#1A1A2E]"
+            >
+              Clear Buyer Filter
+            </button>
+          )}
         </div>
         <button onClick={() => openClientForm()} className="rounded-md bg-[#C9A84C] px-4 py-2 text-sm font-bold text-black">
           Add Client
@@ -137,7 +154,17 @@ function ClientsPage() {
       <DataTable
         headers={['Buyer', 'Unit', 'Agent', 'TCP', 'Paid', 'Balance', 'Mode', 'Docs', 'Sales', 'Action']}
         rows={visibleClients.map((client) => [
-          client.buyer,
+          <div key={`${client.clientId}-buyer`} className="flex flex-wrap items-center gap-2">
+            <span>{client.buyer}</span>
+            {buyerUnitCounts[client.buyerId] > 1 && (
+              <button
+                onClick={() => setBuyerFilter(client.buyerId)}
+                className="rounded-full border border-[#C9A84C]/40 bg-[#C9A84C]/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#9A7A22]"
+              >
+                {buyerUnitCounts[client.buyerId]} units
+              </button>
+            )}
+          </div>,
           client.unitId,
           client.agent,
           formatCurrency(client.totalContractPrice),
@@ -146,7 +173,7 @@ function ClientsPage() {
           <Badge key={`${client.unitId}-mode`}>{client.paymentMode}</Badge>,
           <Badge key={`${client.unitId}-docs`}>{client.documentStatus}</Badge>,
           <Badge key={`${client.unitId}-sales`}>{client.salesStatus}</Badge>,
-          <div key={`${client.unitId}-actions`} className="flex gap-2">
+          <div key={`${client.clientId}-actions`} className="flex gap-2">
             <button
               onClick={() => setSelectedClient(client)}
               className="rounded-md border border-[#C9A84C]/40 px-3 py-1 text-xs font-semibold text-[#C9A84C] hover:bg-[#C9A84C]/10"

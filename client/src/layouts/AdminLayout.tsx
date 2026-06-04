@@ -1,6 +1,22 @@
-import { useState } from 'react'
-import type { ReactNode } from 'react'
+import { useMemo, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import {
+  BarChart3,
+  Bell,
+  Building2,
+  CreditCard,
+  FileText,
+  Home,
+  LayoutGrid,
+  LogOut,
+  Menu,
+  Percent,
+  Search,
+  Settings,
+  UserCog,
+  Users,
+} from '../components/admin/Icons'
+import { auditLogsV2, clientsV2, listingsV2, paymentTracker } from '../data/adminMockData'
 import { company } from '../data/mockData'
 import { adminNavGroups, getActiveAdminPage, getAdminRouteLabel, routeByKey } from '../routes/adminRoutes'
 import type { AdminPageKey } from '../routes/adminRoutes'
@@ -11,7 +27,39 @@ function AdminLayout() {
   const activePage = getActiveAdminPage(location.pathname)
   const activeLabel = getAdminRouteLabel(activePage)
   const [isMobileOpen, setIsMobileOpen] = useState(false)
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false)
+  const [globalSearch, setGlobalSearch] = useState('')
   const adminName = localStorage.getItem('dcprime_name') ?? 'Admin'
+  const globalResults = useMemo(() => {
+    const term = globalSearch.trim().toLowerCase()
+    if (!term) return []
+
+    const records = [
+      ...clientsV2.map((client) => ({
+        type: 'Client',
+        label: client.buyer,
+        detail: `${client.unitId} | ${client.agent}`,
+        path: '/admin/clients',
+      })),
+      ...listingsV2.map((listing) => ({
+        type: 'Listing',
+        label: listing.unitId,
+        detail: `${listing.status} | ${listing.areaSqm} sqm`,
+        path: '/admin/listings',
+      })),
+      ...paymentTracker.map((payment) => ({
+        type: 'Payment',
+        label: payment.buyer,
+        detail: `${payment.unitId} | ${payment.mode}`,
+        path: '/admin/payments',
+      })),
+    ]
+
+    return records
+      .filter((record) => `${record.type} ${record.label} ${record.detail}`.toLowerCase().includes(term))
+      .slice(0, 6)
+  }, [globalSearch])
+  const notificationItems = auditLogsV2.slice(0, 5)
 
   function handleNavigate(page: AdminPageKey) {
     navigate(routeByKey[page])
@@ -25,47 +73,123 @@ function AdminLayout() {
     window.location.reload()
   }
 
+  function openGlobalResult(path: string) {
+    navigate(path)
+    setGlobalSearch('')
+  }
+
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-zinc-100">
+    <div className="min-h-screen bg-[#F8F7F4] text-[#111827]">
       <div className="flex min-h-screen">
-        <aside className="hidden w-64 shrink-0 border-r border-white/10 bg-[#0A0A0A] text-zinc-200 lg:flex lg:flex-col">
+        <aside className="hidden w-[260px] shrink-0 border-r border-[#0F1020] bg-[#1A1A2E] text-[#E8E8F0] shadow-xl lg:flex lg:flex-col">
           <SidebarContent activePage={activePage} onNavigate={handleNavigate} />
         </aside>
 
         {isMobileOpen && (
           <div className="fixed inset-0 z-40 lg:hidden">
-            <button className="absolute inset-0 bg-black/70" onClick={() => setIsMobileOpen(false)} aria-label="Close menu" />
-            <aside className="relative z-10 h-full w-72 border-r border-white/10 bg-[#0A0A0A]">
+            <button className="absolute inset-0 bg-black/35 backdrop-blur-[1px]" onClick={() => setIsMobileOpen(false)} aria-label="Close menu" />
+            <aside className="relative z-10 h-full w-[280px] border-r border-[#0F1020] bg-[#1A1A2E] shadow-2xl">
               <SidebarContent activePage={activePage} onNavigate={handleNavigate} />
             </aside>
           </div>
         )}
 
         <main className="min-w-0 flex-1">
-          <header className="sticky top-0 z-10 border-b border-white/10 bg-[#0A0A0A]/95 px-4 py-4 backdrop-blur md:px-8">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
+          <header className="sticky top-0 z-10 border-b border-[#E8E4DC] bg-white/90 px-4 py-3 backdrop-blur md:px-8">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex min-w-0 items-center gap-3">
                 <button
                   onClick={() => setIsMobileOpen(true)}
-                  className="rounded-md border border-white/10 px-3 py-2 text-sm font-bold text-zinc-200 lg:hidden"
+                  className="grid h-10 w-10 place-items-center rounded-lg border border-[#E8E4DC] bg-white text-[#1A1A2E] shadow-sm lg:hidden"
+                  aria-label="Open menu"
                 >
-                  Menu
+                  <Menu className="h-5 w-5" />
                 </button>
                 <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#C9A84C]">{company.name}</p>
-                <h2 className="mt-1 text-2xl font-bold">{activeLabel}</h2>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#C9A84C]">{company.name}</p>
+                  <h2 className="mt-0.5 truncate font-serif text-2xl text-[#1A1A2E]">{activeLabel}</h2>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <span className="hidden text-sm text-zinc-400 sm:inline">{adminName}</span>
-                <button onClick={handleLogout} className="rounded-md border border-[#C9A84C]/40 px-3 py-2 text-sm font-semibold text-[#C9A84C] hover:bg-[#C9A84C]/10">
-                  Logout
+              <div className="flex flex-1 items-center justify-end gap-2 sm:flex-none">
+                <div className="relative hidden md:block">
+                  <label className="flex h-10 min-w-[260px] items-center gap-2 rounded-lg border border-[#E8E4DC] bg-[#F8F7F4] px-3 text-sm text-[#6B7280]">
+                    <Search className="h-4 w-4 text-[#C9A84C]" />
+                    <input
+                      value={globalSearch}
+                      onChange={(event) => setGlobalSearch(event.target.value)}
+                      className="w-full bg-transparent text-[#111827] outline-none placeholder:text-[#9CA3AF]"
+                      placeholder="Search clients, lots, payments"
+                    />
+                  </label>
+                  {globalSearch.trim() && (
+                    <div className="absolute right-0 top-12 z-20 w-[360px] overflow-hidden rounded-xl border border-[#E8E4DC] bg-white shadow-xl">
+                      <div className="border-b border-[#F0EDE8] px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#6B7280]">
+                        Global Search
+                      </div>
+                      {globalResults.length > 0 ? (
+                        globalResults.map((result) => (
+                          <button
+                            key={`${result.type}-${result.label}-${result.detail}`}
+                            onClick={() => openGlobalResult(result.path)}
+                            className="block w-full border-b border-[#F0EDE8] px-4 py-3 text-left last:border-b-0 hover:bg-[#FAF8F5]"
+                          >
+                            <span className="text-[11px] font-bold uppercase tracking-widest text-[#C9A84C]">{result.type}</span>
+                            <span className="mt-1 block text-sm font-semibold text-[#1A1A2E]">{result.label}</span>
+                            <span className="mt-0.5 block text-xs text-[#6B7280]">{result.detail}</span>
+                          </button>
+                        ))
+                      ) : (
+                        <div className="px-4 py-5 text-sm text-[#6B7280]">No records found.</div>
+                      )}
+                    </div>
+                  )}
+                </div>
+                <div className="relative">
+                  <button
+                    onClick={() => setIsNotificationsOpen((current) => !current)}
+                    className="relative grid h-10 w-10 place-items-center rounded-lg border border-[#E8E4DC] bg-white text-[#1A1A2E] shadow-sm"
+                    aria-label="Notifications"
+                  >
+                    <Bell className="h-5 w-5" />
+                    <span className="absolute right-1.5 top-1.5 grid h-4 min-w-4 place-items-center rounded-full bg-rose-600 px-1 text-[9px] font-bold text-white">
+                      {notificationItems.length}
+                    </span>
+                  </button>
+                  {isNotificationsOpen && (
+                    <div className="absolute right-0 top-12 z-20 w-[320px] overflow-hidden rounded-xl border border-[#E8E4DC] bg-white shadow-xl">
+                      <div className="border-b border-[#F0EDE8] px-4 py-3">
+                        <p className="font-serif text-lg text-[#1A1A2E]">Recent Activity</p>
+                        <p className="text-xs text-[#6B7280]">Latest audit entries</p>
+                      </div>
+                      {notificationItems.map((item) => (
+                        <button
+                          key={item.id}
+                          onClick={() => {
+                            navigate('/admin/settings')
+                            setIsNotificationsOpen(false)
+                          }}
+                          className="block w-full border-b border-[#F0EDE8] px-4 py-3 text-left last:border-b-0 hover:bg-[#FAF8F5]"
+                        >
+                          <span className="text-sm font-semibold text-[#111827]">{item.action}</span>
+                          <span className="mt-0.5 block text-xs text-[#6B7280]">{item.details}</span>
+                          <span className="mt-1 block text-[11px] text-[#9CA3AF]">{item.timestamp}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div className="hidden text-right sm:block">
+                  <p className="text-sm font-semibold text-[#1A1A2E]">{adminName}</p>
+                  <p className="text-[11px] uppercase tracking-widest text-[#9CA3AF]">Administrator</p>
+                </div>
+                <button onClick={handleLogout} className="grid h-10 w-10 place-items-center rounded-lg border border-[#C9A84C]/40 bg-white text-[#9A7A22] shadow-sm hover:bg-[#FFF8E1]" aria-label="Logout">
+                  <LogOut className="h-4 w-4" />
                 </button>
               </div>
             </div>
           </header>
 
-          <section className="px-4 py-6 md:px-8">
+          <section key={location.pathname} className="animate-[admin-fade-in_200ms_ease-out] px-4 py-6 md:px-8">
             <Outlet />
           </section>
         </main>
@@ -77,28 +201,29 @@ function AdminLayout() {
 function SidebarContent({ activePage, onNavigate }: { activePage: AdminPageKey; onNavigate: (page: AdminPageKey) => void }) {
   return (
     <>
-      <div className="border-b border-white/10 p-4">
+      <div className="border-b border-white/10 p-5">
+        <div className="mb-4 h-1 w-20 rounded-full bg-gradient-to-r from-[#C9A84C] to-[#F2D77E]" />
         <div className="flex items-center gap-3">
-          <div className="grid h-9 w-9 place-items-center rounded-md bg-[#C9A84C] text-xs font-black text-black">DC</div>
+          <div className="grid h-10 w-10 place-items-center rounded-lg bg-[#C9A84C] text-xs font-black text-[#1A1A2E] shadow-lg shadow-black/20">DC</div>
           <div>
-            <p className="text-sm font-bold text-white">D&C Prime Realty</p>
-            <p className="text-xs text-zinc-500">Admin</p>
+            <p className="font-serif text-lg leading-tight text-white">D&C Prime</p>
+            <p className="text-xs text-white/45">Realty Admin</p>
           </div>
         </div>
       </div>
-      <nav className="flex-1 space-y-3 overflow-y-auto px-3 pb-5 pt-4">
+      <nav className="flex-1 space-y-4 overflow-y-auto px-3 pb-5 pt-4">
         {adminNavGroups.map((group) => (
-          <div key={group.title} className="border-b border-white/10 pb-2.5 last:border-b-0">
-            <p className="mb-1.5 px-2 text-[10px] font-bold uppercase tracking-wide text-zinc-500">{group.title}</p>
+          <div key={group.title} className="border-b border-white/10 pb-3 last:border-b-0">
+            <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[#C9A84C]/50">{group.title}</p>
             <div className="space-y-1">
               {group.items.map((item) => (
                 <button
                   key={item.key}
                   onClick={() => onNavigate(item.key)}
-                  className={`group flex w-full items-center gap-2.5 border-l-2 px-3 py-2 text-left text-[13px] font-semibold transition ${
+                  className={`group flex w-full items-center gap-3 rounded-r-lg border-l-2 px-3 py-2.5 text-left text-[13px] font-semibold transition ${
                     activePage === item.key
                       ? 'border-[#C9A84C] bg-[#C9A84C]/10 text-[#C9A84C]'
-                      : 'border-transparent text-zinc-300 hover:bg-white/5 hover:text-white'
+                      : 'border-transparent text-white/70 hover:bg-white/10 hover:text-white'
                   }`}
                 >
                   <NavIcon name={item.icon} />
@@ -113,113 +238,22 @@ function SidebarContent({ activePage, onNavigate }: { activePage: AdminPageKey; 
   )
 }
 
+const iconByName: Record<string, typeof LayoutGrid> = {
+  grid: LayoutGrid,
+  building: Building2,
+  home: Home,
+  users: Users,
+  card: CreditCard,
+  percent: Percent,
+  file: FileText,
+  chart: BarChart3,
+  userCog: UserCog,
+  settings: Settings,
+}
+
 function NavIcon({ name }: { name: string }) {
-  const common = 'h-3.5 w-3.5 shrink-0 text-current opacity-75'
-
-  if (name === 'shield') {
-    return (
-      <svg className={common} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
-        <path d="m9 12 2 2 4-5" />
-      </svg>
-    )
-  }
-
-  const paths: Record<string, ReactNode> = {
-    grid: (
-      <>
-        <rect x="4" y="4" width="6" height="6" rx="1" />
-        <rect x="14" y="4" width="6" height="6" rx="1" />
-        <rect x="4" y="14" width="6" height="6" rx="1" />
-        <rect x="14" y="14" width="6" height="6" rx="1" />
-      </>
-    ),
-    building: (
-      <>
-        <path d="M6 22V3h12v19" />
-        <path d="M9 7h1M14 7h1M9 11h1M14 11h1M9 15h1M14 15h1" />
-        <path d="M4 22h16" />
-      </>
-    ),
-    home: (
-      <>
-        <path d="m3 11 9-8 9 8" />
-        <path d="M5 10v11h14V10" />
-      </>
-    ),
-    users: (
-      <>
-        <path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2" />
-        <circle cx="9.5" cy="7" r="4" />
-        <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
-      </>
-    ),
-    card: (
-      <>
-        <rect x="3" y="5" width="18" height="14" rx="2" />
-        <path d="M3 10h18" />
-      </>
-    ),
-    percent: (
-      <>
-        <path d="m19 5-14 14" />
-        <circle cx="7" cy="7" r="2" />
-        <circle cx="17" cy="17" r="2" />
-      </>
-    ),
-    file: (
-      <>
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" />
-        <path d="M14 2v6h6" />
-      </>
-    ),
-    clipboard: (
-      <>
-        <path d="M8 4h8v4H8z" />
-        <path d="M16 4h2a2 2 0 0 1 2 2v14H4V6a2 2 0 0 1 2-2h2" />
-      </>
-    ),
-    id: (
-      <>
-        <rect x="3" y="5" width="18" height="14" rx="2" />
-        <circle cx="9" cy="11" r="2" />
-        <path d="M7 16a2 2 0 0 1 4 0M14 10h4M14 14h4" />
-      </>
-    ),
-    wallet: (
-      <>
-        <path d="M4 7h16v12H4z" />
-        <path d="M4 7V5h13v2" />
-        <path d="M16 13h4" />
-      </>
-    ),
-    chart: (
-      <>
-        <path d="M4 19V5" />
-        <path d="M4 19h16" />
-        <path d="M8 16v-5M12 16V8M16 16v-3" />
-      </>
-    ),
-    userCog: (
-      <>
-        <circle cx="9" cy="7" r="4" />
-        <path d="M3 21v-2a4 4 0 0 1 4-4h3" />
-        <path d="M17 14v6M14 17h6" />
-      </>
-    ),
-    settings: (
-      <>
-        <circle cx="12" cy="12" r="3" />
-        <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1-2 2-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V20h-3v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1-2-2 .1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H4v-3h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1 2-2 .1.1a1.7 1.7 0 0 0 1.8.3 1.7 1.7 0 0 0 1-1.5V4h3v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1 2 2-.1.1a1.7 1.7 0 0 0-.3 1.8 1.7 1.7 0 0 0 1.5 1h.1v3h-.1a1.7 1.7 0 0 0-1.5 1Z" />
-      </>
-    ),
-  }
-
-  return (
-    <svg className={common} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      {paths[name] ?? paths.grid}
-    </svg>
-  )
+  const Icon = iconByName[name] ?? LayoutGrid
+  return <Icon className="h-4 w-4 shrink-0 text-current opacity-85" />
 }
 
 export default AdminLayout

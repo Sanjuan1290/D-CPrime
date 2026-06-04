@@ -8,8 +8,8 @@ type InfoRowProps = {
 function InfoRow({ label, value }: InfoRowProps) {
   return (
     <div className="flex items-start justify-between gap-4 py-1">
-      <span className="text-zinc-500">{label}</span>
-      <span className="text-right font-semibold text-zinc-100">{value}</span>
+      <span className="text-[#6B7280]">{label}</span>
+      <span className="text-right font-semibold text-[#111827] tabular-nums">{value}</span>
     </div>
   )
 }

@@ -3,35 +3,37 @@ type BadgeProps = {
 }
 
 const styles: Record<string, string> = {
-  ACTIVE: 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300',
-  Active: 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300',
-  Approved: 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300',
-  Verified: 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300',
-  Released: 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300',
-  COMPLETE: 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300',
-  'COMPLETE PAID': 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300',
-  Available: 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300',
-  Sold: 'border-red-400/30 bg-red-400/10 text-red-300',
-  Rejected: 'border-red-400/30 bg-red-400/10 text-red-300',
-  Hold: 'border-sky-400/30 bg-sky-400/10 text-sky-300',
-  Reserved: 'border-yellow-400/30 bg-yellow-400/10 text-yellow-300',
-  Pending: 'border-orange-400/30 bg-orange-400/10 text-orange-300',
-  New: 'border-sky-400/30 bg-sky-400/10 text-sky-300',
-  Closed: 'border-zinc-400/30 bg-zinc-400/10 text-zinc-400',
-  Submitted: 'border-orange-400/30 bg-orange-400/10 text-orange-300',
-  'Pending Verification': 'border-orange-400/30 bg-orange-400/10 text-orange-300',
-  'Not Submitted': 'border-zinc-400/30 bg-zinc-400/10 text-zinc-400',
-  INSTALLMENT: 'border-yellow-400/30 bg-yellow-400/10 text-yellow-300',
-  CASH: 'border-zinc-400/30 bg-zinc-400/10 text-zinc-300',
-  INC: 'border-orange-400/30 bg-orange-400/10 text-orange-300',
-  INACTIVE: 'border-zinc-400/30 bg-zinc-400/10 text-zinc-400',
-  Inactive: 'border-zinc-400/30 bg-zinc-400/10 text-zinc-400',
-  'PARTIALLY PAID': 'border-yellow-400/30 bg-yellow-400/10 text-yellow-300',
+  ACTIVE: 'border-emerald-200 bg-emerald-50 text-emerald-700',
+  Active: 'border-emerald-200 bg-emerald-50 text-emerald-700',
+  Approved: 'border-emerald-200 bg-emerald-50 text-emerald-700',
+  Verified: 'border-emerald-200 bg-emerald-50 text-emerald-700',
+  Released: 'border-emerald-200 bg-emerald-50 text-emerald-700',
+  COMPLETE: 'border-blue-200 bg-blue-50 text-blue-700',
+  'COMPLETE PAID': 'border-blue-200 bg-blue-50 text-blue-700',
+  Available: 'border-emerald-200 bg-emerald-50 text-emerald-700',
+  Sold: 'border-blue-200 bg-blue-50 text-blue-700',
+  Rejected: 'border-red-200 bg-red-50 text-red-700',
+  Hold: 'border-gray-200 bg-gray-100 text-gray-600',
+  Reserved: 'border-amber-200 bg-amber-50 text-amber-700',
+  Pending: 'border-amber-200 bg-amber-50 text-amber-700',
+  New: 'border-blue-200 bg-blue-50 text-blue-700',
+  Closed: 'border-gray-200 bg-gray-100 text-gray-600',
+  Submitted: 'border-amber-200 bg-amber-50 text-amber-700',
+  'Pending Verification': 'border-amber-200 bg-amber-50 text-amber-700',
+  'Not Submitted': 'border-gray-200 bg-gray-100 text-gray-600',
+  INSTALLMENT: 'border-amber-200 bg-amber-50 text-amber-700',
+  CASH: 'border-gray-200 bg-gray-100 text-gray-600',
+  INC: 'border-orange-200 bg-orange-50 text-orange-700',
+  INACTIVE: 'border-gray-200 bg-gray-100 text-gray-500',
+  Inactive: 'border-gray-200 bg-gray-100 text-gray-500',
+  'PARTIALLY PAID': 'border-amber-200 bg-amber-50 text-amber-700',
+  'FOR REVIEW': 'border-orange-200 bg-orange-50 text-orange-700',
+  'GOOD SALE': 'border-emerald-200 bg-emerald-50 text-emerald-700',
 }
 
 function Badge({ children }: BadgeProps) {
   return (
-    <span className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-bold ${styles[children] ?? styles.Active}`}>
+    <span className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold ${styles[children] ?? styles.Active}`}>
       {children}
     </span>
   )

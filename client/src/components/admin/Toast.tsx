@@ -1,6 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
+import { AlertCircle, Check, Clock } from './Icons'
 
 type ToastType = 'success' | 'error' | 'warning'
 type Toast = { id: number; type: ToastType; message: string }
@@ -39,15 +40,18 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className={`min-w-72 rounded-lg border px-4 py-3 text-sm font-semibold shadow-xl shadow-black/30 ${
+            className={`flex min-w-72 items-start gap-3 rounded-xl border bg-white px-4 py-3 text-sm font-semibold text-[#111827] shadow-lg ${
               toast.type === 'success'
-                ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-200'
+                ? 'border-l-4 border-l-emerald-500'
                 : toast.type === 'error'
-                  ? 'border-red-400/30 bg-red-400/10 text-red-200'
-                  : 'border-orange-400/30 bg-orange-400/10 text-orange-200'
+                  ? 'border-l-4 border-l-red-500'
+                  : 'border-l-4 border-l-amber-500'
             }`}
           >
-            {toast.message}
+            <span className={toast.type === 'success' ? 'text-emerald-600' : toast.type === 'error' ? 'text-red-600' : 'text-amber-600'}>
+              {toast.type === 'success' ? <Check /> : toast.type === 'error' ? <AlertCircle /> : <Clock />}
+            </span>
+            <span>{toast.message}</span>
           </div>
         ))}
       </div>

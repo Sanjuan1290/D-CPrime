@@ -2,7 +2,7 @@ export type Role = 'admin' | 'agent' | 'treasury' | 'client'
 export type UserStatus = 'Active' | 'Inactive'
 export type FeatureKey = keyof typeof featureLabels
 
-export const mockDataVersion = 'source-workbook-v4'
+export const mockDataVersion = 'source-workbook-v5'
 
 export function ensureMockDataVersion() {
   if (typeof localStorage === 'undefined') return
@@ -142,6 +142,8 @@ export type Listing = {
 }
 
 export type ClientRecord = {
+  clientId: string
+  buyerId: string
   reservationDate: string
   buyer: string
   spouse?: string
@@ -163,6 +165,8 @@ export type ClientRecord = {
   accountStatus: 'COMPLETE PAID' | 'PARTIALLY PAID'
   salesStatus: 'GOOD SALE' | 'FOR REVIEW'
 }
+
+type RawClientRecord = Omit<ClientRecord, 'clientId' | 'buyerId'>
 
 export type Payment = {
   unitId: string
@@ -1885,7 +1889,7 @@ const canonicalListings: Listing[] = [
     "status": "Unspecified"
   }
 ]
-const canonicalClients: ClientRecord[] = [
+const canonicalClients: RawClientRecord[] = [
   {
     "reservationDate": "01/21/2025",
     "buyer": "SILVA, ISABEL LAYUG L.",
@@ -5251,13 +5255,115 @@ const canonicalCommissions = [
   }
 ]
 
-export const listings = canonicalListings
-export const clients = canonicalClients
-export const clientsV2 = clients
-export const paymentTracker = canonicalPaymentTracker
-export const commissions = canonicalCommissions
+function splitUnitIds(unitId: string) {
+  const matches = unitId.match(/LA[-\s]?\d{4}/gi)
+  if (!matches) return [unitId.replace(/\bCOMBINED\b/gi, '').replace(/^COMBINED:\s*/i, '').trim()]
 
-export const soaRecords: SoaRecord[] = [
+  return Array.from(new Set(matches.map((unit) => unit.toUpperCase().replace(/LA[-\s]?(\d{4})/, 'LA-$1'))))
+}
+
+function splitNumber(value: number, count: number) {
+  return count > 1 ? value / count : value
+}
+
+function getBuyerKey(buyer: string) {
+  return buyer.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
+}
+
+function createBuyerId(index: number) {
+  return `buyer-${String(index).padStart(3, '0')}`
+}
+
+function normalizeClients(records: RawClientRecord[]) {
+  const buyerIds = new Map<string, string>()
+  const clientIdByOriginalAndUnit = new Map<string, string>()
+  let buyerCount = 0
+  let clientCount = 0
+
+  const normalized = records.flatMap((record, rawIndex) => {
+    const buyerKey = getBuyerKey(record.buyer)
+    if (!buyerIds.has(buyerKey)) {
+      buyerCount += 1
+      buyerIds.set(buyerKey, createBuyerId(buyerCount))
+    }
+
+    const units = splitUnitIds(record.unitId)
+    const originalClientId = `client-${rawIndex + 1}`
+
+    return units.map((unitId) => {
+      clientCount += 1
+      const clientId = `client-${clientCount}`
+      clientIdByOriginalAndUnit.set(`${originalClientId}|${unitId}`, clientId)
+
+      return {
+        ...record,
+        clientId,
+        buyerId: buyerIds.get(buyerKey) ?? createBuyerId(buyerCount),
+        unitId,
+        relocatedUnit: record.relocatedUnit ? splitUnitIds(record.relocatedUnit).join(', ') : record.relocatedUnit,
+        area: splitNumber(record.area, units.length),
+        totalContractPrice: splitNumber(record.totalContractPrice, units.length),
+        paymentMade: splitNumber(record.paymentMade, units.length),
+        balance: splitNumber(record.balance, units.length),
+      }
+    })
+  })
+
+  return { records: normalized, clientIdByOriginalAndUnit }
+}
+
+function normalizeUnitRows<T extends { unitId: string }>(
+  records: T[],
+  splitValues?: (record: T, count: number) => Partial<T>,
+) {
+  return records.flatMap((record) => {
+    const units = splitUnitIds(record.unitId)
+    return units.map((unitId) => ({
+      ...record,
+      ...splitValues?.(record, units.length),
+      unitId,
+    }))
+  })
+}
+
+function normalizeSoaRecords(records: SoaRecord[]) {
+  return records.flatMap((record) => {
+    const units = splitUnitIds(record.unitNo)
+    return units.map((unitNo) => ({
+      ...record,
+      unitNo,
+      totalContractPrice: splitNumber(record.totalContractPrice, units.length),
+      legalMiscFee: splitNumber(record.legalMiscFee, units.length),
+      totalAmountPayable: splitNumber(record.totalAmountPayable, units.length),
+      totalToFullyPay: splitNumber(record.totalToFullyPay, units.length),
+      schedule: record.schedule.map((line) => ({
+        ...line,
+        dueAmount: splitNumber(line.dueAmount, units.length),
+        penalty: splitNumber(line.penalty, units.length),
+        amountPaid: line.amountPaid === undefined ? undefined : splitNumber(line.amountPaid, units.length),
+        runningBalance: splitNumber(line.runningBalance, units.length),
+      })),
+    }))
+  })
+}
+
+const normalizedClientData = normalizeClients(canonicalClients)
+
+export const listings = canonicalListings
+export const clients = normalizedClientData.records
+export const clientsV2 = clients
+export const paymentTracker = normalizeUnitRows(canonicalPaymentTracker, (payment, count) => ({
+  paymentMade: splitNumber(payment.paymentMade, count),
+  totalContractPrice: splitNumber(payment.totalContractPrice, count),
+  balance: splitNumber(payment.balance, count),
+}))
+export const commissions = normalizeUnitRows(canonicalCommissions, (commission, count) => ({
+  netSellingPrice: splitNumber(commission.netSellingPrice, count),
+  managerCommission: splitNumber(commission.managerCommission, count),
+  agentCommission: splitNumber(commission.agentCommission, count),
+}))
+
+const canonicalSoaRecords: SoaRecord[] = [
   {
     "buyer": "ELORA ANDREI A. DIZON",
     "unitNo": "LA-0416",
@@ -13799,6 +13905,8 @@ export const auditLogs = [
     "Computation"
   ]
 ]
+export const soaRecords = normalizeSoaRecords(canonicalSoaRecords)
+
 export const projects = [
   {
     "id": "project-1",
@@ -13983,7 +14091,7 @@ export const listingsV2 = listings.map((listing, index) => ({
   images: [],
 }))
 
-export const payments = [
+const canonicalPayments = [
   {
     "id": "payment-1",
     "clientId": "client-6",
@@ -18401,6 +18509,16 @@ export const payments = [
     "runningBalance": 0
   }
 ]
+export const payments = normalizeUnitRows(canonicalPayments, (payment, count) => ({
+  amount: splitNumber(payment.amount, count),
+  penalty: splitNumber(payment.penalty, count),
+  runningBalance: splitNumber(payment.runningBalance, count),
+})).map((payment, index) => ({
+  ...payment,
+  id: `payment-${index + 1}`,
+  clientId: normalizedClientData.clientIdByOriginalAndUnit.get(`${payment.clientId}|${payment.unitId}`) ?? payment.clientId,
+}))
+
 export const commissionRules: CommissionRule[] = [
   {
     "id": "rule-1",
@@ -18533,7 +18651,7 @@ export const commissionRules: CommissionRule[] = [
     "status": "Active"
   }
 ]
-export const clientDocuments = [
+const canonicalClientDocuments = [
   {
     "id": "doc-1-1",
     "clientId": "client-1",
@@ -24275,6 +24393,12 @@ export const clientDocuments = [
     "rejectionRemark": ""
   }
 ]
+
+export const clientDocuments = normalizeUnitRows(canonicalClientDocuments).map((document, index) => ({
+  ...document,
+  id: `doc-${index + 1}`,
+  clientId: normalizedClientData.clientIdByOriginalAndUnit.get(`${document.clientId}|${document.unitId}`) ?? document.clientId,
+}))
 
 export const usersV2 = [
   { id: 'user-1', fullName: 'Admin', email: 'admin@dcprime.com', role: 'admin', status: 'Active', dateCreated: '01/01/2026', lastLogin: '06/03/2026', permissions: featureKeys.reduce((acc, key) => ({ ...acc, [key]: true }), {}) },
