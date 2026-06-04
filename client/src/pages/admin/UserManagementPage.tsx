@@ -13,6 +13,11 @@ function UserManagementPage() {
     return saved ? JSON.parse(saved) as AdminUser[] : initialUsers
   })
   const [selectedId, setSelectedId] = useState(initialUsers[1].id)
+  const [userPage, setUserPage] = useState(1)
+  const pageSize = Number(localStorage.getItem('dcprime_page_size') ?? 20)
+  const totalUserPages = Math.max(1, Math.ceil(users.length / pageSize))
+  const currentUserPage = Math.min(userPage, totalUserPages)
+  const visibleUsers = users.slice((currentUserPage - 1) * pageSize, currentUserPage * pageSize)
   const selectedUser = users.find((user) => user.id === selectedId) ?? users[0]
 
   useEffect(() => {
@@ -41,6 +46,7 @@ function UserManagementPage() {
     }
     setUsers((current) => [...current, user])
     setSelectedId(nextId)
+    setUserPage(Math.ceil((users.length + 1) / pageSize))
     toast.success('User created successfully.')
   }
 
@@ -51,7 +57,7 @@ function UserManagementPage() {
           Add User
         </button>
         <div className="space-y-3">
-          {users.map((user) => (
+          {visibleUsers.map((user) => (
             <button
               key={user.id}
               onClick={() => setSelectedId(user.id)}
@@ -69,6 +75,27 @@ function UserManagementPage() {
               <p className="mt-3 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">{user.role}</p>
             </button>
           ))}
+        </div>
+        <div className="mt-4 flex items-center justify-between text-xs text-zinc-500">
+          <span>
+            Showing {(currentUserPage - 1) * pageSize + 1}-{Math.min(currentUserPage * pageSize, users.length)} of {users.length}
+          </span>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setUserPage(Math.max(1, currentUserPage - 1))}
+              disabled={currentUserPage === 1}
+              className="rounded-md border border-white/10 px-3 py-1.5 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Previous
+            </button>
+            <button
+              onClick={() => setUserPage(Math.min(totalUserPages, currentUserPage + 1))}
+              disabled={currentUserPage === totalUserPages}
+              className="rounded-md border border-white/10 px-3 py-1.5 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Next
+            </button>
+          </div>
         </div>
       </Panel>
 

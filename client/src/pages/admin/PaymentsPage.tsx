@@ -9,6 +9,7 @@ import { useToast } from '../../components/admin/Toast'
 import { formatCurrency, formatPercent } from '../../components/admin/formatters'
 import { company, paymentTracker, soaRecords } from '../../data/adminMockData'
 import type { Payment } from '../../data/adminMockData'
+import { paymentDetails } from '../../data/sourceDetails'
 
 type PaymentsPageProps = {
   initialTab?: 'all' | 'due' | 'overdue'
@@ -18,7 +19,11 @@ function PaymentsPage({ initialTab = 'all' }: PaymentsPageProps) {
   const toast = useToast()
   const [payments, setPayments] = useState(paymentTracker)
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null)
+  const [editingPayment, setEditingPayment] = useState<Payment | null>(null)
   const [isRecordModalOpen, setIsRecordModalOpen] = useState(false)
+  const selectedPaymentDetail = selectedPayment
+    ? paymentDetails.find((detail) => detail.unitId === selectedPayment.unitId && detail.buyer === selectedPayment.buyer)
+    : undefined
   const soa = soaRecords[0]
   const title =
     initialTab === 'due' ? 'Due Payments' : initialTab === 'overdue' ? 'Overdue Accounts' : 'Payment Made Tracker'
@@ -53,6 +58,44 @@ function PaymentsPage({ initialTab = 'all' }: PaymentsPageProps) {
     toast.success('Mock payment recorded.')
   }
 
+  function savePaymentEdit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (!editingPayment) return
+
+    const formData = new FormData(event.currentTarget)
+    const paymentMade = Number(formData.get('paymentMade'))
+    const totalContractPrice = Number(formData.get('totalContractPrice'))
+    const payment: Payment = {
+      ...editingPayment,
+      buyer: String(formData.get('buyer')),
+      unitId: String(formData.get('unitId')),
+      mode: String(formData.get('mode')) as Payment['mode'],
+      dueDay: String(formData.get('dueDay')) || undefined,
+      paymentMade,
+      totalContractPrice,
+      balance: Math.max(0, totalContractPrice - paymentMade),
+      paymentPercentage: totalContractPrice > 0 ? paymentMade / totalContractPrice : 0,
+      commissionReleasedPercent: Number(formData.get('commissionReleasedPercent')) / 100,
+    }
+
+    setPayments((current) =>
+      current.map((item) => (item.buyer === editingPayment.buyer && item.unitId === editingPayment.unitId ? payment : item)),
+    )
+    setEditingPayment(null)
+    toast.success('Payment updated.')
+  }
+
+  function voidPayment(payment: Payment) {
+    setPayments((current) =>
+      current.map((item) =>
+        item.buyer === payment.buyer && item.unitId === payment.unitId
+          ? { ...item, paymentMade: 0, balance: item.totalContractPrice, paymentPercentage: 0, commissionReleasedPercent: 0 }
+          : item,
+      ),
+    )
+    toast.success('Payment voided.')
+  }
+
   return (
     <div className="space-y-6">
       <Panel title={title} subtitle="Payment totals from workbook">
@@ -72,13 +115,26 @@ function PaymentsPage({ initialTab = 'all' }: PaymentsPageProps) {
             formatCurrency(payment.totalContractPrice),
             formatCurrency(payment.balance),
             formatPercent(payment.paymentPercentage),
-            <button
-              key={`${payment.unitId}-view`}
-              onClick={() => setSelectedPayment(payment)}
-              className="rounded-md border border-[#C9A84C]/40 px-3 py-1 text-xs font-semibold text-[#C9A84C] hover:bg-[#C9A84C]/10"
-            >
-              View
-            </button>,
+            <div key={`${payment.unitId}-actions`} className="flex gap-2">
+              <button
+                onClick={() => setSelectedPayment(payment)}
+                className="rounded-md border border-[#C9A84C]/40 px-3 py-1 text-xs font-semibold text-[#C9A84C] hover:bg-[#C9A84C]/10"
+              >
+                View
+              </button>
+              <button
+                onClick={() => setEditingPayment(payment)}
+                className="rounded-md border border-white/20 px-3 py-1 text-xs font-semibold text-zinc-300 hover:bg-white/5"
+              >
+                Edit
+              </button>
+              <button
+                onClick={() => voidPayment(payment)}
+                className="rounded-md border border-rose-400/40 px-3 py-1 text-xs font-semibold text-rose-300 hover:bg-rose-400/10"
+              >
+                Void
+              </button>
+            </div>,
           ])}
         />
       </Panel>
@@ -156,16 +212,32 @@ function PaymentsPage({ initialTab = 'all' }: PaymentsPageProps) {
       </div>
       <Modal title="Payment Details" isOpen={selectedPayment !== null} onClose={() => setSelectedPayment(null)}>
         {selectedPayment && (
-          <div className="grid gap-3 text-sm md:grid-cols-2">
-            <InfoRow label="Buyer" value={selectedPayment.buyer} />
-            <InfoRow label="Unit" value={selectedPayment.unitId} />
-            <InfoRow label="Mode" value={selectedPayment.mode} />
-            <InfoRow label="Due Day" value={selectedPayment.dueDay ?? '-'} />
-            <InfoRow label="Payment Made" value={formatCurrency(selectedPayment.paymentMade)} />
-            <InfoRow label="Total Contract Price" value={formatCurrency(selectedPayment.totalContractPrice)} />
-            <InfoRow label="Balance" value={formatCurrency(selectedPayment.balance)} />
-            <InfoRow label="Payment Progress" value={formatPercent(selectedPayment.paymentPercentage)} />
-            <InfoRow label="Commission Released" value={formatPercent(selectedPayment.commissionReleasedPercent)} />
+          <div className="space-y-5">
+            <div className="grid gap-3 text-sm md:grid-cols-2">
+              <InfoRow label="Buyer" value={selectedPayment.buyer} />
+              <InfoRow label="Unit" value={selectedPayment.unitId} />
+              <InfoRow label="Mode" value={selectedPayment.mode} />
+              <InfoRow label="Due Day" value={selectedPayment.dueDay ?? '-'} />
+              <InfoRow label="Payment Made" value={formatCurrency(selectedPayment.paymentMade)} />
+              <InfoRow label="Total Contract Price" value={formatCurrency(selectedPayment.totalContractPrice)} />
+              <InfoRow label="Balance" value={formatCurrency(selectedPayment.balance)} />
+              <InfoRow label="Payment Progress" value={formatPercent(selectedPayment.paymentPercentage)} />
+              <InfoRow label="Commission Released" value={formatPercent(selectedPayment.commissionReleasedPercent)} />
+            </div>
+            <section className="rounded-lg border border-white/10 bg-black p-4">
+              <h3 className="mb-3 text-sm font-bold text-zinc-100">Monthly Payment History</h3>
+              {selectedPaymentDetail?.monthlyPayments.length ? (
+                <DataTable
+                  headers={['Period', 'Amount']}
+                  rows={selectedPaymentDetail.monthlyPayments.map((payment) => [
+                    payment.period,
+                    formatCurrency(payment.amount),
+                  ])}
+                />
+              ) : (
+                <p className="text-sm text-zinc-500">No monthly payment entries found for this account.</p>
+              )}
+            </section>
           </div>
         )}
       </Modal>
@@ -203,7 +275,46 @@ function PaymentsPage({ initialTab = 'all' }: PaymentsPageProps) {
           </div>
         </form>
       </Modal>
+      <Modal title="Edit Payment" isOpen={editingPayment !== null} onClose={() => setEditingPayment(null)}>
+        {editingPayment && (
+          <form onSubmit={savePaymentEdit} className="grid gap-4 text-sm md:grid-cols-2">
+            <PaymentInput label="Buyer" name="buyer" value={editingPayment.buyer} />
+            <PaymentInput label="Unit ID" name="unitId" value={editingPayment.unitId} />
+            <label className="block font-semibold text-zinc-300">
+              Mode
+              <select name="mode" defaultValue={editingPayment.mode} className="mt-2 w-full rounded-md border border-white/10 bg-black px-3 py-2 text-white">
+                <option>CASH</option>
+                <option>INSTALLMENT</option>
+              </select>
+            </label>
+            <PaymentInput label="Due Day" name="dueDay" value={editingPayment.dueDay ?? ''} />
+            <PaymentInput label="Payment Made" name="paymentMade" value={String(editingPayment.paymentMade)} type="number" />
+            <PaymentInput label="Total Contract Price" name="totalContractPrice" value={String(editingPayment.totalContractPrice)} type="number" />
+            <PaymentInput
+              label="Commission Released %"
+              name="commissionReleasedPercent"
+              value={(editingPayment.commissionReleasedPercent * 100).toFixed(2)}
+              type="number"
+            />
+            <div className="flex items-end justify-end gap-2">
+              <button type="button" onClick={() => setEditingPayment(null)} className="rounded-md border border-white/10 px-4 py-2 font-semibold text-zinc-300">
+                Cancel
+              </button>
+              <button className="rounded-md bg-[#C9A84C] px-4 py-2 font-bold text-black">Save Payment</button>
+            </div>
+          </form>
+        )}
+      </Modal>
     </div>
+  )
+}
+
+function PaymentInput({ label, name, value, type = 'text' }: { label: string; name: string; value: string; type?: string }) {
+  return (
+    <label className="block font-semibold text-zinc-300">
+      {label}
+      <input name={name} type={type} defaultValue={value} className="mt-2 w-full rounded-md border border-white/10 bg-black px-3 py-2 text-white" />
+    </label>
   )
 }
 

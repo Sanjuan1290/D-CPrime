@@ -4,7 +4,7 @@ import InfoRow from '../../components/admin/InfoRow'
 import Panel from '../../components/admin/Panel'
 import { useToast } from '../../components/admin/Toast'
 import { formatCurrency, formatPercent } from '../../components/admin/formatters'
-import { accreditedSellers, company, computations } from '../../data/mockData'
+import { accreditedSellers, auditLogsV2, company, computations } from '../../data/mockData'
 
 function SettingsPage() {
   const toast = useToast()
@@ -51,8 +51,8 @@ function SettingsPage() {
                 <InfoRow label="Downpayment" value={formatPercent(item.downpaymentPercent)} />
                 <InfoRow label="Reservation Fee" value={formatCurrency(item.reservationFee)} />
                 <InfoRow label="Balance" value={formatCurrency(item.balance)} />
-                <InfoRow label="3 Years Estimated Monthly" value={formatCurrency(item.estimated3Years)} />
-                <InfoRow label="5 Years Estimated Monthly" value={formatCurrency(item.estimated5Years)} />
+                {item.estimated3Years !== undefined && <InfoRow label="3 Years Estimated Monthly" value={formatCurrency(item.estimated3Years)} />}
+                {item.estimated5Years !== undefined && <InfoRow label="5 Years Estimated Monthly" value={formatCurrency(item.estimated5Years)} />}
               </div>
             </div>
           ))}
@@ -82,6 +82,20 @@ function SettingsPage() {
             Save Changes
           </button>
         </div>
+      </Panel>
+
+      <Panel title="Audit Logs" subtitle="Admin activity history moved from the sidebar into Settings">
+        <DataTable
+          headers={['Date / Time', 'User', 'Role', 'Action', 'Details', 'IP']}
+          rows={auditLogsV2.map((log) => [
+            log.timestamp,
+            log.userName,
+            log.role,
+            log.action,
+            log.details,
+            log.ipAddress,
+          ])}
+        />
       </Panel>
     </div>
   )

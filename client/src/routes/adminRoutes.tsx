@@ -71,6 +71,7 @@ export const adminRoutes: AdminRoute[] = [
   { path: 'payments/receipt/:paymentId', label: 'Receipt', element: <ReceiptPage />, feature: 'payments_view', allowedRoles: adminOnly, activeKey: 'payments' },
   { path: 'commissions', label: 'Commissions', element: <CommissionsPage />, feature: 'commissions_view', allowedRoles: adminOnly, activeKey: 'commissions' },
   { path: 'documents', label: 'Documents', element: <DocumentsPage />, feature: 'documents_view', allowedRoles: adminOnly, activeKey: 'documents' },
+  { path: 'reports', label: 'Reports', element: <ReportsPage />, feature: 'reports_view', allowedRoles: adminOnly, activeKey: 'reports' },
   { path: 'audit-logs', label: 'Audit Logs', element: <AuditLogsPage />, feature: 'audit_logs', allowedRoles: adminOnly, activeKey: 'auditLogs' },
   { path: 'records/clients', label: 'View Clients', element: <ViewClientsPage />, feature: 'clients_view', allowedRoles: adminOnly, activeKey: 'viewClients' },
   { path: 'records/balances', label: 'Balances', element: <BalancesPage />, feature: 'payments_view', allowedRoles: adminOnly, activeKey: 'balances' },
@@ -101,18 +102,11 @@ export const adminNavGroups: AdminNavGroup[] = [
   },
   {
     title: 'Compliance',
-    items: [
-      navItem('documents', 'Documents', 'file', 'documents_view'),
-      navItem('auditLogs', 'Audit logs', 'clipboard', 'audit_logs'),
-    ],
+    items: [navItem('documents', 'Documents', 'file', 'documents_view')],
   },
   {
-    title: 'Records',
-    items: [
-      navItem('viewClients', 'View clients', 'id', 'clients_view'),
-      navItem('balances', 'Balances', 'wallet', 'payments_view'),
-      navItem('reports', 'Reports', 'chart', 'reports_view'),
-    ],
+    title: 'Insights',
+    items: [navItem('reports', 'Reports', 'chart', 'reports_view')],
   },
   {
     title: 'Admin',

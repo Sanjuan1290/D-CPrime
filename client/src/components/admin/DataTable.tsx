@@ -12,6 +12,7 @@ function DataTable({ headers, rows }: DataTableProps) {
   const [page, setPage] = useState(1)
   const pageSize = Number(localStorage.getItem('dcprime_page_size') ?? 20)
   const totalPages = Math.max(1, Math.ceil(rows.length / pageSize))
+  const currentPage = Math.min(page, totalPages)
 
   const sortedRows = useMemo(() => {
     if (sortIndex === null) return rows
@@ -24,7 +25,7 @@ function DataTable({ headers, rows }: DataTableProps) {
     })
   }, [rows, sortDirection, sortIndex])
 
-  const visibleRows = sortedRows.slice((page - 1) * pageSize, page * pageSize)
+  const visibleRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
 
   function handleSort(index: number) {
     setPage(1)
@@ -54,7 +55,7 @@ function DataTable({ headers, rows }: DataTableProps) {
                 <th key={header} className="px-4 py-3 font-semibold">
                   <button onClick={() => handleSort(index)} className="flex items-center gap-1 text-left hover:text-[#C9A84C]">
                     {header}
-                    {sortIndex === index && <span className="text-[#C9A84C]">{sortDirection === 'asc' ? '↑' : '↓'}</span>}
+                    {sortIndex === index && <span className="text-[#C9A84C]">{sortDirection === 'asc' ? 'Asc' : 'Desc'}</span>}
                   </button>
                 </th>
               ))}
@@ -75,19 +76,19 @@ function DataTable({ headers, rows }: DataTableProps) {
       </div>
       <div className="flex items-center justify-between text-xs text-zinc-500">
         <span>
-          Showing {(page - 1) * pageSize + 1}-{Math.min(page * pageSize, rows.length)} of {rows.length}
+          Showing {(currentPage - 1) * pageSize + 1}-{Math.min(currentPage * pageSize, rows.length)} of {rows.length}
         </span>
         <div className="flex gap-2">
           <button
-            onClick={() => setPage((current) => Math.max(1, current - 1))}
-            disabled={page === 1}
+            onClick={() => setPage(Math.max(1, currentPage - 1))}
+            disabled={currentPage === 1}
             className="rounded-md border border-white/10 px-3 py-1.5 disabled:cursor-not-allowed disabled:opacity-40"
           >
             Previous
           </button>
           <button
-            onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
-            disabled={page === totalPages}
+            onClick={() => setPage(Math.min(totalPages, currentPage + 1))}
+            disabled={currentPage === totalPages}
             className="rounded-md border border-white/10 px-3 py-1.5 disabled:cursor-not-allowed disabled:opacity-40"
           >
             Next
