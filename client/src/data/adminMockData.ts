@@ -18863,5754 +18863,59 @@ export const commissionRules: CommissionRule[] = [
     "status": "Active"
   }
 ]
-const canonicalClientDocuments = [
-  {
-    "id": "doc-1-1",
-    "clientId": "client-1",
-    "clientName": "SILVA, ISABEL LAYUG L.",
-    "unitId": "LA-0204",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-1-2",
-    "clientId": "client-1",
-    "clientName": "SILVA, ISABEL LAYUG L.",
-    "unitId": "LA-0204",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-1-3",
-    "clientId": "client-1",
-    "clientName": "SILVA, ISABEL LAYUG L.",
-    "unitId": "LA-0204",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-1-4",
-    "clientId": "client-1",
-    "clientName": "SILVA, ISABEL LAYUG L.",
-    "unitId": "LA-0204",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-1-5",
-    "clientId": "client-1",
-    "clientName": "SILVA, ISABEL LAYUG L.",
-    "unitId": "LA-0204",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-1-6",
-    "clientId": "client-1",
-    "clientName": "SILVA, ISABEL LAYUG L.",
-    "unitId": "LA-0204",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-1-7",
-    "clientId": "client-1",
-    "clientName": "SILVA, ISABEL LAYUG L.",
-    "unitId": "LA-0204",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-2-1",
-    "clientId": "client-2",
-    "clientName": "RABAGO, ELIZABETH L.",
-    "unitId": "LA-0401",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-2-2",
-    "clientId": "client-2",
-    "clientName": "RABAGO, ELIZABETH L.",
-    "unitId": "LA-0401",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-2-3",
-    "clientId": "client-2",
-    "clientName": "RABAGO, ELIZABETH L.",
-    "unitId": "LA-0401",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-2-4",
-    "clientId": "client-2",
-    "clientName": "RABAGO, ELIZABETH L.",
-    "unitId": "LA-0401",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-2-5",
-    "clientId": "client-2",
-    "clientName": "RABAGO, ELIZABETH L.",
-    "unitId": "LA-0401",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-2-6",
-    "clientId": "client-2",
-    "clientName": "RABAGO, ELIZABETH L.",
-    "unitId": "LA-0401",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-2-7",
-    "clientId": "client-2",
-    "clientName": "RABAGO, ELIZABETH L.",
-    "unitId": "LA-0401",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-3-1",
-    "clientId": "client-3",
-    "clientName": "CABISON, AVA MAXINE E.",
-    "unitId": "LA-0403",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-3-2",
-    "clientId": "client-3",
-    "clientName": "CABISON, AVA MAXINE E.",
-    "unitId": "LA-0403",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-3-3",
-    "clientId": "client-3",
-    "clientName": "CABISON, AVA MAXINE E.",
-    "unitId": "LA-0403",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-3-4",
-    "clientId": "client-3",
-    "clientName": "CABISON, AVA MAXINE E.",
-    "unitId": "LA-0403",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-3-5",
-    "clientId": "client-3",
-    "clientName": "CABISON, AVA MAXINE E.",
-    "unitId": "LA-0403",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-3-6",
-    "clientId": "client-3",
-    "clientName": "CABISON, AVA MAXINE E.",
-    "unitId": "LA-0403",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-3-7",
-    "clientId": "client-3",
-    "clientName": "CABISON, AVA MAXINE E.",
-    "unitId": "LA-0403",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-4-1",
-    "clientId": "client-4",
-    "clientName": "CABISON, SOPHIA CLAIRE E.",
-    "unitId": "LA-0404",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-4-2",
-    "clientId": "client-4",
-    "clientName": "CABISON, SOPHIA CLAIRE E.",
-    "unitId": "LA-0404",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-4-3",
-    "clientId": "client-4",
-    "clientName": "CABISON, SOPHIA CLAIRE E.",
-    "unitId": "LA-0404",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-4-4",
-    "clientId": "client-4",
-    "clientName": "CABISON, SOPHIA CLAIRE E.",
-    "unitId": "LA-0404",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-4-5",
-    "clientId": "client-4",
-    "clientName": "CABISON, SOPHIA CLAIRE E.",
-    "unitId": "LA-0404",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-4-6",
-    "clientId": "client-4",
-    "clientName": "CABISON, SOPHIA CLAIRE E.",
-    "unitId": "LA-0404",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-4-7",
-    "clientId": "client-4",
-    "clientName": "CABISON, SOPHIA CLAIRE E.",
-    "unitId": "LA-0404",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-5-1",
-    "clientId": "client-5",
-    "clientName": "AQUINO, JAYMILYN BERNARDO",
-    "unitId": "LA-0103",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Approved",
-    "submittedDate": "01/26/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-5-2",
-    "clientId": "client-5",
-    "clientName": "AQUINO, JAYMILYN BERNARDO",
-    "unitId": "LA-0103",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Approved",
-    "submittedDate": "01/26/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-5-3",
-    "clientId": "client-5",
-    "clientName": "AQUINO, JAYMILYN BERNARDO",
-    "unitId": "LA-0103",
-    "documentType": "Buyer's Information Form",
-    "status": "Approved",
-    "submittedDate": "01/26/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-5-4",
-    "clientId": "client-5",
-    "clientName": "AQUINO, JAYMILYN BERNARDO",
-    "unitId": "LA-0103",
-    "documentType": "Intent to Buy",
-    "status": "Approved",
-    "submittedDate": "01/26/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-5-5",
-    "clientId": "client-5",
-    "clientName": "AQUINO, JAYMILYN BERNARDO",
-    "unitId": "LA-0103",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Approved",
-    "submittedDate": "01/26/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-5-6",
-    "clientId": "client-5",
-    "clientName": "AQUINO, JAYMILYN BERNARDO",
-    "unitId": "LA-0103",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Approved",
-    "submittedDate": "01/26/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-5-7",
-    "clientId": "client-5",
-    "clientName": "AQUINO, JAYMILYN BERNARDO",
-    "unitId": "LA-0103",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Approved",
-    "submittedDate": "01/26/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-6-1",
-    "clientId": "client-6",
-    "clientName": "DIZON, ELORA ANDREI",
-    "unitId": "LA-0416",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-6-2",
-    "clientId": "client-6",
-    "clientName": "DIZON, ELORA ANDREI",
-    "unitId": "LA-0416",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-6-3",
-    "clientId": "client-6",
-    "clientName": "DIZON, ELORA ANDREI",
-    "unitId": "LA-0416",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-6-4",
-    "clientId": "client-6",
-    "clientName": "DIZON, ELORA ANDREI",
-    "unitId": "LA-0416",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-6-5",
-    "clientId": "client-6",
-    "clientName": "DIZON, ELORA ANDREI",
-    "unitId": "LA-0416",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-6-6",
-    "clientId": "client-6",
-    "clientName": "DIZON, ELORA ANDREI",
-    "unitId": "LA-0416",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-6-7",
-    "clientId": "client-6",
-    "clientName": "DIZON, ELORA ANDREI",
-    "unitId": "LA-0416",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-7-1",
-    "clientId": "client-7",
-    "clientName": "DACAYO, JENNIFER MOROJO",
-    "unitId": "LA-0101",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Approved",
-    "submittedDate": "01/31/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-7-2",
-    "clientId": "client-7",
-    "clientName": "DACAYO, JENNIFER MOROJO",
-    "unitId": "LA-0101",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Approved",
-    "submittedDate": "01/31/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-7-3",
-    "clientId": "client-7",
-    "clientName": "DACAYO, JENNIFER MOROJO",
-    "unitId": "LA-0101",
-    "documentType": "Buyer's Information Form",
-    "status": "Approved",
-    "submittedDate": "01/31/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-7-4",
-    "clientId": "client-7",
-    "clientName": "DACAYO, JENNIFER MOROJO",
-    "unitId": "LA-0101",
-    "documentType": "Intent to Buy",
-    "status": "Approved",
-    "submittedDate": "01/31/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-7-5",
-    "clientId": "client-7",
-    "clientName": "DACAYO, JENNIFER MOROJO",
-    "unitId": "LA-0101",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Approved",
-    "submittedDate": "01/31/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-7-6",
-    "clientId": "client-7",
-    "clientName": "DACAYO, JENNIFER MOROJO",
-    "unitId": "LA-0101",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Approved",
-    "submittedDate": "01/31/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-7-7",
-    "clientId": "client-7",
-    "clientName": "DACAYO, JENNIFER MOROJO",
-    "unitId": "LA-0101",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Approved",
-    "submittedDate": "01/31/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-8-1",
-    "clientId": "client-8",
-    "clientName": "CAMANTIGUE, ESTELISA V.",
-    "unitId": "LA-0201 (1.1)",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-8-2",
-    "clientId": "client-8",
-    "clientName": "CAMANTIGUE, ESTELISA V.",
-    "unitId": "LA-0201 (1.1)",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-8-3",
-    "clientId": "client-8",
-    "clientName": "CAMANTIGUE, ESTELISA V.",
-    "unitId": "LA-0201 (1.1)",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-8-4",
-    "clientId": "client-8",
-    "clientName": "CAMANTIGUE, ESTELISA V.",
-    "unitId": "LA-0201 (1.1)",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-8-5",
-    "clientId": "client-8",
-    "clientName": "CAMANTIGUE, ESTELISA V.",
-    "unitId": "LA-0201 (1.1)",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-8-6",
-    "clientId": "client-8",
-    "clientName": "CAMANTIGUE, ESTELISA V.",
-    "unitId": "LA-0201 (1.1)",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-8-7",
-    "clientId": "client-8",
-    "clientName": "CAMANTIGUE, ESTELISA V.",
-    "unitId": "LA-0201 (1.1)",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-9-1",
-    "clientId": "client-9",
-    "clientName": "RAMIREZ, PRINCE RUPERT",
-    "unitId": "LA-0203",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-9-2",
-    "clientId": "client-9",
-    "clientName": "RAMIREZ, PRINCE RUPERT",
-    "unitId": "LA-0203",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-9-3",
-    "clientId": "client-9",
-    "clientName": "RAMIREZ, PRINCE RUPERT",
-    "unitId": "LA-0203",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-9-4",
-    "clientId": "client-9",
-    "clientName": "RAMIREZ, PRINCE RUPERT",
-    "unitId": "LA-0203",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-9-5",
-    "clientId": "client-9",
-    "clientName": "RAMIREZ, PRINCE RUPERT",
-    "unitId": "LA-0203",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-9-6",
-    "clientId": "client-9",
-    "clientName": "RAMIREZ, PRINCE RUPERT",
-    "unitId": "LA-0203",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-9-7",
-    "clientId": "client-9",
-    "clientName": "RAMIREZ, PRINCE RUPERT",
-    "unitId": "LA-0203",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-10-1",
-    "clientId": "client-10",
-    "clientName": "RUSIT, ERIC C.",
-    "unitId": "LA-0305 LA0306 & LA-0307 COMBINED",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Approved",
-    "submittedDate": "02/07/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-10-2",
-    "clientId": "client-10",
-    "clientName": "RUSIT, ERIC C.",
-    "unitId": "LA-0305 LA0306 & LA-0307 COMBINED",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Approved",
-    "submittedDate": "02/07/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-10-3",
-    "clientId": "client-10",
-    "clientName": "RUSIT, ERIC C.",
-    "unitId": "LA-0305 LA0306 & LA-0307 COMBINED",
-    "documentType": "Buyer's Information Form",
-    "status": "Approved",
-    "submittedDate": "02/07/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-10-4",
-    "clientId": "client-10",
-    "clientName": "RUSIT, ERIC C.",
-    "unitId": "LA-0305 LA0306 & LA-0307 COMBINED",
-    "documentType": "Intent to Buy",
-    "status": "Approved",
-    "submittedDate": "02/07/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-10-5",
-    "clientId": "client-10",
-    "clientName": "RUSIT, ERIC C.",
-    "unitId": "LA-0305 LA0306 & LA-0307 COMBINED",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Approved",
-    "submittedDate": "02/07/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-10-6",
-    "clientId": "client-10",
-    "clientName": "RUSIT, ERIC C.",
-    "unitId": "LA-0305 LA0306 & LA-0307 COMBINED",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Approved",
-    "submittedDate": "02/07/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-10-7",
-    "clientId": "client-10",
-    "clientName": "RUSIT, ERIC C.",
-    "unitId": "LA-0305 LA0306 & LA-0307 COMBINED",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Approved",
-    "submittedDate": "02/07/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-11-1",
-    "clientId": "client-11",
-    "clientName": "PRADEZ, JACKIELOU RIA G.",
-    "unitId": "LA-0408",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-11-2",
-    "clientId": "client-11",
-    "clientName": "PRADEZ, JACKIELOU RIA G.",
-    "unitId": "LA-0408",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-11-3",
-    "clientId": "client-11",
-    "clientName": "PRADEZ, JACKIELOU RIA G.",
-    "unitId": "LA-0408",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-11-4",
-    "clientId": "client-11",
-    "clientName": "PRADEZ, JACKIELOU RIA G.",
-    "unitId": "LA-0408",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-11-5",
-    "clientId": "client-11",
-    "clientName": "PRADEZ, JACKIELOU RIA G.",
-    "unitId": "LA-0408",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-11-6",
-    "clientId": "client-11",
-    "clientName": "PRADEZ, JACKIELOU RIA G.",
-    "unitId": "LA-0408",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-11-7",
-    "clientId": "client-11",
-    "clientName": "PRADEZ, JACKIELOU RIA G.",
-    "unitId": "LA-0408",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-12-1",
-    "clientId": "client-12",
-    "clientName": "PRADEZ, JACKIELOU RIA G.",
-    "unitId": "LA-0410",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-12-2",
-    "clientId": "client-12",
-    "clientName": "PRADEZ, JACKIELOU RIA G.",
-    "unitId": "LA-0410",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-12-3",
-    "clientId": "client-12",
-    "clientName": "PRADEZ, JACKIELOU RIA G.",
-    "unitId": "LA-0410",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-12-4",
-    "clientId": "client-12",
-    "clientName": "PRADEZ, JACKIELOU RIA G.",
-    "unitId": "LA-0410",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-12-5",
-    "clientId": "client-12",
-    "clientName": "PRADEZ, JACKIELOU RIA G.",
-    "unitId": "LA-0410",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-12-6",
-    "clientId": "client-12",
-    "clientName": "PRADEZ, JACKIELOU RIA G.",
-    "unitId": "LA-0410",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-12-7",
-    "clientId": "client-12",
-    "clientName": "PRADEZ, JACKIELOU RIA G.",
-    "unitId": "LA-0410",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-13-1",
-    "clientId": "client-13",
-    "clientName": "BORAC, LARRY S.",
-    "unitId": "LA-0405",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-13-2",
-    "clientId": "client-13",
-    "clientName": "BORAC, LARRY S.",
-    "unitId": "LA-0405",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-13-3",
-    "clientId": "client-13",
-    "clientName": "BORAC, LARRY S.",
-    "unitId": "LA-0405",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-13-4",
-    "clientId": "client-13",
-    "clientName": "BORAC, LARRY S.",
-    "unitId": "LA-0405",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-13-5",
-    "clientId": "client-13",
-    "clientName": "BORAC, LARRY S.",
-    "unitId": "LA-0405",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-13-6",
-    "clientId": "client-13",
-    "clientName": "BORAC, LARRY S.",
-    "unitId": "LA-0405",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-13-7",
-    "clientId": "client-13",
-    "clientName": "BORAC, LARRY S.",
-    "unitId": "LA-0405",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-14-1",
-    "clientId": "client-14",
-    "clientName": "OCAMPO, RACQUEL",
-    "unitId": "LA-0412 & LA-0414 COMBINED",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-14-2",
-    "clientId": "client-14",
-    "clientName": "OCAMPO, RACQUEL",
-    "unitId": "LA-0412 & LA-0414 COMBINED",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-14-3",
-    "clientId": "client-14",
-    "clientName": "OCAMPO, RACQUEL",
-    "unitId": "LA-0412 & LA-0414 COMBINED",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-14-4",
-    "clientId": "client-14",
-    "clientName": "OCAMPO, RACQUEL",
-    "unitId": "LA-0412 & LA-0414 COMBINED",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-14-5",
-    "clientId": "client-14",
-    "clientName": "OCAMPO, RACQUEL",
-    "unitId": "LA-0412 & LA-0414 COMBINED",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-14-6",
-    "clientId": "client-14",
-    "clientName": "OCAMPO, RACQUEL",
-    "unitId": "LA-0412 & LA-0414 COMBINED",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-14-7",
-    "clientId": "client-14",
-    "clientName": "OCAMPO, RACQUEL",
-    "unitId": "LA-0412 & LA-0414 COMBINED",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-15-1",
-    "clientId": "client-15",
-    "clientName": "CABISON, CHERRY MAE E.",
-    "unitId": "LA-0406",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-15-2",
-    "clientId": "client-15",
-    "clientName": "CABISON, CHERRY MAE E.",
-    "unitId": "LA-0406",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-15-3",
-    "clientId": "client-15",
-    "clientName": "CABISON, CHERRY MAE E.",
-    "unitId": "LA-0406",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-15-4",
-    "clientId": "client-15",
-    "clientName": "CABISON, CHERRY MAE E.",
-    "unitId": "LA-0406",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-15-5",
-    "clientId": "client-15",
-    "clientName": "CABISON, CHERRY MAE E.",
-    "unitId": "LA-0406",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-15-6",
-    "clientId": "client-15",
-    "clientName": "CABISON, CHERRY MAE E.",
-    "unitId": "LA-0406",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-15-7",
-    "clientId": "client-15",
-    "clientName": "CABISON, CHERRY MAE E.",
-    "unitId": "LA-0406",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-16-1",
-    "clientId": "client-16",
-    "clientName": "DE LEON, CARMINA VICTORIA",
-    "unitId": "LA-0407",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-16-2",
-    "clientId": "client-16",
-    "clientName": "DE LEON, CARMINA VICTORIA",
-    "unitId": "LA-0407",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-16-3",
-    "clientId": "client-16",
-    "clientName": "DE LEON, CARMINA VICTORIA",
-    "unitId": "LA-0407",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-16-4",
-    "clientId": "client-16",
-    "clientName": "DE LEON, CARMINA VICTORIA",
-    "unitId": "LA-0407",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-16-5",
-    "clientId": "client-16",
-    "clientName": "DE LEON, CARMINA VICTORIA",
-    "unitId": "LA-0407",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-16-6",
-    "clientId": "client-16",
-    "clientName": "DE LEON, CARMINA VICTORIA",
-    "unitId": "LA-0407",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-16-7",
-    "clientId": "client-16",
-    "clientName": "DE LEON, CARMINA VICTORIA",
-    "unitId": "LA-0407",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-17-1",
-    "clientId": "client-17",
-    "clientName": "TUBORO, MARILOU GRIMALDO",
-    "unitId": "LA-0411",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-17-2",
-    "clientId": "client-17",
-    "clientName": "TUBORO, MARILOU GRIMALDO",
-    "unitId": "LA-0411",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-17-3",
-    "clientId": "client-17",
-    "clientName": "TUBORO, MARILOU GRIMALDO",
-    "unitId": "LA-0411",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-17-4",
-    "clientId": "client-17",
-    "clientName": "TUBORO, MARILOU GRIMALDO",
-    "unitId": "LA-0411",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-17-5",
-    "clientId": "client-17",
-    "clientName": "TUBORO, MARILOU GRIMALDO",
-    "unitId": "LA-0411",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-17-6",
-    "clientId": "client-17",
-    "clientName": "TUBORO, MARILOU GRIMALDO",
-    "unitId": "LA-0411",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-17-7",
-    "clientId": "client-17",
-    "clientName": "TUBORO, MARILOU GRIMALDO",
-    "unitId": "LA-0411",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-18-1",
-    "clientId": "client-18",
-    "clientName": "DE LEON, CHARLENE MAE T.",
-    "unitId": "LA-0409",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-18-2",
-    "clientId": "client-18",
-    "clientName": "DE LEON, CHARLENE MAE T.",
-    "unitId": "LA-0409",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-18-3",
-    "clientId": "client-18",
-    "clientName": "DE LEON, CHARLENE MAE T.",
-    "unitId": "LA-0409",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-18-4",
-    "clientId": "client-18",
-    "clientName": "DE LEON, CHARLENE MAE T.",
-    "unitId": "LA-0409",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-18-5",
-    "clientId": "client-18",
-    "clientName": "DE LEON, CHARLENE MAE T.",
-    "unitId": "LA-0409",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-18-6",
-    "clientId": "client-18",
-    "clientName": "DE LEON, CHARLENE MAE T.",
-    "unitId": "LA-0409",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-18-7",
-    "clientId": "client-18",
-    "clientName": "DE LEON, CHARLENE MAE T.",
-    "unitId": "LA-0409",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-19-1",
-    "clientId": "client-19",
-    "clientName": "SIAZON, JEFFERSON C.",
-    "unitId": "LA-0108 (CORNER) A",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-19-2",
-    "clientId": "client-19",
-    "clientName": "SIAZON, JEFFERSON C.",
-    "unitId": "LA-0108 (CORNER) A",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-19-3",
-    "clientId": "client-19",
-    "clientName": "SIAZON, JEFFERSON C.",
-    "unitId": "LA-0108 (CORNER) A",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-19-4",
-    "clientId": "client-19",
-    "clientName": "SIAZON, JEFFERSON C.",
-    "unitId": "LA-0108 (CORNER) A",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-19-5",
-    "clientId": "client-19",
-    "clientName": "SIAZON, JEFFERSON C.",
-    "unitId": "LA-0108 (CORNER) A",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-19-6",
-    "clientId": "client-19",
-    "clientName": "SIAZON, JEFFERSON C.",
-    "unitId": "LA-0108 (CORNER) A",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-19-7",
-    "clientId": "client-19",
-    "clientName": "SIAZON, JEFFERSON C.",
-    "unitId": "LA-0108 (CORNER) A",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-20-1",
-    "clientId": "client-20",
-    "clientName": "PRADEZ, JACKIELOU RIA G.",
-    "unitId": "LA-0304",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-20-2",
-    "clientId": "client-20",
-    "clientName": "PRADEZ, JACKIELOU RIA G.",
-    "unitId": "LA-0304",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-20-3",
-    "clientId": "client-20",
-    "clientName": "PRADEZ, JACKIELOU RIA G.",
-    "unitId": "LA-0304",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-20-4",
-    "clientId": "client-20",
-    "clientName": "PRADEZ, JACKIELOU RIA G.",
-    "unitId": "LA-0304",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-20-5",
-    "clientId": "client-20",
-    "clientName": "PRADEZ, JACKIELOU RIA G.",
-    "unitId": "LA-0304",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-20-6",
-    "clientId": "client-20",
-    "clientName": "PRADEZ, JACKIELOU RIA G.",
-    "unitId": "LA-0304",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-20-7",
-    "clientId": "client-20",
-    "clientName": "PRADEZ, JACKIELOU RIA G.",
-    "unitId": "LA-0304",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-21-1",
-    "clientId": "client-21",
-    "clientName": "SALAMAT, ANTONIO, MIGUEL",
-    "unitId": "LA-0413",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-21-2",
-    "clientId": "client-21",
-    "clientName": "SALAMAT, ANTONIO, MIGUEL",
-    "unitId": "LA-0413",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-21-3",
-    "clientId": "client-21",
-    "clientName": "SALAMAT, ANTONIO, MIGUEL",
-    "unitId": "LA-0413",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-21-4",
-    "clientId": "client-21",
-    "clientName": "SALAMAT, ANTONIO, MIGUEL",
-    "unitId": "LA-0413",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-21-5",
-    "clientId": "client-21",
-    "clientName": "SALAMAT, ANTONIO, MIGUEL",
-    "unitId": "LA-0413",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-21-6",
-    "clientId": "client-21",
-    "clientName": "SALAMAT, ANTONIO, MIGUEL",
-    "unitId": "LA-0413",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-21-7",
-    "clientId": "client-21",
-    "clientName": "SALAMAT, ANTONIO, MIGUEL",
-    "unitId": "LA-0413",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-22-1",
-    "clientId": "client-22",
-    "clientName": "COMIA, GRAZELYN M.",
-    "unitId": "LA-0415",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-22-2",
-    "clientId": "client-22",
-    "clientName": "COMIA, GRAZELYN M.",
-    "unitId": "LA-0415",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-22-3",
-    "clientId": "client-22",
-    "clientName": "COMIA, GRAZELYN M.",
-    "unitId": "LA-0415",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-22-4",
-    "clientId": "client-22",
-    "clientName": "COMIA, GRAZELYN M.",
-    "unitId": "LA-0415",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-22-5",
-    "clientId": "client-22",
-    "clientName": "COMIA, GRAZELYN M.",
-    "unitId": "LA-0415",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-22-6",
-    "clientId": "client-22",
-    "clientName": "COMIA, GRAZELYN M.",
-    "unitId": "LA-0415",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-22-7",
-    "clientId": "client-22",
-    "clientName": "COMIA, GRAZELYN M.",
-    "unitId": "LA-0415",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-23-1",
-    "clientId": "client-23",
-    "clientName": "GULLA, SHERYL",
-    "unitId": "LA-0718",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Approved",
-    "submittedDate": "03/01/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-23-2",
-    "clientId": "client-23",
-    "clientName": "GULLA, SHERYL",
-    "unitId": "LA-0718",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Approved",
-    "submittedDate": "03/01/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-23-3",
-    "clientId": "client-23",
-    "clientName": "GULLA, SHERYL",
-    "unitId": "LA-0718",
-    "documentType": "Buyer's Information Form",
-    "status": "Approved",
-    "submittedDate": "03/01/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-23-4",
-    "clientId": "client-23",
-    "clientName": "GULLA, SHERYL",
-    "unitId": "LA-0718",
-    "documentType": "Intent to Buy",
-    "status": "Approved",
-    "submittedDate": "03/01/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-23-5",
-    "clientId": "client-23",
-    "clientName": "GULLA, SHERYL",
-    "unitId": "LA-0718",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Approved",
-    "submittedDate": "03/01/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-23-6",
-    "clientId": "client-23",
-    "clientName": "GULLA, SHERYL",
-    "unitId": "LA-0718",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Approved",
-    "submittedDate": "03/01/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-23-7",
-    "clientId": "client-23",
-    "clientName": "GULLA, SHERYL",
-    "unitId": "LA-0718",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Approved",
-    "submittedDate": "03/01/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-24-1",
-    "clientId": "client-24",
-    "clientName": "DE SAN PERDRO, JOHN MHELCON",
-    "unitId": "COMBINED: LA-0501 & LA-0502",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-24-2",
-    "clientId": "client-24",
-    "clientName": "DE SAN PERDRO, JOHN MHELCON",
-    "unitId": "COMBINED: LA-0501 & LA-0502",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-24-3",
-    "clientId": "client-24",
-    "clientName": "DE SAN PERDRO, JOHN MHELCON",
-    "unitId": "COMBINED: LA-0501 & LA-0502",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-24-4",
-    "clientId": "client-24",
-    "clientName": "DE SAN PERDRO, JOHN MHELCON",
-    "unitId": "COMBINED: LA-0501 & LA-0502",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-24-5",
-    "clientId": "client-24",
-    "clientName": "DE SAN PERDRO, JOHN MHELCON",
-    "unitId": "COMBINED: LA-0501 & LA-0502",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-24-6",
-    "clientId": "client-24",
-    "clientName": "DE SAN PERDRO, JOHN MHELCON",
-    "unitId": "COMBINED: LA-0501 & LA-0502",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-24-7",
-    "clientId": "client-24",
-    "clientName": "DE SAN PERDRO, JOHN MHELCON",
-    "unitId": "COMBINED: LA-0501 & LA-0502",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-25-1",
-    "clientId": "client-25",
-    "clientName": "GARCIA, JANICE M.",
-    "unitId": "LA-0302",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-25-2",
-    "clientId": "client-25",
-    "clientName": "GARCIA, JANICE M.",
-    "unitId": "LA-0302",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-25-3",
-    "clientId": "client-25",
-    "clientName": "GARCIA, JANICE M.",
-    "unitId": "LA-0302",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-25-4",
-    "clientId": "client-25",
-    "clientName": "GARCIA, JANICE M.",
-    "unitId": "LA-0302",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-25-5",
-    "clientId": "client-25",
-    "clientName": "GARCIA, JANICE M.",
-    "unitId": "LA-0302",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-25-6",
-    "clientId": "client-25",
-    "clientName": "GARCIA, JANICE M.",
-    "unitId": "LA-0302",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-25-7",
-    "clientId": "client-25",
-    "clientName": "GARCIA, JANICE M.",
-    "unitId": "LA-0302",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-26-1",
-    "clientId": "client-26",
-    "clientName": "CHANG, IMELDA A.",
-    "unitId": "LA-0417 (CORNER)",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-26-2",
-    "clientId": "client-26",
-    "clientName": "CHANG, IMELDA A.",
-    "unitId": "LA-0417 (CORNER)",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-26-3",
-    "clientId": "client-26",
-    "clientName": "CHANG, IMELDA A.",
-    "unitId": "LA-0417 (CORNER)",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-26-4",
-    "clientId": "client-26",
-    "clientName": "CHANG, IMELDA A.",
-    "unitId": "LA-0417 (CORNER)",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-26-5",
-    "clientId": "client-26",
-    "clientName": "CHANG, IMELDA A.",
-    "unitId": "LA-0417 (CORNER)",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-26-6",
-    "clientId": "client-26",
-    "clientName": "CHANG, IMELDA A.",
-    "unitId": "LA-0417 (CORNER)",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-26-7",
-    "clientId": "client-26",
-    "clientName": "CHANG, IMELDA A.",
-    "unitId": "LA-0417 (CORNER)",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-27-1",
-    "clientId": "client-27",
-    "clientName": "BAGAOISAN, LILIA A.",
-    "unitId": "LA-0108 (INNER) B",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-27-2",
-    "clientId": "client-27",
-    "clientName": "BAGAOISAN, LILIA A.",
-    "unitId": "LA-0108 (INNER) B",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-27-3",
-    "clientId": "client-27",
-    "clientName": "BAGAOISAN, LILIA A.",
-    "unitId": "LA-0108 (INNER) B",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-27-4",
-    "clientId": "client-27",
-    "clientName": "BAGAOISAN, LILIA A.",
-    "unitId": "LA-0108 (INNER) B",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-27-5",
-    "clientId": "client-27",
-    "clientName": "BAGAOISAN, LILIA A.",
-    "unitId": "LA-0108 (INNER) B",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-27-6",
-    "clientId": "client-27",
-    "clientName": "BAGAOISAN, LILIA A.",
-    "unitId": "LA-0108 (INNER) B",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-27-7",
-    "clientId": "client-27",
-    "clientName": "BAGAOISAN, LILIA A.",
-    "unitId": "LA-0108 (INNER) B",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-28-1",
-    "clientId": "client-28",
-    "clientName": "TAYLOR, WENDY B.",
-    "unitId": "LA-0108 (END) C",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-28-2",
-    "clientId": "client-28",
-    "clientName": "TAYLOR, WENDY B.",
-    "unitId": "LA-0108 (END) C",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-28-3",
-    "clientId": "client-28",
-    "clientName": "TAYLOR, WENDY B.",
-    "unitId": "LA-0108 (END) C",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-28-4",
-    "clientId": "client-28",
-    "clientName": "TAYLOR, WENDY B.",
-    "unitId": "LA-0108 (END) C",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-28-5",
-    "clientId": "client-28",
-    "clientName": "TAYLOR, WENDY B.",
-    "unitId": "LA-0108 (END) C",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-28-6",
-    "clientId": "client-28",
-    "clientName": "TAYLOR, WENDY B.",
-    "unitId": "LA-0108 (END) C",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-28-7",
-    "clientId": "client-28",
-    "clientName": "TAYLOR, WENDY B.",
-    "unitId": "LA-0108 (END) C",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-29-1",
-    "clientId": "client-29",
-    "clientName": "JOHNSON, CHERRY F.",
-    "unitId": "LA-1201 (CORNER)",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-29-2",
-    "clientId": "client-29",
-    "clientName": "JOHNSON, CHERRY F.",
-    "unitId": "LA-1201 (CORNER)",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-29-3",
-    "clientId": "client-29",
-    "clientName": "JOHNSON, CHERRY F.",
-    "unitId": "LA-1201 (CORNER)",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-29-4",
-    "clientId": "client-29",
-    "clientName": "JOHNSON, CHERRY F.",
-    "unitId": "LA-1201 (CORNER)",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-29-5",
-    "clientId": "client-29",
-    "clientName": "JOHNSON, CHERRY F.",
-    "unitId": "LA-1201 (CORNER)",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-29-6",
-    "clientId": "client-29",
-    "clientName": "JOHNSON, CHERRY F.",
-    "unitId": "LA-1201 (CORNER)",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-29-7",
-    "clientId": "client-29",
-    "clientName": "JOHNSON, CHERRY F.",
-    "unitId": "LA-1201 (CORNER)",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-30-1",
-    "clientId": "client-30",
-    "clientName": "RICO, MAY LYN B.",
-    "unitId": "LA-1205",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Approved",
-    "submittedDate": "03/23/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-30-2",
-    "clientId": "client-30",
-    "clientName": "RICO, MAY LYN B.",
-    "unitId": "LA-1205",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Approved",
-    "submittedDate": "03/23/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-30-3",
-    "clientId": "client-30",
-    "clientName": "RICO, MAY LYN B.",
-    "unitId": "LA-1205",
-    "documentType": "Buyer's Information Form",
-    "status": "Approved",
-    "submittedDate": "03/23/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-30-4",
-    "clientId": "client-30",
-    "clientName": "RICO, MAY LYN B.",
-    "unitId": "LA-1205",
-    "documentType": "Intent to Buy",
-    "status": "Approved",
-    "submittedDate": "03/23/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-30-5",
-    "clientId": "client-30",
-    "clientName": "RICO, MAY LYN B.",
-    "unitId": "LA-1205",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Approved",
-    "submittedDate": "03/23/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-30-6",
-    "clientId": "client-30",
-    "clientName": "RICO, MAY LYN B.",
-    "unitId": "LA-1205",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Approved",
-    "submittedDate": "03/23/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-30-7",
-    "clientId": "client-30",
-    "clientName": "RICO, MAY LYN B.",
-    "unitId": "LA-1205",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Approved",
-    "submittedDate": "03/23/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-31-1",
-    "clientId": "client-31",
-    "clientName": "RICO, MAY LYN B.",
-    "unitId": "LA-1205",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Approved",
-    "submittedDate": "04/26/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-31-2",
-    "clientId": "client-31",
-    "clientName": "RICO, MAY LYN B.",
-    "unitId": "LA-1205",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Approved",
-    "submittedDate": "04/26/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-31-3",
-    "clientId": "client-31",
-    "clientName": "RICO, MAY LYN B.",
-    "unitId": "LA-1205",
-    "documentType": "Buyer's Information Form",
-    "status": "Approved",
-    "submittedDate": "04/26/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-31-4",
-    "clientId": "client-31",
-    "clientName": "RICO, MAY LYN B.",
-    "unitId": "LA-1205",
-    "documentType": "Intent to Buy",
-    "status": "Approved",
-    "submittedDate": "04/26/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-31-5",
-    "clientId": "client-31",
-    "clientName": "RICO, MAY LYN B.",
-    "unitId": "LA-1205",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Approved",
-    "submittedDate": "04/26/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-31-6",
-    "clientId": "client-31",
-    "clientName": "RICO, MAY LYN B.",
-    "unitId": "LA-1205",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Approved",
-    "submittedDate": "04/26/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-31-7",
-    "clientId": "client-31",
-    "clientName": "RICO, MAY LYN B.",
-    "unitId": "LA-1205",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Approved",
-    "submittedDate": "04/26/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-32-1",
-    "clientId": "client-32",
-    "clientName": "PERALTA, GERRY Q.",
-    "unitId": "LA-1105",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Approved",
-    "submittedDate": "03/23/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-32-2",
-    "clientId": "client-32",
-    "clientName": "PERALTA, GERRY Q.",
-    "unitId": "LA-1105",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Approved",
-    "submittedDate": "03/23/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-32-3",
-    "clientId": "client-32",
-    "clientName": "PERALTA, GERRY Q.",
-    "unitId": "LA-1105",
-    "documentType": "Buyer's Information Form",
-    "status": "Approved",
-    "submittedDate": "03/23/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-32-4",
-    "clientId": "client-32",
-    "clientName": "PERALTA, GERRY Q.",
-    "unitId": "LA-1105",
-    "documentType": "Intent to Buy",
-    "status": "Approved",
-    "submittedDate": "03/23/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-32-5",
-    "clientId": "client-32",
-    "clientName": "PERALTA, GERRY Q.",
-    "unitId": "LA-1105",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Approved",
-    "submittedDate": "03/23/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-32-6",
-    "clientId": "client-32",
-    "clientName": "PERALTA, GERRY Q.",
-    "unitId": "LA-1105",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Approved",
-    "submittedDate": "03/23/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-32-7",
-    "clientId": "client-32",
-    "clientName": "PERALTA, GERRY Q.",
-    "unitId": "LA-1105",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Approved",
-    "submittedDate": "03/23/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-33-1",
-    "clientId": "client-33",
-    "clientName": "LAYUG, EDWARD JO S.",
-    "unitId": "LA-0205",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-33-2",
-    "clientId": "client-33",
-    "clientName": "LAYUG, EDWARD JO S.",
-    "unitId": "LA-0205",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-33-3",
-    "clientId": "client-33",
-    "clientName": "LAYUG, EDWARD JO S.",
-    "unitId": "LA-0205",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-33-4",
-    "clientId": "client-33",
-    "clientName": "LAYUG, EDWARD JO S.",
-    "unitId": "LA-0205",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-33-5",
-    "clientId": "client-33",
-    "clientName": "LAYUG, EDWARD JO S.",
-    "unitId": "LA-0205",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-33-6",
-    "clientId": "client-33",
-    "clientName": "LAYUG, EDWARD JO S.",
-    "unitId": "LA-0205",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-33-7",
-    "clientId": "client-33",
-    "clientName": "LAYUG, EDWARD JO S.",
-    "unitId": "LA-0205",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-34-1",
-    "clientId": "client-34",
-    "clientName": "HATEM, HANNOUSH MARC ANDREEI B.",
-    "unitId": "LA-1201 (INNER)",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-34-2",
-    "clientId": "client-34",
-    "clientName": "HATEM, HANNOUSH MARC ANDREEI B.",
-    "unitId": "LA-1201 (INNER)",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-34-3",
-    "clientId": "client-34",
-    "clientName": "HATEM, HANNOUSH MARC ANDREEI B.",
-    "unitId": "LA-1201 (INNER)",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-34-4",
-    "clientId": "client-34",
-    "clientName": "HATEM, HANNOUSH MARC ANDREEI B.",
-    "unitId": "LA-1201 (INNER)",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-34-5",
-    "clientId": "client-34",
-    "clientName": "HATEM, HANNOUSH MARC ANDREEI B.",
-    "unitId": "LA-1201 (INNER)",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-34-6",
-    "clientId": "client-34",
-    "clientName": "HATEM, HANNOUSH MARC ANDREEI B.",
-    "unitId": "LA-1201 (INNER)",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-34-7",
-    "clientId": "client-34",
-    "clientName": "HATEM, HANNOUSH MARC ANDREEI B.",
-    "unitId": "LA-1201 (INNER)",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-35-1",
-    "clientId": "client-35",
-    "clientName": "MIRADOR, LEO M.",
-    "unitId": "LA-1202 (CORNER)",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Approved",
-    "submittedDate": "03/29/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-35-2",
-    "clientId": "client-35",
-    "clientName": "MIRADOR, LEO M.",
-    "unitId": "LA-1202 (CORNER)",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Approved",
-    "submittedDate": "03/29/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-35-3",
-    "clientId": "client-35",
-    "clientName": "MIRADOR, LEO M.",
-    "unitId": "LA-1202 (CORNER)",
-    "documentType": "Buyer's Information Form",
-    "status": "Approved",
-    "submittedDate": "03/29/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-35-4",
-    "clientId": "client-35",
-    "clientName": "MIRADOR, LEO M.",
-    "unitId": "LA-1202 (CORNER)",
-    "documentType": "Intent to Buy",
-    "status": "Approved",
-    "submittedDate": "03/29/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-35-5",
-    "clientId": "client-35",
-    "clientName": "MIRADOR, LEO M.",
-    "unitId": "LA-1202 (CORNER)",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Approved",
-    "submittedDate": "03/29/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-35-6",
-    "clientId": "client-35",
-    "clientName": "MIRADOR, LEO M.",
-    "unitId": "LA-1202 (CORNER)",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Approved",
-    "submittedDate": "03/29/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-35-7",
-    "clientId": "client-35",
-    "clientName": "MIRADOR, LEO M.",
-    "unitId": "LA-1202 (CORNER)",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Approved",
-    "submittedDate": "03/29/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-36-1",
-    "clientId": "client-36",
-    "clientName": "MIRADOR, LEO M.",
-    "unitId": "LA-1202 (END)",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Approved",
-    "submittedDate": "03/29/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-36-2",
-    "clientId": "client-36",
-    "clientName": "MIRADOR, LEO M.",
-    "unitId": "LA-1202 (END)",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Approved",
-    "submittedDate": "03/29/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-36-3",
-    "clientId": "client-36",
-    "clientName": "MIRADOR, LEO M.",
-    "unitId": "LA-1202 (END)",
-    "documentType": "Buyer's Information Form",
-    "status": "Approved",
-    "submittedDate": "03/29/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-36-4",
-    "clientId": "client-36",
-    "clientName": "MIRADOR, LEO M.",
-    "unitId": "LA-1202 (END)",
-    "documentType": "Intent to Buy",
-    "status": "Approved",
-    "submittedDate": "03/29/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-36-5",
-    "clientId": "client-36",
-    "clientName": "MIRADOR, LEO M.",
-    "unitId": "LA-1202 (END)",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Approved",
-    "submittedDate": "03/29/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-36-6",
-    "clientId": "client-36",
-    "clientName": "MIRADOR, LEO M.",
-    "unitId": "LA-1202 (END)",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Approved",
-    "submittedDate": "03/29/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-36-7",
-    "clientId": "client-36",
-    "clientName": "MIRADOR, LEO M.",
-    "unitId": "LA-1202 (END)",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Approved",
-    "submittedDate": "03/29/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-37-1",
-    "clientId": "client-37",
-    "clientName": "BELIGON, ERDELYN F.",
-    "unitId": "LA-1103",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-37-2",
-    "clientId": "client-37",
-    "clientName": "BELIGON, ERDELYN F.",
-    "unitId": "LA-1103",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-37-3",
-    "clientId": "client-37",
-    "clientName": "BELIGON, ERDELYN F.",
-    "unitId": "LA-1103",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-37-4",
-    "clientId": "client-37",
-    "clientName": "BELIGON, ERDELYN F.",
-    "unitId": "LA-1103",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-37-5",
-    "clientId": "client-37",
-    "clientName": "BELIGON, ERDELYN F.",
-    "unitId": "LA-1103",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-37-6",
-    "clientId": "client-37",
-    "clientName": "BELIGON, ERDELYN F.",
-    "unitId": "LA-1103",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-37-7",
-    "clientId": "client-37",
-    "clientName": "BELIGON, ERDELYN F.",
-    "unitId": "LA-1103",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-38-1",
-    "clientId": "client-38",
-    "clientName": "MORIONES, CHERRY",
-    "unitId": "LA-0719",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Approved",
-    "submittedDate": "04/05/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-38-2",
-    "clientId": "client-38",
-    "clientName": "MORIONES, CHERRY",
-    "unitId": "LA-0719",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Approved",
-    "submittedDate": "04/05/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-38-3",
-    "clientId": "client-38",
-    "clientName": "MORIONES, CHERRY",
-    "unitId": "LA-0719",
-    "documentType": "Buyer's Information Form",
-    "status": "Approved",
-    "submittedDate": "04/05/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-38-4",
-    "clientId": "client-38",
-    "clientName": "MORIONES, CHERRY",
-    "unitId": "LA-0719",
-    "documentType": "Intent to Buy",
-    "status": "Approved",
-    "submittedDate": "04/05/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-38-5",
-    "clientId": "client-38",
-    "clientName": "MORIONES, CHERRY",
-    "unitId": "LA-0719",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Approved",
-    "submittedDate": "04/05/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-38-6",
-    "clientId": "client-38",
-    "clientName": "MORIONES, CHERRY",
-    "unitId": "LA-0719",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Approved",
-    "submittedDate": "04/05/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-38-7",
-    "clientId": "client-38",
-    "clientName": "MORIONES, CHERRY",
-    "unitId": "LA-0719",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Approved",
-    "submittedDate": "04/05/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-39-1",
-    "clientId": "client-39",
-    "clientName": "MAGORA, JOANNA MARIE",
-    "unitId": "LA-0602",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-39-2",
-    "clientId": "client-39",
-    "clientName": "MAGORA, JOANNA MARIE",
-    "unitId": "LA-0602",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-39-3",
-    "clientId": "client-39",
-    "clientName": "MAGORA, JOANNA MARIE",
-    "unitId": "LA-0602",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-39-4",
-    "clientId": "client-39",
-    "clientName": "MAGORA, JOANNA MARIE",
-    "unitId": "LA-0602",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-39-5",
-    "clientId": "client-39",
-    "clientName": "MAGORA, JOANNA MARIE",
-    "unitId": "LA-0602",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-39-6",
-    "clientId": "client-39",
-    "clientName": "MAGORA, JOANNA MARIE",
-    "unitId": "LA-0602",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-39-7",
-    "clientId": "client-39",
-    "clientName": "MAGORA, JOANNA MARIE",
-    "unitId": "LA-0602",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-40-1",
-    "clientId": "client-40",
-    "clientName": "ALCASABAS, ROMEO ESO",
-    "unitId": "LA-0603",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Approved",
-    "submittedDate": "04/06/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-40-2",
-    "clientId": "client-40",
-    "clientName": "ALCASABAS, ROMEO ESO",
-    "unitId": "LA-0603",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Approved",
-    "submittedDate": "04/06/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-40-3",
-    "clientId": "client-40",
-    "clientName": "ALCASABAS, ROMEO ESO",
-    "unitId": "LA-0603",
-    "documentType": "Buyer's Information Form",
-    "status": "Approved",
-    "submittedDate": "04/06/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-40-4",
-    "clientId": "client-40",
-    "clientName": "ALCASABAS, ROMEO ESO",
-    "unitId": "LA-0603",
-    "documentType": "Intent to Buy",
-    "status": "Approved",
-    "submittedDate": "04/06/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-40-5",
-    "clientId": "client-40",
-    "clientName": "ALCASABAS, ROMEO ESO",
-    "unitId": "LA-0603",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Approved",
-    "submittedDate": "04/06/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-40-6",
-    "clientId": "client-40",
-    "clientName": "ALCASABAS, ROMEO ESO",
-    "unitId": "LA-0603",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Approved",
-    "submittedDate": "04/06/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-40-7",
-    "clientId": "client-40",
-    "clientName": "ALCASABAS, ROMEO ESO",
-    "unitId": "LA-0603",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Approved",
-    "submittedDate": "04/06/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-41-1",
-    "clientId": "client-41",
-    "clientName": "ARGETE, RICHELL",
-    "unitId": "LA-0604",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-41-2",
-    "clientId": "client-41",
-    "clientName": "ARGETE, RICHELL",
-    "unitId": "LA-0604",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-41-3",
-    "clientId": "client-41",
-    "clientName": "ARGETE, RICHELL",
-    "unitId": "LA-0604",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-41-4",
-    "clientId": "client-41",
-    "clientName": "ARGETE, RICHELL",
-    "unitId": "LA-0604",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-41-5",
-    "clientId": "client-41",
-    "clientName": "ARGETE, RICHELL",
-    "unitId": "LA-0604",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-41-6",
-    "clientId": "client-41",
-    "clientName": "ARGETE, RICHELL",
-    "unitId": "LA-0604",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-41-7",
-    "clientId": "client-41",
-    "clientName": "ARGETE, RICHELL",
-    "unitId": "LA-0604",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-42-1",
-    "clientId": "client-42",
-    "clientName": "ALITAGTAG, RIZZ ANN",
-    "unitId": "LA-0504",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-42-2",
-    "clientId": "client-42",
-    "clientName": "ALITAGTAG, RIZZ ANN",
-    "unitId": "LA-0504",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-42-3",
-    "clientId": "client-42",
-    "clientName": "ALITAGTAG, RIZZ ANN",
-    "unitId": "LA-0504",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-42-4",
-    "clientId": "client-42",
-    "clientName": "ALITAGTAG, RIZZ ANN",
-    "unitId": "LA-0504",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-42-5",
-    "clientId": "client-42",
-    "clientName": "ALITAGTAG, RIZZ ANN",
-    "unitId": "LA-0504",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-42-6",
-    "clientId": "client-42",
-    "clientName": "ALITAGTAG, RIZZ ANN",
-    "unitId": "LA-0504",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-42-7",
-    "clientId": "client-42",
-    "clientName": "ALITAGTAG, RIZZ ANN",
-    "unitId": "LA-0504",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-43-1",
-    "clientId": "client-43",
-    "clientName": "ALITAGTAG, RIZZ ANN",
-    "unitId": "LA-0503",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-43-2",
-    "clientId": "client-43",
-    "clientName": "ALITAGTAG, RIZZ ANN",
-    "unitId": "LA-0503",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-43-3",
-    "clientId": "client-43",
-    "clientName": "ALITAGTAG, RIZZ ANN",
-    "unitId": "LA-0503",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-43-4",
-    "clientId": "client-43",
-    "clientName": "ALITAGTAG, RIZZ ANN",
-    "unitId": "LA-0503",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-43-5",
-    "clientId": "client-43",
-    "clientName": "ALITAGTAG, RIZZ ANN",
-    "unitId": "LA-0503",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-43-6",
-    "clientId": "client-43",
-    "clientName": "ALITAGTAG, RIZZ ANN",
-    "unitId": "LA-0503",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-43-7",
-    "clientId": "client-43",
-    "clientName": "ALITAGTAG, RIZZ ANN",
-    "unitId": "LA-0503",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-44-1",
-    "clientId": "client-44",
-    "clientName": "DERILO, GENEVIEVE O.",
-    "unitId": "LA-0612",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-44-2",
-    "clientId": "client-44",
-    "clientName": "DERILO, GENEVIEVE O.",
-    "unitId": "LA-0612",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-44-3",
-    "clientId": "client-44",
-    "clientName": "DERILO, GENEVIEVE O.",
-    "unitId": "LA-0612",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-44-4",
-    "clientId": "client-44",
-    "clientName": "DERILO, GENEVIEVE O.",
-    "unitId": "LA-0612",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-44-5",
-    "clientId": "client-44",
-    "clientName": "DERILO, GENEVIEVE O.",
-    "unitId": "LA-0612",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-44-6",
-    "clientId": "client-44",
-    "clientName": "DERILO, GENEVIEVE O.",
-    "unitId": "LA-0612",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-44-7",
-    "clientId": "client-44",
-    "clientName": "DERILO, GENEVIEVE O.",
-    "unitId": "LA-0612",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-45-1",
-    "clientId": "client-45",
-    "clientName": "OLANO, ALLAN RAYMUND P.",
-    "unitId": "LA-0613",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-45-2",
-    "clientId": "client-45",
-    "clientName": "OLANO, ALLAN RAYMUND P.",
-    "unitId": "LA-0613",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-45-3",
-    "clientId": "client-45",
-    "clientName": "OLANO, ALLAN RAYMUND P.",
-    "unitId": "LA-0613",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-45-4",
-    "clientId": "client-45",
-    "clientName": "OLANO, ALLAN RAYMUND P.",
-    "unitId": "LA-0613",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-45-5",
-    "clientId": "client-45",
-    "clientName": "OLANO, ALLAN RAYMUND P.",
-    "unitId": "LA-0613",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-45-6",
-    "clientId": "client-45",
-    "clientName": "OLANO, ALLAN RAYMUND P.",
-    "unitId": "LA-0613",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-45-7",
-    "clientId": "client-45",
-    "clientName": "OLANO, ALLAN RAYMUND P.",
-    "unitId": "LA-0613",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-46-1",
-    "clientId": "client-46",
-    "clientName": "RIL, AUNDRIA ANTONIO",
-    "unitId": "LA-0704",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-46-2",
-    "clientId": "client-46",
-    "clientName": "RIL, AUNDRIA ANTONIO",
-    "unitId": "LA-0704",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-46-3",
-    "clientId": "client-46",
-    "clientName": "RIL, AUNDRIA ANTONIO",
-    "unitId": "LA-0704",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-46-4",
-    "clientId": "client-46",
-    "clientName": "RIL, AUNDRIA ANTONIO",
-    "unitId": "LA-0704",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-46-5",
-    "clientId": "client-46",
-    "clientName": "RIL, AUNDRIA ANTONIO",
-    "unitId": "LA-0704",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-46-6",
-    "clientId": "client-46",
-    "clientName": "RIL, AUNDRIA ANTONIO",
-    "unitId": "LA-0704",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-46-7",
-    "clientId": "client-46",
-    "clientName": "RIL, AUNDRIA ANTONIO",
-    "unitId": "LA-0704",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-47-1",
-    "clientId": "client-47",
-    "clientName": "PANGHULAN, RUTH Q.",
-    "unitId": "LA-0610",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Approved",
-    "submittedDate": "04/26/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-47-2",
-    "clientId": "client-47",
-    "clientName": "PANGHULAN, RUTH Q.",
-    "unitId": "LA-0610",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Approved",
-    "submittedDate": "04/26/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-47-3",
-    "clientId": "client-47",
-    "clientName": "PANGHULAN, RUTH Q.",
-    "unitId": "LA-0610",
-    "documentType": "Buyer's Information Form",
-    "status": "Approved",
-    "submittedDate": "04/26/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-47-4",
-    "clientId": "client-47",
-    "clientName": "PANGHULAN, RUTH Q.",
-    "unitId": "LA-0610",
-    "documentType": "Intent to Buy",
-    "status": "Approved",
-    "submittedDate": "04/26/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-47-5",
-    "clientId": "client-47",
-    "clientName": "PANGHULAN, RUTH Q.",
-    "unitId": "LA-0610",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Approved",
-    "submittedDate": "04/26/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-47-6",
-    "clientId": "client-47",
-    "clientName": "PANGHULAN, RUTH Q.",
-    "unitId": "LA-0610",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Approved",
-    "submittedDate": "04/26/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-47-7",
-    "clientId": "client-47",
-    "clientName": "PANGHULAN, RUTH Q.",
-    "unitId": "LA-0610",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Approved",
-    "submittedDate": "04/26/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-48-1",
-    "clientId": "client-48",
-    "clientName": "ARAYATA, RICHELLE C.",
-    "unitId": "LA-0703 & LA-0705 COMBINED",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-48-2",
-    "clientId": "client-48",
-    "clientName": "ARAYATA, RICHELLE C.",
-    "unitId": "LA-0703 & LA-0705 COMBINED",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-48-3",
-    "clientId": "client-48",
-    "clientName": "ARAYATA, RICHELLE C.",
-    "unitId": "LA-0703 & LA-0705 COMBINED",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-48-4",
-    "clientId": "client-48",
-    "clientName": "ARAYATA, RICHELLE C.",
-    "unitId": "LA-0703 & LA-0705 COMBINED",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-48-5",
-    "clientId": "client-48",
-    "clientName": "ARAYATA, RICHELLE C.",
-    "unitId": "LA-0703 & LA-0705 COMBINED",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-48-6",
-    "clientId": "client-48",
-    "clientName": "ARAYATA, RICHELLE C.",
-    "unitId": "LA-0703 & LA-0705 COMBINED",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-48-7",
-    "clientId": "client-48",
-    "clientName": "ARAYATA, RICHELLE C.",
-    "unitId": "LA-0703 & LA-0705 COMBINED",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-49-1",
-    "clientId": "client-49",
-    "clientName": "ALAMER, JAZZIE",
-    "unitId": "COMBINED: LA-0803 & LA-0805",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Approved",
-    "submittedDate": "04/28/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-49-2",
-    "clientId": "client-49",
-    "clientName": "ALAMER, JAZZIE",
-    "unitId": "COMBINED: LA-0803 & LA-0805",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Approved",
-    "submittedDate": "04/28/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-49-3",
-    "clientId": "client-49",
-    "clientName": "ALAMER, JAZZIE",
-    "unitId": "COMBINED: LA-0803 & LA-0805",
-    "documentType": "Buyer's Information Form",
-    "status": "Approved",
-    "submittedDate": "04/28/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-49-4",
-    "clientId": "client-49",
-    "clientName": "ALAMER, JAZZIE",
-    "unitId": "COMBINED: LA-0803 & LA-0805",
-    "documentType": "Intent to Buy",
-    "status": "Approved",
-    "submittedDate": "04/28/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-49-5",
-    "clientId": "client-49",
-    "clientName": "ALAMER, JAZZIE",
-    "unitId": "COMBINED: LA-0803 & LA-0805",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Approved",
-    "submittedDate": "04/28/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-49-6",
-    "clientId": "client-49",
-    "clientName": "ALAMER, JAZZIE",
-    "unitId": "COMBINED: LA-0803 & LA-0805",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Approved",
-    "submittedDate": "04/28/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-49-7",
-    "clientId": "client-49",
-    "clientName": "ALAMER, JAZZIE",
-    "unitId": "COMBINED: LA-0803 & LA-0805",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Approved",
-    "submittedDate": "04/28/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-50-1",
-    "clientId": "client-50",
-    "clientName": "ORAPA, LOUEL M.",
-    "unitId": "LA-0707 (INNER)",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-50-2",
-    "clientId": "client-50",
-    "clientName": "ORAPA, LOUEL M.",
-    "unitId": "LA-0707 (INNER)",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-50-3",
-    "clientId": "client-50",
-    "clientName": "ORAPA, LOUEL M.",
-    "unitId": "LA-0707 (INNER)",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-50-4",
-    "clientId": "client-50",
-    "clientName": "ORAPA, LOUEL M.",
-    "unitId": "LA-0707 (INNER)",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-50-5",
-    "clientId": "client-50",
-    "clientName": "ORAPA, LOUEL M.",
-    "unitId": "LA-0707 (INNER)",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-50-6",
-    "clientId": "client-50",
-    "clientName": "ORAPA, LOUEL M.",
-    "unitId": "LA-0707 (INNER)",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-50-7",
-    "clientId": "client-50",
-    "clientName": "ORAPA, LOUEL M.",
-    "unitId": "LA-0707 (INNER)",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-51-1",
-    "clientId": "client-51",
-    "clientName": "ORAPA, MARILOU",
-    "unitId": "LA-0709 & LA-0711 COMBINED",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-51-2",
-    "clientId": "client-51",
-    "clientName": "ORAPA, MARILOU",
-    "unitId": "LA-0709 & LA-0711 COMBINED",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-51-3",
-    "clientId": "client-51",
-    "clientName": "ORAPA, MARILOU",
-    "unitId": "LA-0709 & LA-0711 COMBINED",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-51-4",
-    "clientId": "client-51",
-    "clientName": "ORAPA, MARILOU",
-    "unitId": "LA-0709 & LA-0711 COMBINED",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-51-5",
-    "clientId": "client-51",
-    "clientName": "ORAPA, MARILOU",
-    "unitId": "LA-0709 & LA-0711 COMBINED",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-51-6",
-    "clientId": "client-51",
-    "clientName": "ORAPA, MARILOU",
-    "unitId": "LA-0709 & LA-0711 COMBINED",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-51-7",
-    "clientId": "client-51",
-    "clientName": "ORAPA, MARILOU",
-    "unitId": "LA-0709 & LA-0711 COMBINED",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-52-1",
-    "clientId": "client-52",
-    "clientName": "MIRASOL, ROSARIO L.",
-    "unitId": "LA-0713",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Approved",
-    "submittedDate": "05/10/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-52-2",
-    "clientId": "client-52",
-    "clientName": "MIRASOL, ROSARIO L.",
-    "unitId": "LA-0713",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Approved",
-    "submittedDate": "05/10/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-52-3",
-    "clientId": "client-52",
-    "clientName": "MIRASOL, ROSARIO L.",
-    "unitId": "LA-0713",
-    "documentType": "Buyer's Information Form",
-    "status": "Approved",
-    "submittedDate": "05/10/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-52-4",
-    "clientId": "client-52",
-    "clientName": "MIRASOL, ROSARIO L.",
-    "unitId": "LA-0713",
-    "documentType": "Intent to Buy",
-    "status": "Approved",
-    "submittedDate": "05/10/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-52-5",
-    "clientId": "client-52",
-    "clientName": "MIRASOL, ROSARIO L.",
-    "unitId": "LA-0713",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Approved",
-    "submittedDate": "05/10/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-52-6",
-    "clientId": "client-52",
-    "clientName": "MIRASOL, ROSARIO L.",
-    "unitId": "LA-0713",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Approved",
-    "submittedDate": "05/10/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-52-7",
-    "clientId": "client-52",
-    "clientName": "MIRASOL, ROSARIO L.",
-    "unitId": "LA-0713",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Approved",
-    "submittedDate": "05/10/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-53-1",
-    "clientId": "client-53",
-    "clientName": "FABABIER, ANNABELLE B.",
-    "unitId": "LA-0715",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-53-2",
-    "clientId": "client-53",
-    "clientName": "FABABIER, ANNABELLE B.",
-    "unitId": "LA-0715",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-53-3",
-    "clientId": "client-53",
-    "clientName": "FABABIER, ANNABELLE B.",
-    "unitId": "LA-0715",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-53-4",
-    "clientId": "client-53",
-    "clientName": "FABABIER, ANNABELLE B.",
-    "unitId": "LA-0715",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-53-5",
-    "clientId": "client-53",
-    "clientName": "FABABIER, ANNABELLE B.",
-    "unitId": "LA-0715",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-53-6",
-    "clientId": "client-53",
-    "clientName": "FABABIER, ANNABELLE B.",
-    "unitId": "LA-0715",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-53-7",
-    "clientId": "client-53",
-    "clientName": "FABABIER, ANNABELLE B.",
-    "unitId": "LA-0715",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-54-1",
-    "clientId": "client-54",
-    "clientName": "CANTOR, VIEN QUINA",
-    "unitId": "LA-0303",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-54-2",
-    "clientId": "client-54",
-    "clientName": "CANTOR, VIEN QUINA",
-    "unitId": "LA-0303",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-54-3",
-    "clientId": "client-54",
-    "clientName": "CANTOR, VIEN QUINA",
-    "unitId": "LA-0303",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-54-4",
-    "clientId": "client-54",
-    "clientName": "CANTOR, VIEN QUINA",
-    "unitId": "LA-0303",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-54-5",
-    "clientId": "client-54",
-    "clientName": "CANTOR, VIEN QUINA",
-    "unitId": "LA-0303",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-54-6",
-    "clientId": "client-54",
-    "clientName": "CANTOR, VIEN QUINA",
-    "unitId": "LA-0303",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-54-7",
-    "clientId": "client-54",
-    "clientName": "CANTOR, VIEN QUINA",
-    "unitId": "LA-0303",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-55-1",
-    "clientId": "client-55",
-    "clientName": "GALENG, ANGELITA",
-    "unitId": "LA-0809",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Approved",
-    "submittedDate": "05/25/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-55-2",
-    "clientId": "client-55",
-    "clientName": "GALENG, ANGELITA",
-    "unitId": "LA-0809",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Approved",
-    "submittedDate": "05/25/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-55-3",
-    "clientId": "client-55",
-    "clientName": "GALENG, ANGELITA",
-    "unitId": "LA-0809",
-    "documentType": "Buyer's Information Form",
-    "status": "Approved",
-    "submittedDate": "05/25/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-55-4",
-    "clientId": "client-55",
-    "clientName": "GALENG, ANGELITA",
-    "unitId": "LA-0809",
-    "documentType": "Intent to Buy",
-    "status": "Approved",
-    "submittedDate": "05/25/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-55-5",
-    "clientId": "client-55",
-    "clientName": "GALENG, ANGELITA",
-    "unitId": "LA-0809",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Approved",
-    "submittedDate": "05/25/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-55-6",
-    "clientId": "client-55",
-    "clientName": "GALENG, ANGELITA",
-    "unitId": "LA-0809",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Approved",
-    "submittedDate": "05/25/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-55-7",
-    "clientId": "client-55",
-    "clientName": "GALENG, ANGELITA",
-    "unitId": "LA-0809",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Approved",
-    "submittedDate": "05/25/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-56-1",
-    "clientId": "client-56",
-    "clientName": "RIL, MARVIN",
-    "unitId": "LA-0706",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Approved",
-    "submittedDate": "05/30/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-56-2",
-    "clientId": "client-56",
-    "clientName": "RIL, MARVIN",
-    "unitId": "LA-0706",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Approved",
-    "submittedDate": "05/30/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-56-3",
-    "clientId": "client-56",
-    "clientName": "RIL, MARVIN",
-    "unitId": "LA-0706",
-    "documentType": "Buyer's Information Form",
-    "status": "Approved",
-    "submittedDate": "05/30/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-56-4",
-    "clientId": "client-56",
-    "clientName": "RIL, MARVIN",
-    "unitId": "LA-0706",
-    "documentType": "Intent to Buy",
-    "status": "Approved",
-    "submittedDate": "05/30/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-56-5",
-    "clientId": "client-56",
-    "clientName": "RIL, MARVIN",
-    "unitId": "LA-0706",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Approved",
-    "submittedDate": "05/30/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-56-6",
-    "clientId": "client-56",
-    "clientName": "RIL, MARVIN",
-    "unitId": "LA-0706",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Approved",
-    "submittedDate": "05/30/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-56-7",
-    "clientId": "client-56",
-    "clientName": "RIL, MARVIN",
-    "unitId": "LA-0706",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Approved",
-    "submittedDate": "05/30/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-57-1",
-    "clientId": "client-57",
-    "clientName": "OROPESA, ROGELIO",
-    "unitId": "LA-0702",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Approved",
-    "submittedDate": "06/02/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-57-2",
-    "clientId": "client-57",
-    "clientName": "OROPESA, ROGELIO",
-    "unitId": "LA-0702",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Approved",
-    "submittedDate": "06/02/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-57-3",
-    "clientId": "client-57",
-    "clientName": "OROPESA, ROGELIO",
-    "unitId": "LA-0702",
-    "documentType": "Buyer's Information Form",
-    "status": "Approved",
-    "submittedDate": "06/02/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-57-4",
-    "clientId": "client-57",
-    "clientName": "OROPESA, ROGELIO",
-    "unitId": "LA-0702",
-    "documentType": "Intent to Buy",
-    "status": "Approved",
-    "submittedDate": "06/02/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-57-5",
-    "clientId": "client-57",
-    "clientName": "OROPESA, ROGELIO",
-    "unitId": "LA-0702",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Approved",
-    "submittedDate": "06/02/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-57-6",
-    "clientId": "client-57",
-    "clientName": "OROPESA, ROGELIO",
-    "unitId": "LA-0702",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Approved",
-    "submittedDate": "06/02/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-57-7",
-    "clientId": "client-57",
-    "clientName": "OROPESA, ROGELIO",
-    "unitId": "LA-0702",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Approved",
-    "submittedDate": "06/02/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-58-1",
-    "clientId": "client-58",
-    "clientName": "PAYOFELIN, LIZALE ANNE G.",
-    "unitId": "LA-0605",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Approved",
-    "submittedDate": "07/05/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-58-2",
-    "clientId": "client-58",
-    "clientName": "PAYOFELIN, LIZALE ANNE G.",
-    "unitId": "LA-0605",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Approved",
-    "submittedDate": "07/05/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-58-3",
-    "clientId": "client-58",
-    "clientName": "PAYOFELIN, LIZALE ANNE G.",
-    "unitId": "LA-0605",
-    "documentType": "Buyer's Information Form",
-    "status": "Approved",
-    "submittedDate": "07/05/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-58-4",
-    "clientId": "client-58",
-    "clientName": "PAYOFELIN, LIZALE ANNE G.",
-    "unitId": "LA-0605",
-    "documentType": "Intent to Buy",
-    "status": "Approved",
-    "submittedDate": "07/05/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-58-5",
-    "clientId": "client-58",
-    "clientName": "PAYOFELIN, LIZALE ANNE G.",
-    "unitId": "LA-0605",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Approved",
-    "submittedDate": "07/05/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-58-6",
-    "clientId": "client-58",
-    "clientName": "PAYOFELIN, LIZALE ANNE G.",
-    "unitId": "LA-0605",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Approved",
-    "submittedDate": "07/05/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-58-7",
-    "clientId": "client-58",
-    "clientName": "PAYOFELIN, LIZALE ANNE G.",
-    "unitId": "LA-0605",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Approved",
-    "submittedDate": "07/05/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-59-1",
-    "clientId": "client-59",
-    "clientName": "NEPOMUCENO, ERWIN",
-    "unitId": "LA-0901",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Approved",
-    "submittedDate": "07/06/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-59-2",
-    "clientId": "client-59",
-    "clientName": "NEPOMUCENO, ERWIN",
-    "unitId": "LA-0901",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Approved",
-    "submittedDate": "07/06/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-59-3",
-    "clientId": "client-59",
-    "clientName": "NEPOMUCENO, ERWIN",
-    "unitId": "LA-0901",
-    "documentType": "Buyer's Information Form",
-    "status": "Approved",
-    "submittedDate": "07/06/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-59-4",
-    "clientId": "client-59",
-    "clientName": "NEPOMUCENO, ERWIN",
-    "unitId": "LA-0901",
-    "documentType": "Intent to Buy",
-    "status": "Approved",
-    "submittedDate": "07/06/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-59-5",
-    "clientId": "client-59",
-    "clientName": "NEPOMUCENO, ERWIN",
-    "unitId": "LA-0901",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Approved",
-    "submittedDate": "07/06/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-59-6",
-    "clientId": "client-59",
-    "clientName": "NEPOMUCENO, ERWIN",
-    "unitId": "LA-0901",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Approved",
-    "submittedDate": "07/06/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-59-7",
-    "clientId": "client-59",
-    "clientName": "NEPOMUCENO, ERWIN",
-    "unitId": "LA-0901",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Approved",
-    "submittedDate": "07/06/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-60-1",
-    "clientId": "client-60",
-    "clientName": "AURE, ALICIA ALEGRE",
-    "unitId": "LA-0708 & LA-0710 (COMBINED)",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-60-2",
-    "clientId": "client-60",
-    "clientName": "AURE, ALICIA ALEGRE",
-    "unitId": "LA-0708 & LA-0710 (COMBINED)",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-60-3",
-    "clientId": "client-60",
-    "clientName": "AURE, ALICIA ALEGRE",
-    "unitId": "LA-0708 & LA-0710 (COMBINED)",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-60-4",
-    "clientId": "client-60",
-    "clientName": "AURE, ALICIA ALEGRE",
-    "unitId": "LA-0708 & LA-0710 (COMBINED)",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-60-5",
-    "clientId": "client-60",
-    "clientName": "AURE, ALICIA ALEGRE",
-    "unitId": "LA-0708 & LA-0710 (COMBINED)",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-60-6",
-    "clientId": "client-60",
-    "clientName": "AURE, ALICIA ALEGRE",
-    "unitId": "LA-0708 & LA-0710 (COMBINED)",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-60-7",
-    "clientId": "client-60",
-    "clientName": "AURE, ALICIA ALEGRE",
-    "unitId": "LA-0708 & LA-0710 (COMBINED)",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-61-1",
-    "clientId": "client-61",
-    "clientName": "ORDO\u00d1EZ, LEONISA G.",
-    "unitId": "LA-0417 (END) *A",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Approved",
-    "submittedDate": "08/27/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-61-2",
-    "clientId": "client-61",
-    "clientName": "ORDO\u00d1EZ, LEONISA G.",
-    "unitId": "LA-0417 (END) *A",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Approved",
-    "submittedDate": "08/27/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-61-3",
-    "clientId": "client-61",
-    "clientName": "ORDO\u00d1EZ, LEONISA G.",
-    "unitId": "LA-0417 (END) *A",
-    "documentType": "Buyer's Information Form",
-    "status": "Approved",
-    "submittedDate": "08/27/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-61-4",
-    "clientId": "client-61",
-    "clientName": "ORDO\u00d1EZ, LEONISA G.",
-    "unitId": "LA-0417 (END) *A",
-    "documentType": "Intent to Buy",
-    "status": "Approved",
-    "submittedDate": "08/27/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-61-5",
-    "clientId": "client-61",
-    "clientName": "ORDO\u00d1EZ, LEONISA G.",
-    "unitId": "LA-0417 (END) *A",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Approved",
-    "submittedDate": "08/27/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-61-6",
-    "clientId": "client-61",
-    "clientName": "ORDO\u00d1EZ, LEONISA G.",
-    "unitId": "LA-0417 (END) *A",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Approved",
-    "submittedDate": "08/27/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-61-7",
-    "clientId": "client-61",
-    "clientName": "ORDO\u00d1EZ, LEONISA G.",
-    "unitId": "LA-0417 (END) *A",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Approved",
-    "submittedDate": "08/27/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-62-1",
-    "clientId": "client-62",
-    "clientName": "MANGLALLAN, JEMMABEL G.",
-    "unitId": "LA-0417 (END) *B",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Approved",
-    "submittedDate": "08/27/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-62-2",
-    "clientId": "client-62",
-    "clientName": "MANGLALLAN, JEMMABEL G.",
-    "unitId": "LA-0417 (END) *B",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Approved",
-    "submittedDate": "08/27/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-62-3",
-    "clientId": "client-62",
-    "clientName": "MANGLALLAN, JEMMABEL G.",
-    "unitId": "LA-0417 (END) *B",
-    "documentType": "Buyer's Information Form",
-    "status": "Approved",
-    "submittedDate": "08/27/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-62-4",
-    "clientId": "client-62",
-    "clientName": "MANGLALLAN, JEMMABEL G.",
-    "unitId": "LA-0417 (END) *B",
-    "documentType": "Intent to Buy",
-    "status": "Approved",
-    "submittedDate": "08/27/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-62-5",
-    "clientId": "client-62",
-    "clientName": "MANGLALLAN, JEMMABEL G.",
-    "unitId": "LA-0417 (END) *B",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Approved",
-    "submittedDate": "08/27/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-62-6",
-    "clientId": "client-62",
-    "clientName": "MANGLALLAN, JEMMABEL G.",
-    "unitId": "LA-0417 (END) *B",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Approved",
-    "submittedDate": "08/27/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-62-7",
-    "clientId": "client-62",
-    "clientName": "MANGLALLAN, JEMMABEL G.",
-    "unitId": "LA-0417 (END) *B",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Approved",
-    "submittedDate": "08/27/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-63-1",
-    "clientId": "client-63",
-    "clientName": "VILLEGAS, STEVE RANDY N.",
-    "unitId": "LA-0705",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Approved",
-    "submittedDate": "11/02/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-63-2",
-    "clientId": "client-63",
-    "clientName": "VILLEGAS, STEVE RANDY N.",
-    "unitId": "LA-0705",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Approved",
-    "submittedDate": "11/02/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-63-3",
-    "clientId": "client-63",
-    "clientName": "VILLEGAS, STEVE RANDY N.",
-    "unitId": "LA-0705",
-    "documentType": "Buyer's Information Form",
-    "status": "Approved",
-    "submittedDate": "11/02/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-63-4",
-    "clientId": "client-63",
-    "clientName": "VILLEGAS, STEVE RANDY N.",
-    "unitId": "LA-0705",
-    "documentType": "Intent to Buy",
-    "status": "Approved",
-    "submittedDate": "11/02/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-63-5",
-    "clientId": "client-63",
-    "clientName": "VILLEGAS, STEVE RANDY N.",
-    "unitId": "LA-0705",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Approved",
-    "submittedDate": "11/02/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-63-6",
-    "clientId": "client-63",
-    "clientName": "VILLEGAS, STEVE RANDY N.",
-    "unitId": "LA-0705",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Approved",
-    "submittedDate": "11/02/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-63-7",
-    "clientId": "client-63",
-    "clientName": "VILLEGAS, STEVE RANDY N.",
-    "unitId": "LA-0705",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Approved",
-    "submittedDate": "11/02/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-64-1",
-    "clientId": "client-64",
-    "clientName": "GOMEZ, BRYAN ANTAZO",
-    "unitId": "LA-0604",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Approved",
-    "submittedDate": "11/04/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-64-2",
-    "clientId": "client-64",
-    "clientName": "GOMEZ, BRYAN ANTAZO",
-    "unitId": "LA-0604",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Approved",
-    "submittedDate": "11/04/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-64-3",
-    "clientId": "client-64",
-    "clientName": "GOMEZ, BRYAN ANTAZO",
-    "unitId": "LA-0604",
-    "documentType": "Buyer's Information Form",
-    "status": "Approved",
-    "submittedDate": "11/04/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-64-4",
-    "clientId": "client-64",
-    "clientName": "GOMEZ, BRYAN ANTAZO",
-    "unitId": "LA-0604",
-    "documentType": "Intent to Buy",
-    "status": "Approved",
-    "submittedDate": "11/04/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-64-5",
-    "clientId": "client-64",
-    "clientName": "GOMEZ, BRYAN ANTAZO",
-    "unitId": "LA-0604",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Approved",
-    "submittedDate": "11/04/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-64-6",
-    "clientId": "client-64",
-    "clientName": "GOMEZ, BRYAN ANTAZO",
-    "unitId": "LA-0604",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Approved",
-    "submittedDate": "11/04/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-64-7",
-    "clientId": "client-64",
-    "clientName": "GOMEZ, BRYAN ANTAZO",
-    "unitId": "LA-0604",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Approved",
-    "submittedDate": "11/04/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-65-1",
-    "clientId": "client-65",
-    "clientName": "RIL, AUNDRIA ANTONIO",
-    "unitId": "LA-0703",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Approved",
-    "submittedDate": "12/03/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-65-2",
-    "clientId": "client-65",
-    "clientName": "RIL, AUNDRIA ANTONIO",
-    "unitId": "LA-0703",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Approved",
-    "submittedDate": "12/03/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-65-3",
-    "clientId": "client-65",
-    "clientName": "RIL, AUNDRIA ANTONIO",
-    "unitId": "LA-0703",
-    "documentType": "Buyer's Information Form",
-    "status": "Approved",
-    "submittedDate": "12/03/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-65-4",
-    "clientId": "client-65",
-    "clientName": "RIL, AUNDRIA ANTONIO",
-    "unitId": "LA-0703",
-    "documentType": "Intent to Buy",
-    "status": "Approved",
-    "submittedDate": "12/03/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-65-5",
-    "clientId": "client-65",
-    "clientName": "RIL, AUNDRIA ANTONIO",
-    "unitId": "LA-0703",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Approved",
-    "submittedDate": "12/03/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-65-6",
-    "clientId": "client-65",
-    "clientName": "RIL, AUNDRIA ANTONIO",
-    "unitId": "LA-0703",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Approved",
-    "submittedDate": "12/03/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-65-7",
-    "clientId": "client-65",
-    "clientName": "RIL, AUNDRIA ANTONIO",
-    "unitId": "LA-0703",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Approved",
-    "submittedDate": "12/03/2025",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-66-1",
-    "clientId": "client-66",
-    "clientName": "DELA CRUZ, JENNY ANN G.",
-    "unitId": "LA-1208 (NEW)",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-66-2",
-    "clientId": "client-66",
-    "clientName": "DELA CRUZ, JENNY ANN G.",
-    "unitId": "LA-1208 (NEW)",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-66-3",
-    "clientId": "client-66",
-    "clientName": "DELA CRUZ, JENNY ANN G.",
-    "unitId": "LA-1208 (NEW)",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-66-4",
-    "clientId": "client-66",
-    "clientName": "DELA CRUZ, JENNY ANN G.",
-    "unitId": "LA-1208 (NEW)",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-66-5",
-    "clientId": "client-66",
-    "clientName": "DELA CRUZ, JENNY ANN G.",
-    "unitId": "LA-1208 (NEW)",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-66-6",
-    "clientId": "client-66",
-    "clientName": "DELA CRUZ, JENNY ANN G.",
-    "unitId": "LA-1208 (NEW)",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-66-7",
-    "clientId": "client-66",
-    "clientName": "DELA CRUZ, JENNY ANN G.",
-    "unitId": "LA-1208 (NEW)",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-67-1",
-    "clientId": "client-67",
-    "clientName": "DELA CRUZ, JENNY ANN G.",
-    "unitId": "LA-1207 (NEW)",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-67-2",
-    "clientId": "client-67",
-    "clientName": "DELA CRUZ, JENNY ANN G.",
-    "unitId": "LA-1207 (NEW)",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-67-3",
-    "clientId": "client-67",
-    "clientName": "DELA CRUZ, JENNY ANN G.",
-    "unitId": "LA-1207 (NEW)",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-67-4",
-    "clientId": "client-67",
-    "clientName": "DELA CRUZ, JENNY ANN G.",
-    "unitId": "LA-1207 (NEW)",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-67-5",
-    "clientId": "client-67",
-    "clientName": "DELA CRUZ, JENNY ANN G.",
-    "unitId": "LA-1207 (NEW)",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-67-6",
-    "clientId": "client-67",
-    "clientName": "DELA CRUZ, JENNY ANN G.",
-    "unitId": "LA-1207 (NEW)",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-67-7",
-    "clientId": "client-67",
-    "clientName": "DELA CRUZ, JENNY ANN G.",
-    "unitId": "LA-1207 (NEW)",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-68-1",
-    "clientId": "client-68",
-    "clientName": "GELUZ, CONRADO JR, A.",
-    "unitId": "LA-1205 (NEW)",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-68-2",
-    "clientId": "client-68",
-    "clientName": "GELUZ, CONRADO JR, A.",
-    "unitId": "LA-1205 (NEW)",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-68-3",
-    "clientId": "client-68",
-    "clientName": "GELUZ, CONRADO JR, A.",
-    "unitId": "LA-1205 (NEW)",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-68-4",
-    "clientId": "client-68",
-    "clientName": "GELUZ, CONRADO JR, A.",
-    "unitId": "LA-1205 (NEW)",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-68-5",
-    "clientId": "client-68",
-    "clientName": "GELUZ, CONRADO JR, A.",
-    "unitId": "LA-1205 (NEW)",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-68-6",
-    "clientId": "client-68",
-    "clientName": "GELUZ, CONRADO JR, A.",
-    "unitId": "LA-1205 (NEW)",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-68-7",
-    "clientId": "client-68",
-    "clientName": "GELUZ, CONRADO JR, A.",
-    "unitId": "LA-1205 (NEW)",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-69-1",
-    "clientId": "client-69",
-    "clientName": "JANDUSAY, JOHN WENDELL F.",
-    "unitId": "LA-0801 (NEW)",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-69-2",
-    "clientId": "client-69",
-    "clientName": "JANDUSAY, JOHN WENDELL F.",
-    "unitId": "LA-0801 (NEW)",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-69-3",
-    "clientId": "client-69",
-    "clientName": "JANDUSAY, JOHN WENDELL F.",
-    "unitId": "LA-0801 (NEW)",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-69-4",
-    "clientId": "client-69",
-    "clientName": "JANDUSAY, JOHN WENDELL F.",
-    "unitId": "LA-0801 (NEW)",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-69-5",
-    "clientId": "client-69",
-    "clientName": "JANDUSAY, JOHN WENDELL F.",
-    "unitId": "LA-0801 (NEW)",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-69-6",
-    "clientId": "client-69",
-    "clientName": "JANDUSAY, JOHN WENDELL F.",
-    "unitId": "LA-0801 (NEW)",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-69-7",
-    "clientId": "client-69",
-    "clientName": "JANDUSAY, JOHN WENDELL F.",
-    "unitId": "LA-0801 (NEW)",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-70-1",
-    "clientId": "client-70",
-    "clientName": "AHMED, SARAH NACINO",
-    "unitId": "LA-0414 & LA-0415",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-70-2",
-    "clientId": "client-70",
-    "clientName": "AHMED, SARAH NACINO",
-    "unitId": "LA-0414 & LA-0415",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-70-3",
-    "clientId": "client-70",
-    "clientName": "AHMED, SARAH NACINO",
-    "unitId": "LA-0414 & LA-0415",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-70-4",
-    "clientId": "client-70",
-    "clientName": "AHMED, SARAH NACINO",
-    "unitId": "LA-0414 & LA-0415",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-70-5",
-    "clientId": "client-70",
-    "clientName": "AHMED, SARAH NACINO",
-    "unitId": "LA-0414 & LA-0415",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-70-6",
-    "clientId": "client-70",
-    "clientName": "AHMED, SARAH NACINO",
-    "unitId": "LA-0414 & LA-0415",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-70-7",
-    "clientId": "client-70",
-    "clientName": "AHMED, SARAH NACINO",
-    "unitId": "LA-0414 & LA-0415",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-71-1",
-    "clientId": "client-71",
-    "clientName": "ISO, DENMARK S.",
-    "unitId": "LA-0408 & LA 0409",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-71-2",
-    "clientId": "client-71",
-    "clientName": "ISO, DENMARK S.",
-    "unitId": "LA-0408 & LA 0409",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-71-3",
-    "clientId": "client-71",
-    "clientName": "ISO, DENMARK S.",
-    "unitId": "LA-0408 & LA 0409",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-71-4",
-    "clientId": "client-71",
-    "clientName": "ISO, DENMARK S.",
-    "unitId": "LA-0408 & LA 0409",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-71-5",
-    "clientId": "client-71",
-    "clientName": "ISO, DENMARK S.",
-    "unitId": "LA-0408 & LA 0409",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-71-6",
-    "clientId": "client-71",
-    "clientName": "ISO, DENMARK S.",
-    "unitId": "LA-0408 & LA 0409",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-71-7",
-    "clientId": "client-71",
-    "clientName": "ISO, DENMARK S.",
-    "unitId": "LA-0408 & LA 0409",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-72-1",
-    "clientId": "client-72",
-    "clientName": "DE CHAVEZ, MARIA ANGELICA G.",
-    "unitId": "LA-1207 (NEW)",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-72-2",
-    "clientId": "client-72",
-    "clientName": "DE CHAVEZ, MARIA ANGELICA G.",
-    "unitId": "LA-1207 (NEW)",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-72-3",
-    "clientId": "client-72",
-    "clientName": "DE CHAVEZ, MARIA ANGELICA G.",
-    "unitId": "LA-1207 (NEW)",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-72-4",
-    "clientId": "client-72",
-    "clientName": "DE CHAVEZ, MARIA ANGELICA G.",
-    "unitId": "LA-1207 (NEW)",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-72-5",
-    "clientId": "client-72",
-    "clientName": "DE CHAVEZ, MARIA ANGELICA G.",
-    "unitId": "LA-1207 (NEW)",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-72-6",
-    "clientId": "client-72",
-    "clientName": "DE CHAVEZ, MARIA ANGELICA G.",
-    "unitId": "LA-1207 (NEW)",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-72-7",
-    "clientId": "client-72",
-    "clientName": "DE CHAVEZ, MARIA ANGELICA G.",
-    "unitId": "LA-1207 (NEW)",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-73-1",
-    "clientId": "client-73",
-    "clientName": "CHRISTINE B. BOLISAY",
-    "unitId": "LA-0411 & LA-0412 (NEW)",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-73-2",
-    "clientId": "client-73",
-    "clientName": "CHRISTINE B. BOLISAY",
-    "unitId": "LA-0411 & LA-0412 (NEW)",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-73-3",
-    "clientId": "client-73",
-    "clientName": "CHRISTINE B. BOLISAY",
-    "unitId": "LA-0411 & LA-0412 (NEW)",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-73-4",
-    "clientId": "client-73",
-    "clientName": "CHRISTINE B. BOLISAY",
-    "unitId": "LA-0411 & LA-0412 (NEW)",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-73-5",
-    "clientId": "client-73",
-    "clientName": "CHRISTINE B. BOLISAY",
-    "unitId": "LA-0411 & LA-0412 (NEW)",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-73-6",
-    "clientId": "client-73",
-    "clientName": "CHRISTINE B. BOLISAY",
-    "unitId": "LA-0411 & LA-0412 (NEW)",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-73-7",
-    "clientId": "client-73",
-    "clientName": "CHRISTINE B. BOLISAY",
-    "unitId": "LA-0411 & LA-0412 (NEW)",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-74-1",
-    "clientId": "client-74",
-    "clientName": "BACUS, ERLOVE",
-    "unitId": "LA-1209 (NEW)",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-74-2",
-    "clientId": "client-74",
-    "clientName": "BACUS, ERLOVE",
-    "unitId": "LA-1209 (NEW)",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-74-3",
-    "clientId": "client-74",
-    "clientName": "BACUS, ERLOVE",
-    "unitId": "LA-1209 (NEW)",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-74-4",
-    "clientId": "client-74",
-    "clientName": "BACUS, ERLOVE",
-    "unitId": "LA-1209 (NEW)",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-74-5",
-    "clientId": "client-74",
-    "clientName": "BACUS, ERLOVE",
-    "unitId": "LA-1209 (NEW)",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-74-6",
-    "clientId": "client-74",
-    "clientName": "BACUS, ERLOVE",
-    "unitId": "LA-1209 (NEW)",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-74-7",
-    "clientId": "client-74",
-    "clientName": "BACUS, ERLOVE",
-    "unitId": "LA-1209 (NEW)",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-75-1",
-    "clientId": "client-75",
-    "clientName": "REGIS, GERALDINE O.",
-    "unitId": "LA-0410 (NEW)",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-75-2",
-    "clientId": "client-75",
-    "clientName": "REGIS, GERALDINE O.",
-    "unitId": "LA-0410 (NEW)",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-75-3",
-    "clientId": "client-75",
-    "clientName": "REGIS, GERALDINE O.",
-    "unitId": "LA-0410 (NEW)",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-75-4",
-    "clientId": "client-75",
-    "clientName": "REGIS, GERALDINE O.",
-    "unitId": "LA-0410 (NEW)",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-75-5",
-    "clientId": "client-75",
-    "clientName": "REGIS, GERALDINE O.",
-    "unitId": "LA-0410 (NEW)",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-75-6",
-    "clientId": "client-75",
-    "clientName": "REGIS, GERALDINE O.",
-    "unitId": "LA-0410 (NEW)",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-75-7",
-    "clientId": "client-75",
-    "clientName": "REGIS, GERALDINE O.",
-    "unitId": "LA-0410 (NEW)",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-76-1",
-    "clientId": "client-76",
-    "clientName": "CODON, MA. CZARINA A.",
-    "unitId": "LA-0407 (NEW)",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-76-2",
-    "clientId": "client-76",
-    "clientName": "CODON, MA. CZARINA A.",
-    "unitId": "LA-0407 (NEW)",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-76-3",
-    "clientId": "client-76",
-    "clientName": "CODON, MA. CZARINA A.",
-    "unitId": "LA-0407 (NEW)",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-76-4",
-    "clientId": "client-76",
-    "clientName": "CODON, MA. CZARINA A.",
-    "unitId": "LA-0407 (NEW)",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-76-5",
-    "clientId": "client-76",
-    "clientName": "CODON, MA. CZARINA A.",
-    "unitId": "LA-0407 (NEW)",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-76-6",
-    "clientId": "client-76",
-    "clientName": "CODON, MA. CZARINA A.",
-    "unitId": "LA-0407 (NEW)",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-76-7",
-    "clientId": "client-76",
-    "clientName": "CODON, MA. CZARINA A.",
-    "unitId": "LA-0407 (NEW)",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-77-1",
-    "clientId": "client-77",
-    "clientName": "SALONGA, EDWIN L.",
-    "unitId": "LA-1203 & LA-1204 (NEW)",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-77-2",
-    "clientId": "client-77",
-    "clientName": "SALONGA, EDWIN L.",
-    "unitId": "LA-1203 & LA-1204 (NEW)",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-77-3",
-    "clientId": "client-77",
-    "clientName": "SALONGA, EDWIN L.",
-    "unitId": "LA-1203 & LA-1204 (NEW)",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-77-4",
-    "clientId": "client-77",
-    "clientName": "SALONGA, EDWIN L.",
-    "unitId": "LA-1203 & LA-1204 (NEW)",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-77-5",
-    "clientId": "client-77",
-    "clientName": "SALONGA, EDWIN L.",
-    "unitId": "LA-1203 & LA-1204 (NEW)",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-77-6",
-    "clientId": "client-77",
-    "clientName": "SALONGA, EDWIN L.",
-    "unitId": "LA-1203 & LA-1204 (NEW)",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-77-7",
-    "clientId": "client-77",
-    "clientName": "SALONGA, EDWIN L.",
-    "unitId": "LA-1203 & LA-1204 (NEW)",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-78-1",
-    "clientId": "client-78",
-    "clientName": "GERMANO, ERICO C. JR",
-    "unitId": "LA-0704 (NEW)",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-78-2",
-    "clientId": "client-78",
-    "clientName": "GERMANO, ERICO C. JR",
-    "unitId": "LA-0704 (NEW)",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-78-3",
-    "clientId": "client-78",
-    "clientName": "GERMANO, ERICO C. JR",
-    "unitId": "LA-0704 (NEW)",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-78-4",
-    "clientId": "client-78",
-    "clientName": "GERMANO, ERICO C. JR",
-    "unitId": "LA-0704 (NEW)",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-78-5",
-    "clientId": "client-78",
-    "clientName": "GERMANO, ERICO C. JR",
-    "unitId": "LA-0704 (NEW)",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-78-6",
-    "clientId": "client-78",
-    "clientName": "GERMANO, ERICO C. JR",
-    "unitId": "LA-0704 (NEW)",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-78-7",
-    "clientId": "client-78",
-    "clientName": "GERMANO, ERICO C. JR",
-    "unitId": "LA-0704 (NEW)",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-79-1",
-    "clientId": "client-79",
-    "clientName": "CABALIDA, MADELYN G.",
-    "unitId": "LA-0201",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-79-2",
-    "clientId": "client-79",
-    "clientName": "CABALIDA, MADELYN G.",
-    "unitId": "LA-0201",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-79-3",
-    "clientId": "client-79",
-    "clientName": "CABALIDA, MADELYN G.",
-    "unitId": "LA-0201",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-79-4",
-    "clientId": "client-79",
-    "clientName": "CABALIDA, MADELYN G.",
-    "unitId": "LA-0201",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-79-5",
-    "clientId": "client-79",
-    "clientName": "CABALIDA, MADELYN G.",
-    "unitId": "LA-0201",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-79-6",
-    "clientId": "client-79",
-    "clientName": "CABALIDA, MADELYN G.",
-    "unitId": "LA-0201",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-79-7",
-    "clientId": "client-79",
-    "clientName": "CABALIDA, MADELYN G.",
-    "unitId": "LA-0201",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-80-1",
-    "clientId": "client-80",
-    "clientName": "LOMAN, KURT ERNEST M.",
-    "unitId": "LA-0405 & LA-0406",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-80-2",
-    "clientId": "client-80",
-    "clientName": "LOMAN, KURT ERNEST M.",
-    "unitId": "LA-0405 & LA-0406",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-80-3",
-    "clientId": "client-80",
-    "clientName": "LOMAN, KURT ERNEST M.",
-    "unitId": "LA-0405 & LA-0406",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-80-4",
-    "clientId": "client-80",
-    "clientName": "LOMAN, KURT ERNEST M.",
-    "unitId": "LA-0405 & LA-0406",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-80-5",
-    "clientId": "client-80",
-    "clientName": "LOMAN, KURT ERNEST M.",
-    "unitId": "LA-0405 & LA-0406",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-80-6",
-    "clientId": "client-80",
-    "clientName": "LOMAN, KURT ERNEST M.",
-    "unitId": "LA-0405 & LA-0406",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-80-7",
-    "clientId": "client-80",
-    "clientName": "LOMAN, KURT ERNEST M.",
-    "unitId": "LA-0405 & LA-0406",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-81-1",
-    "clientId": "client-81",
-    "clientName": "MEDILO, LARRY D.",
-    "unitId": "LA-0502",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-81-2",
-    "clientId": "client-81",
-    "clientName": "MEDILO, LARRY D.",
-    "unitId": "LA-0502",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-81-3",
-    "clientId": "client-81",
-    "clientName": "MEDILO, LARRY D.",
-    "unitId": "LA-0502",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-81-4",
-    "clientId": "client-81",
-    "clientName": "MEDILO, LARRY D.",
-    "unitId": "LA-0502",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-81-5",
-    "clientId": "client-81",
-    "clientName": "MEDILO, LARRY D.",
-    "unitId": "LA-0502",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-81-6",
-    "clientId": "client-81",
-    "clientName": "MEDILO, LARRY D.",
-    "unitId": "LA-0502",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-81-7",
-    "clientId": "client-81",
-    "clientName": "MEDILO, LARRY D.",
-    "unitId": "LA-0502",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-82-1",
-    "clientId": "client-82",
-    "clientName": "MICHELLE C. SAQUILAYAN",
-    "unitId": "LA-1208 (NEW)",
-    "documentType": "Client Registration Form (Seller's Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-82-2",
-    "clientId": "client-82",
-    "clientName": "MICHELLE C. SAQUILAYAN",
-    "unitId": "LA-1208 (NEW)",
-    "documentType": "Client Registration Form (Administrator Copy)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-82-3",
-    "clientId": "client-82",
-    "clientName": "MICHELLE C. SAQUILAYAN",
-    "unitId": "LA-1208 (NEW)",
-    "documentType": "Buyer's Information Form",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-82-4",
-    "clientId": "client-82",
-    "clientName": "MICHELLE C. SAQUILAYAN",
-    "unitId": "LA-1208 (NEW)",
-    "documentType": "Intent to Buy",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-82-5",
-    "clientId": "client-82",
-    "clientName": "MICHELLE C. SAQUILAYAN",
-    "unitId": "LA-1208 (NEW)",
-    "documentType": "Offer to Buy & Buyer's Profile",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-82-6",
-    "clientId": "client-82",
-    "clientName": "MICHELLE C. SAQUILAYAN",
-    "unitId": "LA-1208 (NEW)",
-    "documentType": "Deed of Absolute Sale",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  },
-  {
-    "id": "doc-82-7",
-    "clientId": "client-82",
-    "clientName": "MICHELLE C. SAQUILAYAN",
-    "unitId": "LA-1208 (NEW)",
-    "documentType": "Contract to Sell (Undivided Share)",
-    "status": "Not Submitted",
-    "submittedDate": "",
-    "rejectionRemark": ""
-  }
+export type DocumentStatus = 'Not Submitted' | 'Submitted' | 'Approved' | 'Rejected'
+
+export const documentRequirements = [
+  { id: 'client-registration-seller-copy', category: 'List of Documents', documentType: "Client Registration Form - Seller's Copy", sortOrder: 1 },
+  { id: 'client-registration-admin-copy', category: 'List of Documents', documentType: 'Client Registration Form - Administrator Copy', sortOrder: 2 },
+  { id: 'buyers-information-form', category: 'List of Documents', documentType: "Buyer's Information Form", sortOrder: 3 },
+  { id: 'intent-to-buy', category: 'List of Documents', documentType: 'Intent to Buy', sortOrder: 4 },
+  { id: 'offer-to-buy-buyers-profile', category: 'List of Documents', documentType: "Offer to Buy & Buyer's Profile", sortOrder: 5 },
+  { id: 'reservation-agreement', category: 'List of Documents', documentType: 'Reservation Agreement', sortOrder: 6 },
+  { id: 'deed-of-sale', category: 'List of Documents', documentType: 'Deed of Sale', sortOrder: 7 },
+  { id: 'contract-to-sell', category: 'List of Documents', documentType: 'Contract to Sell', sortOrder: 8 },
+  { id: 'buyer-counselling-acknowledgement', category: 'List of Documents', documentType: 'Buyer Counselling and Acknowledgement Form', sortOrder: 9 },
+  { id: 'voluntary-cancellation-waiver', category: 'List of Documents', documentType: 'Voluntary Cancellation and Waiver of Rights', sortOrder: 10 },
+  { id: 'buyer-acknowledgement-form', category: 'List of Documents', documentType: 'Buyer Acknowledgement Form', sortOrder: 11 },
+  { id: 'spa-process-title-company', category: "For OFW's", documentType: 'SPA to Process Title (for Company)', sortOrder: 12 },
+  { id: 'spa-authorization-sign-representative', category: "For OFW's", documentType: 'SPA Authorization to Sign (for Representative)', sortOrder: 13 },
+  { id: 'two-valid-government-ids', category: 'Required for Submission', documentType: "Two Valid Government-issued ID's (w/ 3 specimen signatures)", sortOrder: 14 },
+  { id: 'tin-no-tin-id', category: 'Required for Submission', documentType: 'TIN No. / TIN ID', sortOrder: 15 },
+  { id: 'psa-single', category: 'Required for Submission', documentType: 'PSA (Single)', sortOrder: 16 },
+  { id: 'marriage-certificate', category: 'For Married Clients', documentType: 'Marriage Certificate', sortOrder: 17 },
+  { id: 'valid-id-spouse', category: 'For Married Clients', documentType: 'Valid ID of Spouse (w/ 3 specimen signatures)', sortOrder: 18 },
+  { id: 'spouse-signature', category: 'For Married Clients', documentType: "Spouse's Signature (when required)", sortOrder: 19 },
+  { id: 'cenomar-with-kids-not-married', category: 'For Married Clients', documentType: 'CENOMAR (if the buyer has kids but not married)', sortOrder: 20 },
+  { id: 'passport-id', category: "For OFW's or Representative", documentType: 'Passport ID', sortOrder: 21 },
+  { id: 'valid-ids-principal-representative', category: "For OFW's or Representative", documentType: "Valid ID's of both Principal and Representative", sortOrder: 22 },
 ]
 
-export const clientDocuments = normalizeUnitRows(canonicalClientDocuments).map((document, index) => ({
-  ...document,
-  id: `doc-${index + 1}`,
-  clientId: normalizedClientData.clientIdByOriginalAndUnit.get(`${document.clientId}|${document.unitId}`) ?? document.clientId,
-}))
+function getInitialDocumentStatus(client: ClientRecord, requirementIndex: number, clientIndex: number): DocumentStatus {
+  if (client.documentStatus === 'COMPLETE') return 'Approved'
+  if (requirementIndex < 4) return 'Approved'
+  if (requirementIndex === 4 || requirementIndex === 13) return 'Submitted'
+  if ((clientIndex + requirementIndex) % 37 === 0) return 'Rejected'
+  return 'Not Submitted'
+}
+
+export const clientDocuments = clients.flatMap((client, clientIndex) =>
+  documentRequirements.map((requirement, requirementIndex) => {
+    const status = getInitialDocumentStatus(client, requirementIndex, clientIndex)
+
+    return {
+      id: `doc-${clientIndex + 1}-${requirement.id}`,
+      clientId: client.clientId,
+      clientName: client.buyer,
+      unitId: client.unitId,
+      requirementId: requirement.id,
+      category: requirement.category,
+      documentType: requirement.documentType,
+      status,
+      submittedDate: status === 'Not Submitted' ? '' : client.reservationDate,
+      rejectionRemark: status === 'Rejected' ? 'Needs clearer copy or admin follow-up.' : '',
+    }
+  }),
+)
 
 export const usersV2 = [
   { id: 'user-1', fullName: 'Admin', email: 'admin@dcprime.com', role: 'admin', status: 'Active', dateCreated: '01/01/2026', lastLogin: '06/03/2026', permissions: featureKeys.reduce((acc, key) => ({ ...acc, [key]: true }), {}) },
@@ -24633,3 +18938,626 @@ export const auditLogsV2 = auditActions.flatMap((action, actionIndex) =>
     ipAddress: `192.168.1.${(actionIndex * 8 + index) + 1}`,
   })),
 )
+
+export type MockDbTimestamp = string
+export type MockDbUserRole = 'admin' | 'treasury' | 'manager' | 'broker' | 'agent' | 'client'
+export type MockDbActiveStatus = 'active' | 'inactive'
+export type MockDbProjectStatus = 'active' | 'inactive' | 'completed'
+export type MockDbListingStatus = 'available' | 'reserved' | 'sold' | 'inactive'
+export type MockDbClientStatus = 'lead' | 'reserved' | 'active' | 'completed' | 'cancelled'
+export type MockDbClientUnitStatus = 'reserved' | 'active' | 'fully_paid' | 'cancelled'
+export type MockDbDocumentMasterStatus = 'active' | 'inactive'
+export type MockDbClientUnitDocumentStatus = 'missing' | 'submitted' | 'approved' | 'rejected' | 'not_required'
+export type MockDbPaymentType = 'reservation' | 'downpayment' | 'monthly' | 'full_payment' | 'legal_misc' | 'other'
+export type MockDbPaymentStatus = 'pending' | 'verified' | 'rejected'
+export type MockDbPaymentScheduleStatus = 'unpaid' | 'partial' | 'paid' | 'overdue'
+export type MockDbCommissionType = 'agent' | 'broker' | 'manager'
+export type MockDbCommissionStatus = 'pending' | 'approved' | 'released' | 'cancelled'
+export type MockDbCashAdvanceStatus = 'pending' | 'approved' | 'deducted' | 'rejected'
+
+export type MockDbUser = {
+  id: number
+  full_name: string
+  email: string
+  password_hash: string
+  role: MockDbUserRole
+  status: MockDbActiveStatus
+  created_at: MockDbTimestamp
+  updated_at: MockDbTimestamp
+}
+
+export type MockDbProject = {
+  id: number
+  name: string
+  location: string | null
+  administrator: string
+  tax_declaration_no: string
+  pin: string
+  description: string | null
+  status: MockDbProjectStatus
+  created_at: MockDbTimestamp
+  updated_at: MockDbTimestamp
+}
+
+export type MockDbListing = {
+  id: number
+  project_id: number
+  unit_id: string
+  lot_type: string | null
+  lot_area_sqm: number
+  price_per_sqm: number
+  reservation_fee: number
+  legal_misc_fee: number
+  net_selling_price: number
+  status: MockDbListingStatus
+  created_at: MockDbTimestamp
+  updated_at: MockDbTimestamp
+}
+
+export type MockDbClient = {
+  id: number
+  full_name: string
+  email: string | null
+  contact_no: string | null
+  address: string | null
+  assigned_seller_id: number | null
+  status: MockDbClientStatus
+  created_at: MockDbTimestamp
+  updated_at: MockDbTimestamp
+}
+
+export type MockDbClientUnit = {
+  id: number
+  client_id: number
+  listing_id: number
+  assigned_seller_id: number
+  reservation_date: string | null
+  contract_date: string | null
+  selling_price: number | null
+  downpayment: number | null
+  balance: number | null
+  status: MockDbClientUnitStatus
+}
+
+export type MockDbDocument = {
+  id: number
+  name: string
+  description: string | null
+  is_required: boolean
+  status: MockDbDocumentMasterStatus
+  created_at: MockDbTimestamp
+  updated_at: MockDbTimestamp
+}
+
+export type MockDbClientUnitDocument = {
+  id: number
+  client_unit_id: number
+  document_id: number
+  file_url: string | null
+  status: MockDbClientUnitDocumentStatus
+  remarks: string | null
+  submitted_at: MockDbTimestamp | null
+  reviewed_by: number | null
+  reviewed_at: MockDbTimestamp | null
+  created_at: MockDbTimestamp
+  updated_at: MockDbTimestamp
+}
+
+export type MockDbPayment = {
+  id: number
+  client_unit_id: number
+  amount: number
+  payment_date: string
+  payment_type: MockDbPaymentType
+  payment_method: string | null
+  bank_name: string | null
+  reference_no: string | null
+  remarks: string | null
+  status: MockDbPaymentStatus
+  verified_by: number | null
+  verified_at: MockDbTimestamp | null
+  created_at: MockDbTimestamp
+}
+
+export type MockDbPaymentSchedule = {
+  id: number
+  client_unit_id: number
+  due_date: string
+  amount_due: number
+  amount_paid: number
+  balance: number
+  status: MockDbPaymentScheduleStatus
+  created_at: MockDbTimestamp
+  updated_at: MockDbTimestamp
+}
+
+export type MockDbCommissionPlan = {
+  id: number
+  project_id: number
+  name: string
+  agent_rate: number
+  broker_rate: number
+  manager_rate: number
+  status: MockDbActiveStatus
+  created_at: MockDbTimestamp
+}
+
+export type MockDbCommission = {
+  id: number
+  client_unit_id: number
+  user_id: number
+  commission_type: MockDbCommissionType
+  rate: number
+  amount: number
+  status: MockDbCommissionStatus
+  approved_by: number | null
+  approved_at: MockDbTimestamp | null
+  created_at: MockDbTimestamp
+}
+
+export type MockDbCashAdvance = {
+  id: number
+  user_id: number
+  amount: number
+  reason: string | null
+  status: MockDbCashAdvanceStatus
+  approved_by: number | null
+  approved_at: MockDbTimestamp | null
+  created_at: MockDbTimestamp
+}
+
+export type MockDbCommissionRelease = {
+  id: number
+  commission_id: number
+  cash_advance_id: number | null
+  gross_amount: number
+  cash_advance_deduction: number
+  net_released_amount: number
+  released_by: number
+  released_at: MockDbTimestamp
+  remarks: string | null
+}
+
+const mockDbCreatedAt = '2026-01-01 08:00:00'
+const mockDbUpdatedAt = '2026-06-05 09:00:00'
+const defaultReservationFee = 50000
+
+function mockDbTimestampFromDate(date: string | null | undefined, fallback = mockDbCreatedAt): MockDbTimestamp {
+  if (!date) return fallback
+  return `${mockDbIsoDate(date, fallback.slice(0, 10))} 09:00:00`
+}
+
+function mockDbIsoDate(date: string | null | undefined, fallback = '2026-01-01') {
+  if (!date) return fallback
+
+  const match = date.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/)
+  if (match) {
+    const [, month, day, year] = match
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+  }
+
+  if (/^\d{4}-\d{2}-\d{2}/.test(date)) return date.slice(0, 10)
+  return fallback
+}
+
+function addMonthsToMockDbDate(date: string | null | undefined, months: number) {
+  const [year, month, day] = mockDbIsoDate(date).split('-').map(Number)
+  const nextDate = new Date(year, month - 1 + months, day)
+  const nextYear = nextDate.getFullYear()
+  const nextMonth = String(nextDate.getMonth() + 1).padStart(2, '0')
+  const nextDay = String(nextDate.getDate()).padStart(2, '0')
+  return `${nextYear}-${nextMonth}-${nextDay}`
+}
+
+function roundMockCurrency(value: number) {
+  return Math.round((Number.isFinite(value) ? value : 0) * 100) / 100
+}
+
+function mockActiveStatus(status?: string): MockDbActiveStatus {
+  return status?.toLowerCase().includes('inactive') || status?.toLowerCase().includes('suspended') ? 'inactive' : 'active'
+}
+
+function mockListingStatus(status: Listing['status']): MockDbListingStatus {
+  if (status === 'Available') return 'available'
+  if (status === 'Reserved') return 'reserved'
+  if (status === 'Sold') return 'sold'
+  return 'inactive'
+}
+
+function mockClientStatus(client: ClientRecord): MockDbClientStatus {
+  if (client.accountStatus === 'COMPLETE PAID') return 'completed'
+  if (client.salesStatus === 'FOR REVIEW') return 'reserved'
+  if (client.paymentMade > 0) return 'active'
+  return 'lead'
+}
+
+function mockClientUnitStatus(client: ClientRecord): MockDbClientUnitStatus {
+  if (client.accountStatus === 'COMPLETE PAID') return 'fully_paid'
+  if (client.salesStatus === 'FOR REVIEW') return 'reserved'
+  if (client.paymentMade > 0) return 'active'
+  return 'reserved'
+}
+
+function mockDocumentStatus(status: DocumentStatus): MockDbClientUnitDocumentStatus {
+  if (status === 'Approved') return 'approved'
+  if (status === 'Submitted') return 'submitted'
+  if (status === 'Rejected') return 'rejected'
+  return 'missing'
+}
+
+function mockPaymentStatus(status: string): MockDbPaymentStatus {
+  if (status === 'Verified') return 'verified'
+  if (status === 'Rejected') return 'rejected'
+  return 'pending'
+}
+
+function mockPaymentType(paymentIndex: number, paymentDescription: string): MockDbPaymentType {
+  const description = paymentDescription.toLowerCase()
+  if (description.includes('reservation')) return 'reservation'
+  if (description.includes('legal')) return 'legal_misc'
+  if (paymentIndex % 17 === 0) return 'downpayment'
+  return 'monthly'
+}
+
+const mockDbManagerUserId = 3
+const mockDbBrokerUserId = 4
+const mockDbFirstSellerUserId = 5
+
+export const mockDbUsers: MockDbUser[] = [
+  {
+    id: 1,
+    full_name: 'Admin User',
+    email: 'admin@dcprime.test',
+    password_hash: 'mock_hash_admin',
+    role: 'admin',
+    status: 'active',
+    created_at: mockDbCreatedAt,
+    updated_at: mockDbUpdatedAt,
+  },
+  {
+    id: 2,
+    full_name: company.preparedBy,
+    email: 'treasury@dcprime.test',
+    password_hash: 'mock_hash_treasury',
+    role: 'treasury',
+    status: 'active',
+    created_at: mockDbCreatedAt,
+    updated_at: mockDbUpdatedAt,
+  },
+  {
+    id: mockDbManagerUserId,
+    full_name: 'Sales Manager',
+    email: 'manager@dcprime.test',
+    password_hash: 'mock_hash_manager',
+    role: 'manager',
+    status: 'active',
+    created_at: mockDbCreatedAt,
+    updated_at: mockDbUpdatedAt,
+  },
+  {
+    id: mockDbBrokerUserId,
+    full_name: 'Accredited Broker',
+    email: 'broker@dcprime.test',
+    password_hash: 'mock_hash_broker',
+    role: 'broker',
+    status: 'active',
+    created_at: mockDbCreatedAt,
+    updated_at: mockDbUpdatedAt,
+  },
+  ...agents.map((agent, index) => ({
+    id: mockDbFirstSellerUserId + index,
+    full_name: agent.fullName,
+    email: agent.email || `seller${index + 1}@dcprime.test`,
+    password_hash: `mock_hash_seller_${index + 1}`,
+    role: 'agent' as const,
+    status: mockActiveStatus(agent.status),
+    created_at: mockDbCreatedAt,
+    updated_at: mockDbUpdatedAt,
+  })),
+  ...clients.slice(0, 12).map((client, index) => ({
+    id: 1000 + index,
+    full_name: client.buyer,
+    email: client.email || `client${index + 1}@dcprime.test`,
+    password_hash: `mock_hash_client_${index + 1}`,
+    role: 'client' as const,
+    status: mockClientStatus(client) === 'cancelled' ? 'inactive' as const : 'active' as const,
+    created_at: mockDbTimestampFromDate(client.reservationDate),
+    updated_at: mockDbUpdatedAt,
+  })),
+]
+
+const mockDbSellerIdByName = new Map(
+  agents.map((agent, index) => [agent.fullName, mockDbFirstSellerUserId + index]),
+)
+
+export const mockDbProjects: MockDbProject[] = [
+  {
+    id: 1,
+    name: 'Pantihan 4',
+    location: 'Maragondon, Cavite',
+    administrator: company.preparedBy,
+    tax_declaration_no: 'MOCK-TD-2026-0001',
+    pin: 'MOCK-PIN-2026-0001',
+    description: 'Mock project row for Pantihan 4 inventory, clients, payments, documents, and commissions.',
+    status: 'active',
+    created_at: mockDbCreatedAt,
+    updated_at: mockDbUpdatedAt,
+  },
+]
+
+const mockDbListingSeeds = new Map<string, Pick<Listing, 'unitId' | 'lotType' | 'area' | 'pricePerSqm' | 'netSellingPrice' | 'legalMiscFee' | 'status'>>()
+
+listings.forEach((listing) => {
+  if (!listing.unitId || mockDbListingSeeds.has(listing.unitId)) return
+  if (listing.area <= 0 || listing.netSellingPrice <= 0) return
+  mockDbListingSeeds.set(listing.unitId, listing)
+})
+
+clients.forEach((client) => {
+  if (!client.unitId || mockDbListingSeeds.has(client.unitId)) return
+
+  mockDbListingSeeds.set(client.unitId, {
+    unitId: client.unitId,
+    lotType: 'Client Allocation',
+    area: client.area,
+    pricePerSqm: client.pricePerSqm,
+    netSellingPrice: client.totalContractPrice,
+    legalMiscFee: 0,
+    status: client.accountStatus === 'COMPLETE PAID' ? 'Sold' : 'Reserved',
+  })
+})
+
+export const mockDbListings: MockDbListing[] = Array.from(mockDbListingSeeds.values()).map((listing, index) => {
+  const legalMiscFee = listing.legalMiscFee > 0 && listing.legalMiscFee <= 1
+    ? listing.netSellingPrice * listing.legalMiscFee
+    : listing.legalMiscFee
+
+  return {
+    id: index + 1,
+    project_id: 1,
+    unit_id: listing.unitId,
+    lot_type: listing.lotType || null,
+    lot_area_sqm: listing.area,
+    price_per_sqm: listing.pricePerSqm,
+    reservation_fee: defaultReservationFee,
+    legal_misc_fee: roundMockCurrency(legalMiscFee),
+    net_selling_price: roundMockCurrency(listing.netSellingPrice),
+    status: mockListingStatus(listing.status),
+    created_at: mockDbCreatedAt,
+    updated_at: mockDbUpdatedAt,
+  }
+})
+
+const mockDbListingIdByUnitId = new Map(mockDbListings.map((listing) => [listing.unit_id, listing.id]))
+
+export const mockDbClients: MockDbClient[] = clients.map((client, index) => ({
+  id: index + 1,
+  full_name: client.buyer,
+  email: client.email || null,
+  contact_no: client.contactNo || null,
+  address: client.address || null,
+  assigned_seller_id: mockDbSellerIdByName.get(client.agent) ?? mockDbFirstSellerUserId,
+  status: mockClientStatus(client),
+  created_at: mockDbTimestampFromDate(client.reservationDate),
+  updated_at: mockDbUpdatedAt,
+}))
+
+export const mockDbClientUnits: MockDbClientUnit[] = clients.map((client, index) => {
+  const reservationDate = mockDbIsoDate(client.reservationDate, '2026-01-01')
+  const clientUnitStatus = mockClientUnitStatus(client)
+
+  return {
+    id: index + 1,
+    client_id: index + 1,
+    listing_id: mockDbListingIdByUnitId.get(client.unitId) ?? 1,
+    assigned_seller_id: mockDbSellerIdByName.get(client.agent) ?? mockDbFirstSellerUserId,
+    reservation_date: reservationDate,
+    contract_date: addMonthsToMockDbDate(reservationDate, 1),
+    selling_price: roundMockCurrency(client.totalContractPrice),
+    downpayment: roundMockCurrency(client.paymentMade),
+    balance: roundMockCurrency(client.balance),
+    status: clientUnitStatus,
+  }
+})
+
+const mockDbClientUnitIdByLegacyKey = new Map(
+  clients.map((client, index) => [`${client.clientId}|${client.unitId}`, index + 1]),
+)
+
+export const mockDbDocuments: MockDbDocument[] = documentRequirements.map((document, index) => ({
+  id: index + 1,
+  name: document.documentType,
+  description: document.category,
+  is_required: true,
+  status: 'active',
+  created_at: mockDbCreatedAt,
+  updated_at: mockDbUpdatedAt,
+}))
+
+const mockDbDocumentIdByRequirementId = new Map(
+  documentRequirements.map((document, index) => [document.id, index + 1]),
+)
+
+export const mockDbClientUnitDocuments: MockDbClientUnitDocument[] = clientDocuments.map((document, index) => {
+  const clientUnitDocumentStatus = mockDocumentStatus(document.status)
+  const submittedAt = document.submittedDate ? mockDbTimestampFromDate(document.submittedDate) : null
+  const reviewedAt = clientUnitDocumentStatus === 'approved' || clientUnitDocumentStatus === 'rejected' ? submittedAt : null
+
+  return {
+    id: index + 1,
+    client_unit_id: mockDbClientUnitIdByLegacyKey.get(`${document.clientId}|${document.unitId}`) ?? 1,
+    document_id: mockDbDocumentIdByRequirementId.get(document.requirementId) ?? 1,
+    file_url: clientUnitDocumentStatus === 'missing' ? null : `/mock-documents/${document.clientId}/${document.requirementId}.pdf`,
+    status: clientUnitDocumentStatus,
+    remarks: document.rejectionRemark || null,
+    submitted_at: submittedAt,
+    reviewed_by: reviewedAt ? 2 : null,
+    reviewed_at: reviewedAt,
+    created_at: mockDbCreatedAt,
+    updated_at: mockDbUpdatedAt,
+  }
+})
+
+export const mockDbPayments: MockDbPayment[] = payments.map((payment, index) => {
+  const paymentStatus = mockPaymentStatus(payment.status)
+
+  return {
+    id: index + 1,
+    client_unit_id: mockDbClientUnitIdByLegacyKey.get(`${payment.clientId}|${payment.unitId}`) ?? 1,
+    amount: roundMockCurrency(payment.amount),
+    payment_date: mockDbIsoDate(payment.date, '2026-01-15'),
+    payment_type: mockPaymentType(index, payment.description),
+    payment_method: payment.bank ? 'Bank Deposit' : null,
+    bank_name: payment.bank && payment.bank !== 'BANK' ? payment.bank : 'Mock Bank',
+    reference_no: payment.referenceNumber || payment.id,
+    remarks: payment.description || null,
+    status: paymentStatus,
+    verified_by: paymentStatus === 'verified' ? 2 : null,
+    verified_at: paymentStatus === 'verified' ? mockDbTimestampFromDate(payment.date, mockDbUpdatedAt) : null,
+    created_at: mockDbTimestampFromDate(payment.date, mockDbCreatedAt),
+  }
+})
+
+export const mockDbPaymentSchedules: MockDbPaymentSchedule[] = mockDbClientUnits.flatMap((clientUnit) => {
+  const scheduleLength = 6
+  const monthlyDue = roundMockCurrency((clientUnit.balance ?? 0) / scheduleLength)
+
+  return Array.from({ length: scheduleLength }, (_, monthIndex) => {
+    const amountPaid = clientUnit.status === 'fully_paid' ? monthlyDue : 0
+    const balance = roundMockCurrency(Math.max(monthlyDue - amountPaid, 0))
+    const dueDate = addMonthsToMockDbDate(clientUnit.reservation_date, monthIndex + 1)
+    const status: MockDbPaymentScheduleStatus = amountPaid >= monthlyDue && monthlyDue > 0
+      ? 'paid'
+      : dueDate < '2026-06-05'
+        ? 'overdue'
+        : 'unpaid'
+
+    return {
+      id: ((clientUnit.id - 1) * scheduleLength) + monthIndex + 1,
+      client_unit_id: clientUnit.id,
+      due_date: dueDate,
+      amount_due: monthlyDue,
+      amount_paid: amountPaid,
+      balance,
+      status,
+      created_at: mockDbCreatedAt,
+      updated_at: mockDbUpdatedAt,
+    }
+  })
+})
+
+export const mockDbCommissionPlans: MockDbCommissionPlan[] = [
+  {
+    id: 1,
+    project_id: 1,
+    name: 'Standard Land Sales Commission',
+    agent_rate: 5,
+    broker_rate: 2,
+    manager_rate: 1,
+    status: 'active',
+    created_at: mockDbCreatedAt,
+  },
+]
+
+export const mockDbCommissions: MockDbCommission[] = mockDbClientUnits.flatMap((clientUnit, index) => {
+  const sellingPrice = clientUnit.selling_price ?? 0
+  const baseStatus: MockDbCommissionStatus = clientUnit.status === 'fully_paid' ? 'released' : index % 3 === 0 ? 'approved' : 'pending'
+
+  return [
+    {
+      id: (index * 3) + 1,
+      client_unit_id: clientUnit.id,
+      user_id: clientUnit.assigned_seller_id,
+      commission_type: 'agent' as const,
+      rate: 5,
+      amount: roundMockCurrency(sellingPrice * 0.05),
+      status: baseStatus,
+      approved_by: baseStatus === 'pending' ? null : 1,
+      approved_at: baseStatus === 'pending' ? null : mockDbUpdatedAt,
+      created_at: mockDbCreatedAt,
+    },
+    {
+      id: (index * 3) + 2,
+      client_unit_id: clientUnit.id,
+      user_id: mockDbBrokerUserId,
+      commission_type: 'broker' as const,
+      rate: 2,
+      amount: roundMockCurrency(sellingPrice * 0.02),
+      status: baseStatus,
+      approved_by: baseStatus === 'pending' ? null : 1,
+      approved_at: baseStatus === 'pending' ? null : mockDbUpdatedAt,
+      created_at: mockDbCreatedAt,
+    },
+    {
+      id: (index * 3) + 3,
+      client_unit_id: clientUnit.id,
+      user_id: mockDbManagerUserId,
+      commission_type: 'manager' as const,
+      rate: 1,
+      amount: roundMockCurrency(sellingPrice * 0.01),
+      status: baseStatus,
+      approved_by: baseStatus === 'pending' ? null : 1,
+      approved_at: baseStatus === 'pending' ? null : mockDbUpdatedAt,
+      created_at: mockDbCreatedAt,
+    },
+  ]
+})
+
+export const mockDbCashAdvances: MockDbCashAdvance[] = [
+  {
+    id: 1,
+    user_id: mockDbFirstSellerUserId,
+    amount: 10000,
+    reason: 'Mock advance against upcoming commission release.',
+    status: 'deducted',
+    approved_by: 1,
+    approved_at: mockDbUpdatedAt,
+    created_at: '2026-05-15 10:00:00',
+  },
+  {
+    id: 2,
+    user_id: mockDbFirstSellerUserId + 1,
+    amount: 7500,
+    reason: 'Transportation and client processing allowance.',
+    status: 'approved',
+    approved_by: 1,
+    approved_at: mockDbUpdatedAt,
+    created_at: '2026-05-20 10:00:00',
+  },
+]
+
+export const mockDbCommissionReleases: MockDbCommissionRelease[] = mockDbCommissions
+  .filter((commission) => commission.status === 'released')
+  .slice(0, 12)
+  .map((commission, index) => {
+    const cashAdvance = index === 0 ? mockDbCashAdvances[0] : null
+    const deduction = cashAdvance?.amount ?? 0
+
+    return {
+      id: index + 1,
+      commission_id: commission.id,
+      cash_advance_id: cashAdvance?.id ?? null,
+      gross_amount: commission.amount,
+      cash_advance_deduction: deduction,
+      net_released_amount: roundMockCurrency(Math.max(commission.amount - deduction, 0)),
+      released_by: 2,
+      released_at: mockDbUpdatedAt,
+      remarks: cashAdvance ? 'Released with cash advance deduction.' : 'Released in full.',
+    }
+  })
+
+export const dcPrimeMockDb = {
+  users: mockDbUsers,
+  projects: mockDbProjects,
+  listings: mockDbListings,
+  clients: mockDbClients,
+  client_units: mockDbClientUnits,
+  documents: mockDbDocuments,
+  client_unit_documents: mockDbClientUnitDocuments,
+  payments: mockDbPayments,
+  payment_schedules: mockDbPaymentSchedules,
+  commission_plans: mockDbCommissionPlans,
+  commissions: mockDbCommissions,
+  cash_advances: mockDbCashAdvances,
+  commission_releases: mockDbCommissionReleases,
+}
