@@ -4,16 +4,40 @@ import { useNavigate } from 'react-router-dom'
 import Badge from '../../components/admin/Badge'
 import ConfirmModal from '../../components/admin/ConfirmModal'
 import DataTable from '../../components/admin/DataTable'
+import FormField from '../../components/admin/FormField'
 import InfoRow from '../../components/admin/InfoRow'
 import Modal from '../../components/admin/Modal'
 import Panel from '../../components/admin/Panel'
 import StatCard from '../../components/admin/StatCard'
 import { useToast } from '../../components/admin/Toast'
 import { formatCurrency, formatPercent } from '../../components/admin/formatters'
-import { agents, commissionRules as initialCommissionRules, commissions, projects } from '../../data/adminMockData'
-import type { CommissionRule } from '../../data/adminMockData'
+import {
+  agents,
+  commissionRules as initialCommissionRules,
+  commissions,
+  getNextMockId,
+  mockDbCashAdvanceDeductions,
+  mockDbCashAdvances,
+  mockDbCommissions,
+  mockDbCommissionReleases,
+  mockDbUsers,
+  projects,
+} from '../../data/adminMockData'
+import type { CommissionRule, MockDbCashAdvance, MockDbCashAdvanceDeduction, MockDbCommissionRelease } from '../../data/adminMockData'
 import { commissionDetails } from '../../data/sourceDetails'
 import type { CommissionDetail, CommissionPartyRelease } from '../../data/sourceDetails'
+
+const CASH_ADVANCES_STORAGE_KEY = 'dcprime_cash_advances'
+const CASH_ADVANCE_DEDUCTIONS_STORAGE_KEY = 'dcprime_cash_advance_deductions'
+const COMMISSION_RELEASES_STORAGE_KEY = 'dcprime_commission_releases'
+
+function timestamp() {
+  return new Date().toISOString().slice(0, 19).replace('T', ' ')
+}
+
+function titleCase(value: string) {
+  return value.replace(/_/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase())
+}
 
 function CommissionsPage() {
   const toast = useToast()
@@ -26,6 +50,13 @@ function CommissionsPage() {
   const [selectedRule, setSelectedRule] = useState<CommissionRule | null>(null)
   const [selectedDetail, setSelectedDetail] = useState<CommissionDetail | null>(null)
   const [rulePendingDelete, setRulePendingDelete] = useState<CommissionRule | null>(null)
+  const [cashAdvances, setCashAdvances] = useState<MockDbCashAdvance[]>(() => loadRows(CASH_ADVANCES_STORAGE_KEY, mockDbCashAdvances))
+  const [cashAdvanceDeductions, setCashAdvanceDeductions] = useState<MockDbCashAdvanceDeduction[]>(() =>
+    loadRows(CASH_ADVANCE_DEDUCTIONS_STORAGE_KEY, mockDbCashAdvanceDeductions),
+  )
+  const [commissionReleases, setCommissionReleases] = useState<MockDbCommissionRelease[]>(() => loadRows(COMMISSION_RELEASES_STORAGE_KEY, mockDbCommissionReleases))
+  const [isCashAdvanceModalOpen, setIsCashAdvanceModalOpen] = useState(false)
+  const [deductionTarget, setDeductionTarget] = useState<MockDbCashAdvance | null>(null)
   const totalCommissionPayable = commissionDetails.reduce((total, detail) => total + detail.manager.commission + detail.agent.commission, 0)
   const totalCommissionReleased = commissionDetails.reduce(
     (total, detail) =>
@@ -41,12 +72,26 @@ function CommissionsPage() {
     0,
   )
   const totalCommissionRemaining = commissionDetails.reduce((total, detail) => total + detail.manager.totalRemaining + detail.agent.totalRemaining, 0)
-  const totalCashAdvance = commissionDetails.reduce((total, detail) => total + detail.manager.cashAdvance + detail.agent.cashAdvance, 0)
+  const totalCashAdvance = cashAdvances.reduce((total, advance) => total + advance.amount, 0)
+  const totalCashAdvanceDeducted = cashAdvanceDeductions.reduce((total, deduction) => total + deduction.deducted_amount, 0)
   const totalRetention = commissionDetails.reduce((total, detail) => total + detail.manager.retention25 + detail.agent.retention25, 0)
+  const sellers = mockDbUsers.filter((user) => ['agent', 'broker', 'manager'].includes(user.role) && user.status === 'active')
 
   useEffect(() => {
     localStorage.setItem('dcprime_commission_rules', JSON.stringify(rules))
   }, [rules])
+
+  useEffect(() => {
+    localStorage.setItem(CASH_ADVANCES_STORAGE_KEY, JSON.stringify(cashAdvances))
+  }, [cashAdvances])
+
+  useEffect(() => {
+    localStorage.setItem(CASH_ADVANCE_DEDUCTIONS_STORAGE_KEY, JSON.stringify(cashAdvanceDeductions))
+  }, [cashAdvanceDeductions])
+
+  useEffect(() => {
+    localStorage.setItem(COMMISSION_RELEASES_STORAGE_KEY, JSON.stringify(commissionReleases))
+  }, [commissionReleases])
 
   function openRule(rule?: CommissionRule) {
     setSelectedRule(
@@ -123,6 +168,131 @@ function CommissionsPage() {
     return commissionDetails.find((detail) => detail.unitId === unitId && detail.buyer === buyer)
   }
 
+  function userName(userId: number) {
+    return mockDbUsers.find((user) => user.id === userId)?.full_name ?? `User #${userId}`
+  }
+
+  function commissionLabel(commissionId: number | null) {
+    if (!commissionId) return 'Unlinked'
+    const commission = mockDbCommissions.find((item) => item.id === commissionId)
+    if (!commission) return `Commission #${commissionId}`
+    return `${titleCase(commission.commission_type)} - ${userName(commission.user_id)} (${formatCurrency(commission.gross_commission)})`
+  }
+
+  function releaseLabel(releaseId: number) {
+    const release = commissionReleases.find((item) => item.id === releaseId)
+    if (!release) return `Release #${releaseId}`
+    return `#${release.id} ${titleCase(release.release_stage)} - ${formatCurrency(release.net_release_amount)} net`
+  }
+
+  function deductedAmount(cashAdvanceId: number) {
+    return cashAdvanceDeductions
+      .filter((deduction) => deduction.cash_advance_id === cashAdvanceId)
+      .reduce((total, deduction) => total + deduction.deducted_amount, 0)
+  }
+
+  function remainingAdvance(cashAdvance: MockDbCashAdvance) {
+    return Math.max(cashAdvance.amount - deductedAmount(cashAdvance.id), 0)
+  }
+
+  function saveCashAdvance(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    const formData = new FormData(event.currentTarget)
+    const amount = Number(formData.get('amount'))
+
+    if (!amount || amount <= 0) {
+      toast.error('Enter a valid cash advance amount.')
+      return
+    }
+
+    const commissionId = Number(formData.get('commission_id')) || null
+    const commission = commissionId ? mockDbCommissions.find((item) => item.id === commissionId) : null
+    const cashAdvance: MockDbCashAdvance = {
+      id: getNextMockId(cashAdvances),
+      user_id: Number(formData.get('user_id')),
+      client_unit_id: commission?.client_unit_id ?? null,
+      commission_id: commission?.id ?? null,
+      amount,
+      reason: String(formData.get('reason') || '').trim() || null,
+      status: 'pending',
+      approved_by: null,
+      approved_at: null,
+      created_at: timestamp(),
+      updated_at: timestamp(),
+    }
+
+    setCashAdvances((current) => [cashAdvance, ...current])
+    setIsCashAdvanceModalOpen(false)
+    toast.success('Cash advance request added.')
+  }
+
+  function updateCashAdvance(cashAdvanceId: number, updates: Partial<MockDbCashAdvance>) {
+    setCashAdvances((current) =>
+      current.map((advance) => (advance.id === cashAdvanceId ? { ...advance, ...updates, updated_at: timestamp() } : advance)),
+    )
+  }
+
+  function approveCashAdvance(cashAdvance: MockDbCashAdvance) {
+    updateCashAdvance(cashAdvance.id, { status: 'approved', approved_by: 1, approved_at: timestamp() })
+    toast.success('Cash advance approved.')
+  }
+
+  function disapproveCashAdvance(cashAdvance: MockDbCashAdvance) {
+    updateCashAdvance(cashAdvance.id, { status: 'disapproved', approved_by: 1, approved_at: timestamp() })
+    toast.success('Cash advance disapproved.')
+  }
+
+  function applyCashAdvanceDeduction(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (!deductionTarget) return
+
+    const formData = new FormData(event.currentTarget)
+    const commissionReleaseId = Number(formData.get('commission_release_id'))
+    const amount = Number(formData.get('amount'))
+    const release = commissionReleases.find((item) => item.id === commissionReleaseId)
+
+    if (!release || !amount || amount <= 0) {
+      toast.error('Choose a release and enter a valid deduction amount.')
+      return
+    }
+
+    const remaining = remainingAdvance(deductionTarget)
+    if (amount > remaining) {
+      toast.error('Deduction exceeds the remaining cash advance balance.')
+      return
+    }
+
+    if (amount > release.net_release_amount) {
+      toast.error('Deduction exceeds the release net amount.')
+      return
+    }
+
+    const deduction: MockDbCashAdvanceDeduction = {
+      id: getNextMockId(cashAdvanceDeductions),
+      cash_advance_id: deductionTarget.id,
+      commission_release_id: release.id,
+      deducted_amount: amount,
+      created_at: timestamp(),
+    }
+    const nextRemaining = remaining - amount
+
+    setCashAdvanceDeductions((current) => [deduction, ...current])
+    setCommissionReleases((current) =>
+      current.map((item) =>
+        item.id === release.id
+          ? {
+              ...item,
+              cash_advance_deduction: item.cash_advance_deduction + amount,
+              net_release_amount: Math.max(item.net_release_amount - amount, 0),
+            }
+          : item,
+      ),
+    )
+    updateCashAdvance(deductionTarget.id, { status: nextRemaining <= 0 ? 'deducted' : 'partially_deducted' })
+    setDeductionTarget(null)
+    toast.success('Cash advance deduction applied.')
+  }
+
   return (
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
@@ -130,7 +300,7 @@ function CommissionsPage() {
         <StatCard label="Released" value={formatCurrency(totalCommissionReleased)} note="1st to 4th release total" />
         <StatCard label="Remaining" value={formatCurrency(totalCommissionRemaining)} note="Total remaining from workbook" />
         <StatCard label="Retention" value={formatCurrency(totalRetention)} note="25% retention total" />
-        <StatCard label="Cash Advance" value={formatCurrency(totalCashAdvance)} note="Manager + agent advances" />
+        <StatCard label="Cash Advance" value={formatCurrency(totalCashAdvance)} note={`${formatCurrency(totalCashAdvanceDeducted)} deducted`} />
       </div>
 
       <Panel title="Commission Settings" subtitle="Admin-controlled commission rules by project and agent">
@@ -208,6 +378,60 @@ function CommissionsPage() {
             </div>,
           ])}
         />
+      </Panel>
+
+      <Panel title="Cash Advances" subtitle="Requests, approvals, and deductions against commission releases">
+        <div className="mb-5 flex justify-end">
+          <button onClick={() => setIsCashAdvanceModalOpen(true)} className="rounded-lg bg-[#1A1A2E] px-4 py-2 text-sm font-bold text-white hover:bg-[#2A2A4E]">
+            Add Cash Advance
+          </button>
+        </div>
+        <DataTable
+          searchable={false}
+          headers={['Seller', 'Amount', 'Deducted', 'Remaining', 'Status', 'Linked Commission', 'Created', 'Actions']}
+          rows={cashAdvances.map((advance) => {
+            const remaining = remainingAdvance(advance)
+            return [
+              userName(advance.user_id),
+              formatCurrency(advance.amount),
+              formatCurrency(deductedAmount(advance.id)),
+              formatCurrency(remaining),
+              <Badge key={`${advance.id}-status`}>{titleCase(advance.status)}</Badge>,
+              commissionLabel(advance.commission_id),
+              advance.created_at,
+              <div key={`${advance.id}-actions`} className="flex flex-wrap gap-2">
+                {advance.status === 'pending' && (
+                  <>
+                    <button onClick={() => approveCashAdvance(advance)} className="rounded-lg border border-emerald-200 px-3 py-1 text-xs font-semibold text-emerald-700 hover:bg-emerald-50">
+                      Approve
+                    </button>
+                    <button onClick={() => disapproveCashAdvance(advance)} className="rounded-lg border border-rose-200 px-3 py-1 text-xs font-semibold text-rose-600 hover:bg-rose-50">
+                      Disapprove
+                    </button>
+                  </>
+                )}
+                {(advance.status === 'approved' || advance.status === 'partially_deducted') && remaining > 0 && (
+                  <button onClick={() => setDeductionTarget(advance)} className="rounded-lg border border-[#C9A84C]/40 px-3 py-1 text-xs font-semibold text-[#9A7A22] hover:bg-[#C9A84C]/10">
+                    Deduct
+                  </button>
+                )}
+              </div>,
+            ]
+          })}
+        />
+
+        <div className="mt-5">
+          <DataTable
+            searchable={false}
+            headers={['Cash Advance', 'Commission Release', 'Deducted Amount', 'Date']}
+            rows={cashAdvanceDeductions.map((deduction) => [
+              `Advance #${deduction.cash_advance_id} - ${userName(cashAdvances.find((advance) => advance.id === deduction.cash_advance_id)?.user_id ?? 0)}`,
+              releaseLabel(deduction.commission_release_id),
+              formatCurrency(deduction.deducted_amount),
+              deduction.created_at,
+            ])}
+          />
+        </div>
       </Panel>
 
       <Modal title="Commission Rule" isOpen={selectedRule !== null} onClose={() => setSelectedRule(null)}>
@@ -289,6 +513,67 @@ function CommissionsPage() {
         )}
       </Modal>
 
+      <Modal title="Cash Advance Request" isOpen={isCashAdvanceModalOpen} onClose={() => setIsCashAdvanceModalOpen(false)}>
+        <form onSubmit={saveCashAdvance} className="grid gap-4 text-sm md:grid-cols-2">
+          <FormField
+            label="Seller"
+            name="user_id"
+            required
+            selectOptions={sellers.map((seller) => ({ label: `${seller.full_name} (${titleCase(seller.role)})`, value: String(seller.id) }))}
+          />
+          <FormField
+            label="Linked Commission"
+            name="commission_id"
+            selectOptions={[
+              { label: 'Unlinked', value: '' },
+              ...mockDbCommissions.map((commission) => ({ label: commissionLabel(commission.id), value: String(commission.id) })),
+            ]}
+          />
+          <FormField label="Amount" name="amount" type="number" min="0" step="0.01" defaultValue="5000" required />
+          <div className="md:col-span-2">
+            <FormField label="Reason" name="reason" textarea placeholder="Transportation, processing allowance, or advance note" />
+          </div>
+          <div className="flex justify-end gap-2 border-t border-[#E8E4DC] pt-4 md:col-span-2">
+            <button type="button" onClick={() => setIsCashAdvanceModalOpen(false)} className="rounded-lg border border-[#E8E4DC] px-4 py-2 font-semibold text-[#374151] hover:bg-[#F8F7F4]">
+              Cancel
+            </button>
+            <button className="rounded-lg bg-[#1A1A2E] px-4 py-2 font-bold text-white hover:bg-[#2A2A4E]">Save Request</button>
+          </div>
+        </form>
+      </Modal>
+
+      <Modal title="Apply Cash Advance Deduction" isOpen={deductionTarget !== null} onClose={() => setDeductionTarget(null)}>
+        {deductionTarget && (
+          <form onSubmit={applyCashAdvanceDeduction} className="grid gap-4 text-sm md:grid-cols-2">
+            <div className="rounded-lg border border-[#E8E4DC] bg-[#F8F7F4] p-4 md:col-span-2">
+              <InfoRow label="Seller" value={userName(deductionTarget.user_id)} />
+              <InfoRow label="Remaining Advance" value={formatCurrency(remainingAdvance(deductionTarget))} />
+            </div>
+            <FormField
+              label="Commission Release"
+              name="commission_release_id"
+              required
+              selectOptions={commissionReleases.map((release) => ({ label: releaseLabel(release.id), value: String(release.id) }))}
+            />
+            <FormField
+              label="Deduction Amount"
+              name="amount"
+              type="number"
+              min="0"
+              step="0.01"
+              defaultValue={String(Math.min(remainingAdvance(deductionTarget), commissionReleases[0]?.net_release_amount ?? 0))}
+              required
+            />
+            <div className="flex justify-end gap-2 border-t border-[#E8E4DC] pt-4 md:col-span-2">
+              <button type="button" onClick={() => setDeductionTarget(null)} className="rounded-lg border border-[#E8E4DC] px-4 py-2 font-semibold text-[#374151] hover:bg-[#F8F7F4]">
+                Cancel
+              </button>
+              <button className="rounded-lg bg-[#1A1A2E] px-4 py-2 font-bold text-white hover:bg-[#2A2A4E]">Apply Deduction</button>
+            </div>
+          </form>
+        )}
+      </Modal>
+
       <ConfirmModal
         title="Delete Commission Rule"
         message={`Delete the commission rule for ${rulePendingDelete ? getAgentName(rulePendingDelete.agentId) : 'this agent'}? This only changes the mock data in this browser.`}
@@ -345,6 +630,17 @@ function PercentInput({ label, name, value }: { label: string; name: string; val
       />
     </label>
   )
+}
+
+function loadRows<T>(key: string, fallback: T[]): T[] {
+  try {
+    const stored = localStorage.getItem(key)
+    if (!stored) return fallback
+    const parsed = JSON.parse(stored)
+    return Array.isArray(parsed) ? parsed : fallback
+  } catch {
+    return fallback
+  }
 }
 
 export default CommissionsPage

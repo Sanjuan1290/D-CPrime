@@ -107,7 +107,7 @@ function ViewClientsPage() {
                   listing?.unit_id ?? `Listing #${clientUnit.listing_id}`,
                   projectById.get(listing?.project_id ?? 0)?.name ?? 'Unassigned',
                   listing ? getLotType(listing.lot_type).display_name : '-',
-                  formatCurrency(listing?.total_contract_price ?? 0),
+                  formatCurrency(clientUnit.total_contract_price ?? 0),
                   formatCurrency(schedule.paid),
                   formatCurrency(schedule.remaining),
                   `${clientUnit.payment_status.replace(/_/g, ' ')} / ${clientUnit.account_status}`,

@@ -198,7 +198,7 @@ function ClientsPage() {
                 return [
                   listing?.unit_id ?? `Listing #${clientUnit.listing_id}`,
                   project?.name ?? 'Unassigned',
-                  formatCurrency(listing?.total_contract_price ?? 0),
+                  formatCurrency(clientUnit.total_contract_price ?? 0),
                   formatCurrency(schedule.paid),
                   formatCurrency(schedule.remaining),
                   `${clientUnit.payment_status.replace(/_/g, ' ')} / ${clientUnit.account_status}`,

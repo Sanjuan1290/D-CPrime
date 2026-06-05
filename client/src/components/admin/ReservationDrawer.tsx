@@ -69,7 +69,7 @@ function ReservationDrawer({
   const [brokerId, setBrokerId] = useState(String(brokers[0]?.id ?? ''))
   const [managerId, setManagerId] = useState(String(managers[0]?.id ?? ''))
   const [reservationDate, setReservationDate] = useState(today())
-  const [expiryDate, setExpiryDate] = useState(addDays(today(), maxExpiryDays))
+  const [expiresAt, setExpiresAt] = useState(addDays(today(), maxExpiryDays))
   const [reservationFee, setReservationFee] = useState(defaultFee)
   const [remarks, setRemarks] = useState('')
   const [showDiscard, setShowDiscard] = useState(false)
@@ -83,7 +83,7 @@ function ReservationDrawer({
     setBrokerId(String(brokers[0]?.id ?? ''))
     setManagerId(String(managers[0]?.id ?? ''))
     setReservationDate(today())
-    setExpiryDate(addDays(today(), maxExpiryDays))
+    setExpiresAt(addDays(today(), maxExpiryDays))
     setReservationFee(defaultFee)
     setRemarks('')
     setShowDiscard(false)
@@ -150,7 +150,7 @@ function ReservationDrawer({
       client_id: client.id,
       reserved_by: Number(agentId),
       reservation_date: reservationDate,
-      expiry_date: expiryDate || null,
+      expires_at: expiresAt || null,
       reservation_fee: Number(reservationFee || defaultFee),
       status: 'pending',
       converted_to_client_unit_id: null,
@@ -236,7 +236,7 @@ function ReservationDrawer({
             <FormField label="Broker" name="broker" value={brokerId} onChange={(event) => setBrokerId(event.target.value)} selectOptions={[{ label: 'Optional', value: '' }, ...brokers.map((user) => ({ label: user.full_name, value: String(user.id) }))]} />
             <FormField label="Manager" name="manager" value={managerId} onChange={(event) => setManagerId(event.target.value)} selectOptions={[{ label: 'Optional', value: '' }, ...managers.map((user) => ({ label: user.full_name, value: String(user.id) }))]} />
             <FormField label="Reservation Date" name="reservation_date" type="date" value={reservationDate} onChange={(event) => setReservationDate(event.target.value)} required />
-            <FormField label="Expiry Date" name="expiry_date" type="date" value={expiryDate} onChange={(event) => setExpiryDate(event.target.value)} />
+            <FormField label="Expiry Date" name="expires_at" type="date" value={expiresAt} onChange={(event) => setExpiresAt(event.target.value)} />
             <FormField label="Reservation Fee" name="reservation_fee" type="number" value={reservationFee} onChange={(event) => setReservationFee(event.target.value)} required />
             <div className="md:col-span-2">
               <FormField label="Remarks" name="remarks" value={remarks} onChange={(event) => setRemarks(event.target.value)} textarea />

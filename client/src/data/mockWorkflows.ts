@@ -65,14 +65,26 @@ export function convertReservationToContract(
   const listing = mockDbListings.find((item) => item.id === reservation.listing_id)
   const commissionPlan = mockDbCommissionPlans.find((plan) => plan.project_id === listing?.project_id) ?? mockDbCommissionPlans[0]
   const managerId = roleUserId('manager', 3)
+  const contractPrice = listing?.net_selling_price ?? sellingPrice
+  const legalMiscFee = listing?.legal_misc_fee ?? Math.max(sellingPrice - contractPrice, 0)
+  const totalContractPrice = listing?.total_contract_price ?? sellingPrice
+  const paymentTermsMonths = 60
   const createdClientUnit: MockDbClientUnit = {
     id: Date.now(),
     client_id: reservation.client_id,
     listing_id: reservation.listing_id,
+    reservation_id: reservation.id,
     assigned_agent_id: reservation.reserved_by,
     assigned_manager_id: managerId,
     reservation_date: reservation.reservation_date,
     mode_of_payment: 'installment',
+    contract_date: isoDate(),
+    contract_price: contractPrice,
+    legal_misc_fee: legalMiscFee,
+    total_contract_price: totalContractPrice,
+    payment_terms_months: paymentTermsMonths,
+    monthly_amortization: paymentTermsMonths > 0 ? Math.max(0, totalContractPrice - downpayment) / paymentTermsMonths : null,
+    due_day: 15,
     document_status: 'incomplete',
     account_status: 'active',
     payment_status: downpayment >= sellingPrice ? 'complete_paid' : 'partially_paid',
@@ -198,7 +210,7 @@ export function generateClientUnitDocuments(
   projectId: number,
   setClientUnitDocuments: Setter<MockDbClientUnitDocument>,
 ): void {
-  const projectDocuments = mockDbProjectDocuments.filter((document) => document.project_id === projectId && document.status === 'active')
+  const projectDocuments = mockDbProjectDocuments.filter((document) => document.project_id === projectId)
   setClientUnitDocuments((current) => {
     const startId = getNextMockId(current)
     const rows = projectDocuments.map((projectDocument, index) => ({

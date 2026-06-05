@@ -114,15 +114,26 @@ function ReservationsPage() {
     const plan = mockDbCommissionPlans.find((item) => item.project_id === listing.project_id) ?? mockDbCommissionPlans[0]
     const newClientUnitId = getNextMockId(clientUnits)
     const totalContractPrice = listing.total_contract_price ?? listing.net_selling_price ?? 0
+    const contractPrice = listing.net_selling_price ?? totalContractPrice
+    const legalMiscFee = listing.legal_misc_fee ?? Math.max(totalContractPrice - contractPrice, 0)
+    const paymentTermsMonths = 60
     const manager = mockDbUsers.find((user) => user.role === 'manager')
     const newClientUnit: MockDbClientUnit = {
       id: newClientUnitId,
       client_id: reservation.client_id,
       listing_id: reservation.listing_id,
+      reservation_id: reservation.id,
       assigned_agent_id: reservation.reserved_by,
       assigned_manager_id: manager?.id ?? null,
       reservation_date: reservation.reservation_date,
+      contract_date: new Date().toISOString().slice(0, 10),
       mode_of_payment: 'installment',
+      contract_price: contractPrice,
+      legal_misc_fee: legalMiscFee,
+      total_contract_price: totalContractPrice,
+      payment_terms_months: paymentTermsMonths,
+      monthly_amortization: paymentTermsMonths > 0 ? Math.max(0, totalContractPrice - reservation.reservation_fee) / paymentTermsMonths : null,
+      due_day: 15,
       document_status: 'incomplete',
       account_status: 'active',
       payment_status: reservation.reservation_fee >= totalContractPrice ? 'complete_paid' : 'partially_paid',
@@ -140,7 +151,7 @@ function ReservationsPage() {
       { id: nextSellerId + 2, client_unit_id: newClientUnitId, user_id: manager?.id ?? reservation.reserved_by, role: 'manager', assigned_at: timestamp() },
     ]
 
-    const projectDocuments = mockDbProjectDocuments.filter((document) => document.project_id === listing.project_id && document.status === 'active')
+    const projectDocuments = mockDbProjectDocuments.filter((document) => document.project_id === listing.project_id)
     const nextDocumentId = getNextMockId(clientUnitDocuments)
     const documentRows: MockDbClientUnitDocument[] = projectDocuments.map((projectDocument, index) => ({
       id: nextDocumentId + index,
@@ -227,7 +238,7 @@ function ReservationsPage() {
               project?.name ?? 'Unassigned',
               reservedBy?.full_name ?? 'Unknown',
               reservation.reservation_date,
-              reservation.expiry_date ?? '-',
+              reservation.expires_at ?? '-',
               formatCurrency(reservation.reservation_fee),
               <Badge key={`${reservation.id}-status`}>{titleCase(reservation.status)}</Badge>,
               <div key={`${reservation.id}-actions`} className="flex flex-wrap gap-2">

@@ -2,7 +2,7 @@ export type Role = 'owner' | 'admin' | 'treasury' | 'broker' | 'manager' | 'agen
 export type UserStatus = 'Active' | 'Inactive'
 export type FeatureKey = keyof typeof featureLabels
 
-export const mockDataVersion = 'source-workbook-v8'
+export const mockDataVersion = 'source-workbook-v9'
 
 export function ensureMockDataVersion() {
   if (typeof localStorage === 'undefined') return
@@ -19079,10 +19079,18 @@ export type MockDbClientUnit = {
   id: number
   client_id: number
   listing_id: number
+  reservation_id: number | null
   assigned_agent_id: number | null
   assigned_manager_id: number | null
   reservation_date: string | null
+  contract_date: string | null
   mode_of_payment: MockDbClientUnitPaymentMode
+  contract_price: number | null
+  legal_misc_fee: number | null
+  total_contract_price: number | null
+  payment_terms_months: number | null
+  monthly_amortization: number | null
+  due_day: number | null
   document_status: MockDbClientUnitDocumentState
   account_status: MockDbClientUnitAccountStatus
   payment_status: MockDbClientUnitPaymentStatus
@@ -19098,7 +19106,7 @@ export type MockDbReservation = {
   client_id: number
   reserved_by: number
   reservation_date: string
-  expiry_date: string | null
+  expires_at: string | null
   reservation_fee: number
   status: MockDbReservationStatus
   converted_to_client_unit_id: number | null
@@ -19120,7 +19128,7 @@ export type MockDbProjectDocument = {
   project_id: number
   document_id: number
   is_required: boolean
-  status: MockDbActiveStatus
+  created_at: MockDbTimestamp
 }
 
 export type MockDbDocument = {
@@ -19708,15 +19716,27 @@ export const mockDbClientUnits: MockDbClientUnit[] = clients.map((client, index)
   const reservationDate = mockDbIsoDate(client.reservationDate, '2026-01-01')
   const paymentStatus = mockClientUnitPaymentStatus(client)
   const salesStatus = mockClientUnitSalesStatus(client)
+  const legalMiscFee = roundMockCurrency(Math.max(client.totalContractPrice - client.totalContractPrice / 1.1, 0))
+  const contractPrice = roundMockCurrency(client.totalContractPrice - legalMiscFee)
+  const terms = client.paymentMode === 'INSTALLMENT' ? 60 : null
+  const monthlyAmortization = terms ? roundMockCurrency(client.balance / terms) : null
 
   return {
     id: index + 1,
     client_id: index + 1,
     listing_id: mockDbListingIdByUnitId.get(client.unitId) ?? 1,
+    reservation_id: index < 2 ? index + 3 : null,
     assigned_agent_id: mockDbSellerIdByName.get(client.agent) ?? mockDbFirstSellerUserId,
     assigned_manager_id: mockDbManagerUserId,
     reservation_date: reservationDate,
+    contract_date: addMonthsToMockDbDate(reservationDate, 1),
     mode_of_payment: client.paymentMode.toLowerCase() as MockDbClientUnitPaymentMode,
+    contract_price: contractPrice,
+    legal_misc_fee: legalMiscFee,
+    total_contract_price: roundMockCurrency(client.totalContractPrice),
+    payment_terms_months: terms,
+    monthly_amortization: monthlyAmortization,
+    due_day: client.paymentMode === 'INSTALLMENT' ? 15 : null,
     document_status: client.documentStatus === 'COMPLETE' ? 'complete' : 'incomplete',
     account_status: client.accountStatus === 'COMPLETE PAID' ? 'closed' : 'active',
     payment_status: paymentStatus,
@@ -19738,7 +19758,7 @@ export const mockDbReservations: MockDbReservation[] = [
     client_id: 1,
     reserved_by: mockDbSellerIdByName.get(clients[0]?.agent) ?? mockDbFirstSellerUserId,
     reservation_date: '2026-06-05',
-    expiry_date: '2026-07-05',
+    expires_at: '2026-07-05',
     reservation_fee: defaultReservationFee,
     status: 'pending',
     converted_to_client_unit_id: null,
@@ -19752,7 +19772,7 @@ export const mockDbReservations: MockDbReservation[] = [
     client_id: 2,
     reserved_by: mockDbSellerIdByName.get(clients[1]?.agent) ?? mockDbFirstSellerUserId,
     reservation_date: '2026-06-01',
-    expiry_date: '2026-07-01',
+    expires_at: '2026-07-01',
     reservation_fee: defaultReservationFee,
     status: 'confirmed',
     converted_to_client_unit_id: null,
@@ -19766,7 +19786,7 @@ export const mockDbReservations: MockDbReservation[] = [
     client_id: mockDbClientUnits[0]?.client_id ?? 1,
     reserved_by: mockDbSellerIdByName.get(clients[0]?.agent) ?? mockDbFirstSellerUserId,
     reservation_date: mockDbClientUnits[0]?.reservation_date ?? '2026-01-05',
-    expiry_date: addMonthsToMockDbDate(mockDbClientUnits[0]?.reservation_date, 1),
+    expires_at: addMonthsToMockDbDate(mockDbClientUnits[0]?.reservation_date, 1),
     reservation_fee: defaultReservationFee,
     status: 'converted',
     converted_to_client_unit_id: mockDbClientUnits[0]?.id ?? 1,
@@ -19780,7 +19800,7 @@ export const mockDbReservations: MockDbReservation[] = [
     client_id: mockDbClientUnits[1]?.client_id ?? 2,
     reserved_by: mockDbSellerIdByName.get(clients[1]?.agent) ?? mockDbFirstSellerUserId,
     reservation_date: mockDbClientUnits[1]?.reservation_date ?? '2026-01-10',
-    expiry_date: addMonthsToMockDbDate(mockDbClientUnits[1]?.reservation_date, 1),
+    expires_at: addMonthsToMockDbDate(mockDbClientUnits[1]?.reservation_date, 1),
     reservation_fee: defaultReservationFee,
     status: 'converted',
     converted_to_client_unit_id: mockDbClientUnits[1]?.id ?? 2,
@@ -19794,7 +19814,7 @@ export const mockDbReservations: MockDbReservation[] = [
     client_id: 3,
     reserved_by: mockDbSellerIdByName.get(clients[2]?.agent) ?? mockDbFirstSellerUserId,
     reservation_date: '2026-05-20',
-    expiry_date: '2026-06-19',
+    expires_at: '2026-06-19',
     reservation_fee: defaultReservationFee,
     status: 'cancelled',
     converted_to_client_unit_id: null,
@@ -19835,7 +19855,7 @@ export const mockDbProjectDocuments: MockDbProjectDocument[] = mockDbDocuments.m
   project_id: 1,
   document_id: document.id,
   is_required: true,
-  status: 'active',
+  created_at: mockDbCreatedAt,
 }))
 
 const mockDbDocumentIdByRequirementId = new Map(
@@ -19884,8 +19904,7 @@ export const mockDbPayments: MockDbPayment[] = payments.map((payment, index) => 
 
 export const mockDbPaymentSchedules: MockDbPaymentSchedule[] = mockDbClientUnits.flatMap((clientUnit) => {
   const scheduleLength = 6
-  const listing = mockDbListings.find((item) => item.id === clientUnit.listing_id)
-  const totalContractPrice = listing?.total_contract_price ?? 0
+  const totalContractPrice = clientUnit.total_contract_price ?? 0
   const paidSoFar = payments
     .filter((payment) => mockDbClientUnitIdByLegacyKey.get(`${payment.clientId}|${payment.unitId}`) === clientUnit.id)
     .reduce((total, payment) => total + payment.amount, 0)
@@ -19929,8 +19948,7 @@ export const mockDbCommissionPlans: MockDbCommissionPlan[] = [
 ]
 
 export const mockDbCommissions: MockDbCommission[] = mockDbClientUnits.flatMap((clientUnit, index) => {
-  const listing = mockDbListings.find((item) => item.id === clientUnit.listing_id)
-  const sellingPrice = listing?.net_selling_price ?? listing?.total_contract_price ?? 0
+  const sellingPrice = clientUnit.contract_price ?? clientUnit.total_contract_price ?? 0
   const baseStatus: MockDbCommissionStatus = clientUnit.payment_status === 'complete_paid' ? 'released' : index % 3 === 0 ? 'approved' : 'pending'
   const agentSeller = mockDbClientUnitSellers.find((seller) => seller.client_unit_id === clientUnit.id && seller.role === 'agent')
   const brokerSeller = mockDbClientUnitSellers.find((seller) => seller.client_unit_id === clientUnit.id && seller.role === 'broker')
@@ -20143,7 +20161,7 @@ export const dcPrimeMockDb = {
   clients: mockDbClients,
   client_units: mockDbClientUnits,
   documents: mockDbDocuments,
-  client_document_listings: mockDbClientUnitDocuments,
+  client_unit_documents: mockDbClientUnitDocuments,
   payments: mockDbPayments,
   payment_schedules: mockDbPaymentSchedules,
   commission_plans: mockDbCommissionPlans,
@@ -20157,7 +20175,7 @@ export const dcPrimeMockDb = {
   app_features: mockDbAppFeatures,
   role_feature_permissions: mockDbRoleFeaturePermissions,
   user_feature_permissions: mockDbUserFeaturePermissions,
-  settings: mockDbSettings,
+  system_settings: mockDbSettings,
   lot_types: mockDbLotTypes,
   payment_methods: mockDbPaymentMethods,
   payment_types: mockDbPaymentTypes,
@@ -20278,7 +20296,7 @@ export function computeCommissions(clientUnitId: number): Array<{
   const plan = mockDbCommissionPlans.find((item) => item.project_id === listing?.project_id)
   if (!clientUnit || !listing || !plan) return []
 
-  const sellingPrice = listing.net_selling_price ?? listing.total_contract_price ?? 0
+  const sellingPrice = clientUnit.contract_price ?? clientUnit.total_contract_price ?? 0
   const rateByRole: Record<MockDbSellerRole, number> = {
     agent: plan.direct_agent_rate,
     broker: plan.distributed_agent_rate,

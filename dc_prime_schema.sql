@@ -137,8 +137,42 @@ CREATE TABLE clients (
 );
 
 -- =====================================================
+-- RESERVATIONS
+-- One row = one reservation workflow before sale conversion
+-- =====================================================
+
+CREATE TABLE reservations (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+
+  client_id INT NOT NULL,
+  listing_id INT NOT NULL,
+  reserved_by INT NOT NULL,
+
+  reservation_fee DECIMAL(12,2) DEFAULT 0,
+  reservation_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+  expires_at DATETIME,
+
+  status ENUM(
+    'pending',
+    'confirmed',
+    'converted',
+    'cancelled',
+    'expired'
+  ) DEFAULT 'pending',
+
+  remarks TEXT,
+
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+  FOREIGN KEY (client_id) REFERENCES clients(id),
+  FOREIGN KEY (listing_id) REFERENCES listings(id),
+  FOREIGN KEY (reserved_by) REFERENCES users(id)
+);
+
+-- =====================================================
 -- CLIENT UNITS / SALES ACCOUNT
--- One row = one client buying/reserving one listing
+-- One row = one converted client account for one listing
 -- =====================================================
 
 CREATE TABLE client_units (
@@ -146,13 +180,23 @@ CREATE TABLE client_units (
 
   client_id INT NOT NULL,
   listing_id INT NOT NULL,
+  reservation_id INT,
 
   assigned_agent_id INT,
   assigned_manager_id INT,
 
   reservation_date DATE,
+  contract_date DATE,
 
   mode_of_payment ENUM('cash', 'installment') NOT NULL,
+
+  contract_price DECIMAL(12,2),
+  legal_misc_fee DECIMAL(12,2),
+  total_contract_price DECIMAL(12,2),
+
+  payment_terms_months INT,
+  monthly_amortization DECIMAL(12,2),
+  due_day INT,
 
   document_status ENUM('complete', 'incomplete') DEFAULT 'incomplete',
 
@@ -181,10 +225,9 @@ CREATE TABLE client_units (
 
   FOREIGN KEY (client_id) REFERENCES clients(id),
   FOREIGN KEY (listing_id) REFERENCES listings(id),
+  FOREIGN KEY (reservation_id) REFERENCES reservations(id),
   FOREIGN KEY (assigned_agent_id) REFERENCES users(id),
-  FOREIGN KEY (assigned_manager_id) REFERENCES users(id),
-
-  UNIQUE (listing_id)
+  FOREIGN KEY (assigned_manager_id) REFERENCES users(id)
 );
 
 -- =====================================================
@@ -205,7 +248,23 @@ CREATE TABLE documents (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE client_document_listings (
+CREATE TABLE project_documents (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+
+  project_id INT NOT NULL,
+  document_id INT NOT NULL,
+
+  is_required BOOLEAN DEFAULT TRUE,
+
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+  FOREIGN KEY (project_id) REFERENCES projects(id),
+  FOREIGN KEY (document_id) REFERENCES documents(id),
+
+  UNIQUE (project_id, document_id)
+);
+
+CREATE TABLE client_unit_documents (
   id INT AUTO_INCREMENT PRIMARY KEY,
 
   client_unit_id INT NOT NULL,
@@ -519,6 +578,23 @@ CREATE TABLE user_feature_permissions (
 );
 
 -- =====================================================
+-- SYSTEM SETTINGS
+-- =====================================================
+
+CREATE TABLE system_settings (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+
+  setting_key VARCHAR(100) NOT NULL UNIQUE,
+  setting_value TEXT NOT NULL,
+  module_group VARCHAR(100) NOT NULL,
+
+  updated_by INT,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+  FOREIGN KEY (updated_by) REFERENCES users(id)
+);
+
+-- =====================================================
 -- AUDIT LOGS
 -- =====================================================
 
@@ -541,6 +617,20 @@ CREATE TABLE audit_logs (
 
   FOREIGN KEY (user_id) REFERENCES users(id)
 );
+
+-- =====================================================
+-- INDEXES
+-- =====================================================
+
+CREATE INDEX idx_listings_status ON listings(status);
+CREATE INDEX idx_reservations_listing_status ON reservations(listing_id, status);
+CREATE INDEX idx_reservations_client_status ON reservations(client_id, status);
+CREATE INDEX idx_client_units_listing_status ON client_units(listing_id, account_status);
+CREATE INDEX idx_client_units_status ON client_units(account_status, payment_status);
+CREATE INDEX idx_payments_client_status ON payments(client_unit_id, status);
+CREATE INDEX idx_payment_schedules_due ON payment_schedules(due_date, status);
+CREATE INDEX idx_commissions_user_status ON commissions(user_id, status);
+CREATE INDEX idx_cash_advances_user_status ON cash_advances(user_id, status);
 
 -- =====================================================
 -- FEATURE SEED DATA
@@ -726,7 +816,7 @@ SELECT
   l.unit_id,
   p.name AS project_name,
 
-  l.total_contract_price,
+  cu.total_contract_price,
 
   COALESCE(
     SUM(
@@ -738,7 +828,7 @@ SELECT
     0
   ) AS total_paid,
 
-  l.total_contract_price - COALESCE(
+  cu.total_contract_price - COALESCE(
     SUM(
       CASE 
         WHEN pay.status = 'verified' THEN pay.amount 
@@ -764,7 +854,7 @@ GROUP BY
   c.spouse_co_owner_name,
   l.unit_id,
   p.name,
-  l.total_contract_price,
+  cu.total_contract_price,
   cu.mode_of_payment,
   cu.payment_status,
   cu.account_status;
