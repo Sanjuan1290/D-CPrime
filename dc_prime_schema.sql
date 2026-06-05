@@ -2,468 +2,836 @@ DROP DATABASE IF EXISTS dc_prime;
 CREATE DATABASE dc_prime CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE dc_prime;
 
--- Core ERD tables
+-- =====================================================
+-- USERS / SELLERS
+-- =====================================================
 
 CREATE TABLE users (
   id INT AUTO_INCREMENT PRIMARY KEY,
+
   full_name VARCHAR(150) NOT NULL,
-  email VARCHAR(150) NOT NULL UNIQUE,
-  password_hash VARCHAR(255) NOT NULL,
-  role ENUM('admin', 'treasury', 'manager', 'broker', 'agent', 'client') NOT NULL,
-  status ENUM('active', 'inactive') DEFAULT 'active',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  INDEX idx_users_role_status (role, status)
-);
-
-CREATE TABLE projects (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(150) NOT NULL,
-  location VARCHAR(255),
-  administrator VARCHAR(255) NOT NULL,
-  tax_declaration_no VARCHAR(255) NOT NULL,
-  pin VARCHAR(255) NOT NULL,
-  description TEXT,
-  status ENUM('active', 'inactive', 'completed') DEFAULT 'active',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  INDEX idx_projects_status (status)
-);
-
-CREATE TABLE listings (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  project_id INT NOT NULL,
-  unit_id VARCHAR(50) NOT NULL,
-  lot_type VARCHAR(100),
-  lot_area_sqm DECIMAL(10,2) NOT NULL,
-  price_per_sqm DECIMAL(12,2) NOT NULL,
-  reservation_fee DECIMAL(12,2) DEFAULT 0,
-  legal_misc_fee DECIMAL(12,2) DEFAULT 0,
-  net_selling_price DECIMAL(12,2) NOT NULL,
-  status ENUM('available', 'reserved', 'sold', 'inactive') DEFAULT 'available',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  CONSTRAINT fk_listings_project FOREIGN KEY (project_id) REFERENCES projects(id),
-  UNIQUE KEY uq_listings_project_unit (project_id, unit_id),
-  INDEX idx_listings_status (status)
-);
-
-CREATE TABLE clients (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  full_name VARCHAR(150) NOT NULL,
-  email VARCHAR(150),
+  email VARCHAR(150) UNIQUE,
   contact_no VARCHAR(50),
-  address TEXT,
-  assigned_seller_id INT,
-  status ENUM('lead', 'reserved', 'active', 'completed', 'cancelled') DEFAULT 'lead',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  CONSTRAINT fk_clients_assigned_seller FOREIGN KEY (assigned_seller_id) REFERENCES users(id) ON DELETE SET NULL,
-  INDEX idx_clients_status (status),
-  INDEX idx_clients_seller (assigned_seller_id)
-);
+  password_hash VARCHAR(255),
 
-CREATE TABLE client_units (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  client_id INT NOT NULL,
-  listing_id INT NOT NULL,
-  assigned_seller_id INT NOT NULL,
-  reservation_date DATE,
-  contract_date DATE,
-  selling_price DECIMAL(12,2),
-  downpayment DECIMAL(12,2),
-  balance DECIMAL(12,2),
-  status ENUM('reserved', 'active', 'fully_paid', 'cancelled') DEFAULT 'reserved',
-  CONSTRAINT fk_client_units_client FOREIGN KEY (client_id) REFERENCES clients(id),
-  CONSTRAINT fk_client_units_listing FOREIGN KEY (listing_id) REFERENCES listings(id),
-  CONSTRAINT fk_client_units_seller FOREIGN KEY (assigned_seller_id) REFERENCES users(id),
-  UNIQUE KEY uq_client_units_client_listing (client_id, listing_id),
-  INDEX idx_client_units_status (status),
-  INDEX idx_client_units_seller (assigned_seller_id)
-);
+  role ENUM(
+    'owner',
+    'admin',
+    'treasury',
+    'broker',
+    'manager',
+    'agent',
+    'client'
+  ) NOT NULL,
 
-CREATE TABLE documents (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(150) NOT NULL,
-  description TEXT,
-  is_required BOOLEAN DEFAULT TRUE,
   status ENUM('active', 'inactive') DEFAULT 'active',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  INDEX idx_documents_status (status)
-);
 
-CREATE TABLE client_unit_documents (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  client_unit_id INT NOT NULL,
-  document_id INT NOT NULL,
-  file_url TEXT,
-  status ENUM('missing', 'submitted', 'approved', 'rejected', 'not_required') DEFAULT 'missing',
-  remarks TEXT,
-  submitted_at DATETIME,
-  reviewed_by INT,
-  reviewed_at DATETIME,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  CONSTRAINT fk_client_unit_documents_client_unit FOREIGN KEY (client_unit_id) REFERENCES client_units(id),
-  CONSTRAINT fk_client_unit_documents_document FOREIGN KEY (document_id) REFERENCES documents(id),
-  CONSTRAINT fk_client_unit_documents_reviewer FOREIGN KEY (reviewed_by) REFERENCES users(id) ON DELETE SET NULL,
-  UNIQUE KEY uq_client_unit_documents (client_unit_id, document_id),
-  INDEX idx_client_unit_documents_status (status)
-);
+  accreditation_date DATE,
+  last_login DATETIME,
 
-CREATE TABLE payments (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  client_unit_id INT NOT NULL,
-  amount DECIMAL(12,2) NOT NULL,
-  payment_date DATE NOT NULL,
-  payment_type ENUM('reservation', 'downpayment', 'monthly', 'full_payment', 'legal_misc', 'other') NOT NULL,
-  payment_method VARCHAR(100),
-  bank_name VARCHAR(100),
-  reference_no VARCHAR(150),
-  remarks TEXT,
-  status ENUM('pending', 'verified', 'rejected') DEFAULT 'pending',
-  verified_by INT,
-  verified_at DATETIME,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_payments_client_unit FOREIGN KEY (client_unit_id) REFERENCES client_units(id),
-  CONSTRAINT fk_payments_verified_by FOREIGN KEY (verified_by) REFERENCES users(id) ON DELETE SET NULL,
-  INDEX idx_payments_client_unit (client_unit_id),
-  INDEX idx_payments_status_date (status, payment_date)
-);
-
-CREATE TABLE payment_schedules (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  client_unit_id INT NOT NULL,
-  due_date DATE NOT NULL,
-  amount_due DECIMAL(12,2) NOT NULL,
-  amount_paid DECIMAL(12,2) DEFAULT 0,
-  balance DECIMAL(12,2) DEFAULT 0,
-  status ENUM('unpaid', 'partial', 'paid', 'overdue') DEFAULT 'unpaid',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  CONSTRAINT fk_payment_schedules_client_unit FOREIGN KEY (client_unit_id) REFERENCES client_units(id),
-  INDEX idx_payment_schedules_due_status (due_date, status)
-);
-
-CREATE TABLE commission_plans (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  project_id INT NOT NULL,
-  name VARCHAR(150) NOT NULL,
-  agent_rate DECIMAL(5,2) DEFAULT 0,
-  broker_rate DECIMAL(5,2) DEFAULT 0,
-  manager_rate DECIMAL(5,2) DEFAULT 0,
-  status ENUM('active', 'inactive') DEFAULT 'active',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_commission_plans_project FOREIGN KEY (project_id) REFERENCES projects(id),
-  INDEX idx_commission_plans_status (status)
-);
-
-CREATE TABLE commissions (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  client_unit_id INT NOT NULL,
-  user_id INT NOT NULL,
-  commission_type ENUM('agent', 'broker', 'manager') NOT NULL,
-  rate DECIMAL(5,2) NOT NULL,
-  amount DECIMAL(12,2) NOT NULL,
-  status ENUM('pending', 'approved', 'released', 'cancelled') DEFAULT 'pending',
-  approved_by INT,
-  approved_at DATETIME,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_commissions_client_unit FOREIGN KEY (client_unit_id) REFERENCES client_units(id),
-  CONSTRAINT fk_commissions_user FOREIGN KEY (user_id) REFERENCES users(id),
-  CONSTRAINT fk_commissions_approved_by FOREIGN KEY (approved_by) REFERENCES users(id) ON DELETE SET NULL,
-  INDEX idx_commissions_user_status (user_id, status),
-  INDEX idx_commissions_client_unit (client_unit_id)
-);
-
-CREATE TABLE cash_advances (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  user_id INT NOT NULL,
-  amount DECIMAL(12,2) NOT NULL,
-  reason TEXT,
-  status ENUM('pending', 'approved', 'deducted', 'rejected') DEFAULT 'pending',
-  approved_by INT,
-  approved_at DATETIME,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_cash_advances_user FOREIGN KEY (user_id) REFERENCES users(id),
-  CONSTRAINT fk_cash_advances_approved_by FOREIGN KEY (approved_by) REFERENCES users(id) ON DELETE SET NULL,
-  INDEX idx_cash_advances_user_status (user_id, status)
-);
-
-CREATE TABLE commission_releases (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  commission_id INT NOT NULL,
-  cash_advance_id INT,
-  gross_amount DECIMAL(12,2) NOT NULL,
-  cash_advance_deduction DECIMAL(12,2) DEFAULT 0,
-  net_released_amount DECIMAL(12,2) NOT NULL,
-  released_by INT NOT NULL,
-  released_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  remarks TEXT,
-  CONSTRAINT fk_commission_releases_commission FOREIGN KEY (commission_id) REFERENCES commissions(id),
-  CONSTRAINT fk_commission_releases_cash_advance FOREIGN KEY (cash_advance_id) REFERENCES cash_advances(id) ON DELETE SET NULL,
-  CONSTRAINT fk_commission_releases_released_by FOREIGN KEY (released_by) REFERENCES users(id),
-  INDEX idx_commission_releases_released_at (released_at)
-);
-
--- Admin access-control tables
-
-CREATE TABLE app_features (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  feature_key VARCHAR(80) NOT NULL UNIQUE,
-  module VARCHAR(80) NOT NULL,
-  label VARCHAR(120) NOT NULL,
-  description TEXT,
-  status ENUM('active', 'inactive') DEFAULT 'active',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-CREATE TABLE role_feature_permissions (
+CREATE TABLE user_supervisors (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  role ENUM('admin', 'treasury', 'manager', 'broker', 'agent', 'client') NOT NULL,
-  feature_id INT NOT NULL,
-  can_access BOOLEAN NOT NULL DEFAULT FALSE,
+
+  user_id INT NOT NULL,
+  supervisor_id INT NOT NULL,
+
+  status ENUM('active', 'inactive') DEFAULT 'active',
+
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  CONSTRAINT fk_role_feature_permissions_feature FOREIGN KEY (feature_id) REFERENCES app_features(id) ON DELETE CASCADE,
-  UNIQUE KEY uq_role_feature_permissions (role, feature_id)
+
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  FOREIGN KEY (supervisor_id) REFERENCES users(id),
+
+  UNIQUE (user_id, supervisor_id)
+);
+
+-- =====================================================
+-- PROJECTS
+-- =====================================================
+
+CREATE TABLE projects (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+
+  name VARCHAR(150) NOT NULL,
+  location VARCHAR(255),
+  administrator VARCHAR(255),
+  tax_declaration_no VARCHAR(255),
+  pin VARCHAR(255),
+
+  status ENUM('active', 'inactive') DEFAULT 'active',
+
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- =====================================================
+-- LISTINGS / LOTS / UNITS
+-- =====================================================
+
+CREATE TABLE listings (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+
+  project_id INT NOT NULL,
+
+  cadastral_lot_no VARCHAR(100),
+  administrator_group VARCHAR(100),
+
+  unit_id VARCHAR(100) NOT NULL,
+  reloc_unit_id VARCHAR(100),
+
+  lot_type VARCHAR(100),
+
+  lot_area_sqm DECIMAL(10,2),
+  new_area_sqm DECIMAL(10,2),
+
+  price_per_sqm DECIMAL(12,2),
+  net_selling_price DECIMAL(12,2),
+
+  legal_misc_rate DECIMAL(5,2) DEFAULT 10.00,
+  legal_misc_fee DECIMAL(12,2),
+
+  total_contract_price DECIMAL(12,2),
+
+  reservation_fee DECIMAL(12,2) DEFAULT 0,
+  promo_discount DECIMAL(12,2) DEFAULT 0,
+
+  status ENUM(
+    'available',
+    'reserved',
+    'hold',
+    'sold',
+    'inactive'
+  ) DEFAULT 'available',
+
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+  FOREIGN KEY (project_id) REFERENCES projects(id),
+
+  UNIQUE (project_id, unit_id)
+);
+
+-- =====================================================
+-- CLIENTS
+-- =====================================================
+
+CREATE TABLE clients (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+
+  buyer_name VARCHAR(150) NOT NULL,
+  spouse_co_owner_name VARCHAR(150),
+  aif_administrator_name VARCHAR(150),
+
+  email VARCHAR(150),
+  contact_no VARCHAR(50),
+  age INT,
+  address TEXT,
+
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- =====================================================
+-- CLIENT UNITS / SALES ACCOUNT
+-- One row = one client buying/reserving one listing
+-- =====================================================
+
+CREATE TABLE client_units (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+
+  client_id INT NOT NULL,
+  listing_id INT NOT NULL,
+
+  assigned_agent_id INT,
+  assigned_manager_id INT,
+
+  reservation_date DATE,
+
+  mode_of_payment ENUM('cash', 'installment') NOT NULL,
+
+  document_status ENUM('complete', 'incomplete') DEFAULT 'incomplete',
+
+  account_status ENUM(
+    'active',
+    'cancelled',
+    'closed'
+  ) DEFAULT 'active',
+
+  payment_status ENUM(
+    'unpaid',
+    'partially_paid',
+    'complete_paid'
+  ) DEFAULT 'unpaid',
+
+  sales_status ENUM(
+    'good_sale',
+    'bad_sale',
+    'cancelled'
+  ) DEFAULT 'good_sale',
+
+  remarks TEXT,
+
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+  FOREIGN KEY (client_id) REFERENCES clients(id),
+  FOREIGN KEY (listing_id) REFERENCES listings(id),
+  FOREIGN KEY (assigned_agent_id) REFERENCES users(id),
+  FOREIGN KEY (assigned_manager_id) REFERENCES users(id),
+
+  UNIQUE (listing_id)
+);
+
+-- =====================================================
+-- DOCUMENT MASTER CHECKLIST
+-- =====================================================
+
+CREATE TABLE documents (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+
+  name VARCHAR(150) NOT NULL,
+  description TEXT,
+
+  is_required BOOLEAN DEFAULT TRUE,
+
+  status ENUM('active', 'inactive') DEFAULT 'active',
+
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE client_document_listings (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+
+  client_unit_id INT NOT NULL,
+  document_id INT NOT NULL,
+
+  file_url TEXT,
+
+  status ENUM(
+    'not_submitted',
+    'pending',
+    'approved',
+    'rejected'
+  ) DEFAULT 'not_submitted',
+
+  reviewed_by INT,
+  reviewed_at DATETIME,
+
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+  FOREIGN KEY (client_unit_id) REFERENCES client_units(id),
+  FOREIGN KEY (document_id) REFERENCES documents(id),
+  FOREIGN KEY (reviewed_by) REFERENCES users(id),
+
+  UNIQUE (client_unit_id, document_id)
+);
+
+-- =====================================================
+-- PAYMENTS / COLLECTIONS
+-- =====================================================
+
+CREATE TABLE payments (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+
+  client_unit_id INT NOT NULL,
+
+  payment_date DATE NOT NULL,
+  amount DECIMAL(12,2) NOT NULL,
+
+  payment_type ENUM(
+    'reservation',
+    'downpayment',
+    'monthly',
+    'legal_misc',
+    'full_payment',
+    'other'
+  ) NOT NULL,
+
+  payment_method VARCHAR(100),
+  bank_name VARCHAR(100),
+  reference_no VARCHAR(150),
+
+  status ENUM(
+    'pending',
+    'verified',
+    'rejected'
+  ) DEFAULT 'pending',
+
+  verified_by INT,
+  verified_at DATETIME,
+
+  remarks TEXT,
+
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+  FOREIGN KEY (client_unit_id) REFERENCES client_units(id),
+  FOREIGN KEY (verified_by) REFERENCES users(id)
+);
+
+-- =====================================================
+-- SOA / INSTALLMENT SCHEDULE
+-- =====================================================
+
+CREATE TABLE payment_schedules (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+
+  client_unit_id INT NOT NULL,
+
+  due_date DATE NOT NULL,
+  description VARCHAR(150),
+
+  due_amount DECIMAL(12,2) NOT NULL,
+  penalty DECIMAL(12,2) DEFAULT 0,
+
+  status ENUM(
+    'unpaid',
+    'partial',
+    'paid',
+    'overdue'
+  ) DEFAULT 'unpaid',
+
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+  FOREIGN KEY (client_unit_id) REFERENCES client_units(id)
+);
+
+-- =====================================================
+-- COMMISSION PLANS
+-- =====================================================
+
+CREATE TABLE commission_plans (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+
+  project_id INT NOT NULL,
+
+  name VARCHAR(150) NOT NULL,
+
+  direct_agent_rate DECIMAL(5,2) DEFAULT 7.00,
+  distributed_agent_rate DECIMAL(5,2) DEFAULT 2.00,
+  manager_rate DECIMAL(5,2) DEFAULT 5.00,
+
+  status ENUM('active', 'inactive') DEFAULT 'active',
+
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+  FOREIGN KEY (project_id) REFERENCES projects(id)
+);
+
+-- =====================================================
+-- COMMISSIONS
+-- One row = commission earned by one seller/user
+-- =====================================================
+
+CREATE TABLE commissions (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+
+  client_unit_id INT NOT NULL,
+  user_id INT NOT NULL,
+
+  commission_type ENUM(
+    'agent',
+    'manager',
+    'broker'
+  ) NOT NULL,
+
+  sale_type ENUM(
+    'direct',
+    'distributed'
+  ) DEFAULT 'distributed',
+
+  rate DECIMAL(5,2) NOT NULL,
+  gross_commission DECIMAL(12,2) NOT NULL,
+
+  status ENUM(
+    'pending',
+    'approved',
+    'partially_released',
+    'released',
+    'cancelled'
+  ) DEFAULT 'pending',
+
+  approved_by INT,
+  approved_at DATETIME,
+
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+  FOREIGN KEY (client_unit_id) REFERENCES client_units(id),
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  FOREIGN KEY (approved_by) REFERENCES users(id),
+
+  UNIQUE (client_unit_id, user_id, commission_type)
+);
+
+-- =====================================================
+-- COMMISSION RELEASES
+-- Supports 20%, 40%, 60%, 75%, retention, or manual release
+-- =====================================================
+
+CREATE TABLE commission_releases (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+
+  commission_id INT NOT NULL,
+
+  release_stage ENUM(
+    'first_20',
+    'second_40',
+    'third_60',
+    'fourth_75',
+    'retention_25',
+    'manual'
+  ) NOT NULL,
+
+  release_percentage DECIMAL(5,2),
+
+  gross_release_amount DECIMAL(12,2) NOT NULL,
+  cash_advance_deduction DECIMAL(12,2) DEFAULT 0,
+  net_release_amount DECIMAL(12,2) NOT NULL,
+
+  released_by INT NOT NULL,
+  released_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+  remarks TEXT,
+
+  FOREIGN KEY (commission_id) REFERENCES commissions(id),
+  FOREIGN KEY (released_by) REFERENCES users(id)
+);
+
+-- =====================================================
+-- CASH ADVANCES
+-- =====================================================
+
+CREATE TABLE cash_advances (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+
+  user_id INT NOT NULL,
+
+  client_unit_id INT,
+  commission_id INT,
+
+  amount DECIMAL(12,2) NOT NULL,
+  reason TEXT,
+
+  status ENUM(
+    'pending',
+    'approved',
+    'partially_deducted',
+    'deducted',
+    'disapproved'
+  ) DEFAULT 'pending',
+
+  approved_by INT,
+  approved_at DATETIME,
+
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  FOREIGN KEY (client_unit_id) REFERENCES client_units(id),
+  FOREIGN KEY (commission_id) REFERENCES commissions(id),
+  FOREIGN KEY (approved_by) REFERENCES users(id)
+);
+
+-- =====================================================
+-- CASH ADVANCE DEDUCTIONS
+-- Tracks which cash advance was deducted from which commission release
+-- =====================================================
+
+CREATE TABLE cash_advance_deductions (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+
+  cash_advance_id INT NOT NULL,
+  commission_release_id INT NOT NULL,
+
+  deducted_amount DECIMAL(12,2) NOT NULL,
+
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+  FOREIGN KEY (cash_advance_id) REFERENCES cash_advances(id),
+  FOREIGN KEY (commission_release_id) REFERENCES commission_releases(id),
+
+  UNIQUE (cash_advance_id, commission_release_id)
+);
+
+-- =====================================================
+-- ROLE / FEATURE ACCESS
+-- =====================================================
+
+CREATE TABLE app_features (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+
+  feature_key VARCHAR(100) NOT NULL UNIQUE,
+  module_name VARCHAR(100) NOT NULL,
+  display_name VARCHAR(150) NOT NULL,
+
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE role_feature_permissions (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+
+  role ENUM(
+    'owner',
+    'admin',
+    'treasury',
+    'broker',
+    'manager',
+    'agent',
+    'client'
+  ) NOT NULL,
+
+  feature_id INT NOT NULL,
+  can_access BOOLEAN NOT NULL DEFAULT FALSE,
+
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+  FOREIGN KEY (feature_id) REFERENCES app_features(id),
+
+  UNIQUE (role, feature_id)
 );
 
 CREATE TABLE user_feature_permissions (
   id INT AUTO_INCREMENT PRIMARY KEY,
+
   user_id INT NOT NULL,
   feature_id INT NOT NULL,
-  is_allowed BOOLEAN NOT NULL,
+
+  can_access BOOLEAN NOT NULL,
   granted_by INT,
-  reason VARCHAR(255),
+
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  CONSTRAINT fk_user_feature_permissions_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-  CONSTRAINT fk_user_feature_permissions_feature FOREIGN KEY (feature_id) REFERENCES app_features(id) ON DELETE CASCADE,
-  CONSTRAINT fk_user_feature_permissions_granted_by FOREIGN KEY (granted_by) REFERENCES users(id) ON DELETE SET NULL,
-  UNIQUE KEY uq_user_feature_permissions (user_id, feature_id)
+
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  FOREIGN KEY (feature_id) REFERENCES app_features(id),
+  FOREIGN KEY (granted_by) REFERENCES users(id),
+
+  UNIQUE (user_id, feature_id)
 );
 
-CREATE TABLE user_project_access (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  user_id INT NOT NULL,
-  project_id INT NOT NULL,
-  access_level ENUM('view', 'manage', 'admin') DEFAULT 'view',
-  granted_by INT,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  CONSTRAINT fk_user_project_access_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-  CONSTRAINT fk_user_project_access_project FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
-  CONSTRAINT fk_user_project_access_granted_by FOREIGN KEY (granted_by) REFERENCES users(id) ON DELETE SET NULL,
-  UNIQUE KEY uq_user_project_access (user_id, project_id)
-);
+-- =====================================================
+-- AUDIT LOGS
+-- =====================================================
 
 CREATE TABLE audit_logs (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
+
   user_id INT,
-  action VARCHAR(120) NOT NULL,
-  module VARCHAR(80) NOT NULL,
-  entity_table VARCHAR(80),
+
+  action VARCHAR(150) NOT NULL,
+  module_name VARCHAR(100),
+  entity_table VARCHAR(100),
   entity_id INT,
+
   old_values JSON,
   new_values JSON,
+
   ip_address VARCHAR(45),
+
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_audit_logs_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
-  INDEX idx_audit_logs_user_date (user_id, created_at),
-  INDEX idx_audit_logs_module_date (module, created_at)
+
+  FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
--- Starter admin and default feature access
+-- =====================================================
+-- FEATURE SEED DATA
+-- =====================================================
 
-INSERT INTO users (full_name, email, password_hash, role, status)
-VALUES ('System Admin', 'admin@dcprime.test', 'replace_with_bcrypt_hash', 'admin', 'active');
+INSERT INTO app_features
+(feature_key, module_name, display_name)
+VALUES
+('dashboard', 'Dashboard', 'Dashboard'),
 
-INSERT INTO app_features (feature_key, module, label) VALUES
-('dashboard', 'dashboard', 'Dashboard'),
-('projects', 'projects', 'Projects'),
-('listings', 'listings', 'Listings'),
-('clients_view', 'clients', 'Clients: View'),
-('clients_manage', 'clients', 'Clients: Manage'),
-('payments_view', 'payments', 'Payments: View'),
-('payments_record', 'payments', 'Payments: Record'),
-('payments_verify', 'payments', 'Payments: Verify'),
-('commissions_view', 'commissions', 'Commissions: View'),
-('commissions_approve', 'commissions', 'Commissions: Approve'),
-('commissions_release', 'commissions', 'Commissions: Release'),
-('documents_view', 'documents', 'Documents: View'),
-('documents_upload', 'documents', 'Documents: Upload'),
-('documents_approve', 'documents', 'Documents: Approve'),
-('soa_view', 'soa', 'SOA: View'),
-('reports_view', 'reports', 'Reports'),
-('audit_logs', 'audit_logs', 'Audit Logs'),
-('user_management', 'users', 'User Management'),
-('settings', 'settings', 'Settings');
+('projects', 'Management', 'Projects'),
+('listings', 'Management', 'Listings'),
+('reservations', 'Management', 'Reservations'),
 
+('clients_view', 'Clients', 'Clients: View'),
+('clients_manage', 'Clients', 'Clients: Manage'),
+
+('payments_view', 'Finance', 'Payments: View'),
+('payments_record', 'Finance', 'Payments: Record'),
+('payments_verify', 'Finance', 'Payments: Verify'),
+
+('commissions_view', 'Finance', 'Commissions: View'),
+('commissions_approve', 'Finance', 'Commissions: Approve'),
+('commissions_release', 'Finance', 'Commissions: Release'),
+
+('cash_advances_view', 'Finance', 'Cash Advances: View'),
+('cash_advances_manage', 'Finance', 'Cash Advances: Manage'),
+
+('documents_view', 'Compliance', 'Documents: View'),
+('documents_upload', 'Compliance', 'Documents: Upload'),
+('documents_approve', 'Compliance', 'Documents: Approve'),
+
+('soa_view', 'Records', 'SOA: View'),
+('balances_view', 'Records', 'Balances'),
+
+('reports_view', 'Records', 'Reports'),
+('audit_logs_view', 'Administration', 'Audit Logs'),
+('user_management', 'Administration', 'User Management'),
+('settings', 'Administration', 'Settings'),
+('lookups', 'Administration', 'Lookup Tables');
+
+-- OWNER DEFAULT ACCESS
 INSERT INTO role_feature_permissions (role, feature_id, can_access)
-SELECT 'admin', id, TRUE FROM app_features;
+SELECT 'owner', id, TRUE
+FROM app_features;
 
+-- ADMIN DEFAULT ACCESS
 INSERT INTO role_feature_permissions (role, feature_id, can_access)
-SELECT 'treasury', id, TRUE FROM app_features
+SELECT 'admin', id, TRUE
+FROM app_features;
+
+-- TREASURY DEFAULT ACCESS
+INSERT INTO role_feature_permissions (role, feature_id, can_access)
+SELECT 'treasury', id, TRUE
+FROM app_features
 WHERE feature_key IN (
-  'dashboard', 'clients_view', 'payments_view', 'payments_record',
-  'payments_verify', 'documents_view', 'soa_view', 'reports_view'
+  'dashboard',
+
+  'clients_view',
+
+  'payments_view',
+  'payments_record',
+  'payments_verify',
+
+  'commissions_view',
+  'commissions_approve',
+  'commissions_release',
+
+  'cash_advances_view',
+  'cash_advances_manage',
+
+  'documents_view',
+  'documents_approve',
+
+  'soa_view',
+  'balances_view',
+
+  'reports_view'
 );
 
+-- MANAGER DEFAULT ACCESS
 INSERT INTO role_feature_permissions (role, feature_id, can_access)
-SELECT 'manager', id, TRUE FROM app_features
+SELECT 'manager', id, TRUE
+FROM app_features
 WHERE feature_key IN (
-  'dashboard', 'projects', 'listings', 'clients_view', 'clients_manage',
-  'payments_view', 'commissions_view', 'commissions_approve',
-  'documents_view', 'documents_approve', 'soa_view', 'reports_view'
+  'dashboard',
+
+  'projects',
+  'listings',
+  'reservations',
+
+  'clients_view',
+  'clients_manage',
+
+  'payments_view',
+
+  'commissions_view',
+  'commissions_approve',
+
+  'cash_advances_view',
+
+  'documents_view',
+  'documents_approve',
+
+  'soa_view',
+  'balances_view',
+
+  'reports_view'
 );
 
+-- BROKER DEFAULT ACCESS
 INSERT INTO role_feature_permissions (role, feature_id, can_access)
-SELECT 'broker', id, TRUE FROM app_features
+SELECT 'broker', id, TRUE
+FROM app_features
 WHERE feature_key IN (
-  'dashboard', 'listings', 'clients_view', 'payments_view',
-  'commissions_view', 'documents_view', 'soa_view'
+  'dashboard',
+
+  'listings',
+  'reservations',
+
+  'clients_view',
+
+  'payments_view',
+
+  'commissions_view',
+  'cash_advances_view',
+
+  'documents_view',
+
+  'soa_view',
+  'balances_view'
 );
 
+-- AGENT DEFAULT ACCESS
 INSERT INTO role_feature_permissions (role, feature_id, can_access)
-SELECT 'agent', id, TRUE FROM app_features
+SELECT 'agent', id, TRUE
+FROM app_features
 WHERE feature_key IN (
-  'dashboard', 'listings', 'clients_view', 'payments_view',
-  'commissions_view', 'documents_view', 'documents_upload', 'soa_view'
+  'dashboard',
+
+  'listings',
+  'reservations',
+
+  'clients_view',
+
+  'payments_view',
+
+  'commissions_view',
+  'cash_advances_view',
+
+  'documents_view',
+  'documents_upload',
+
+  'soa_view',
+  'balances_view'
 );
 
+-- CLIENT DEFAULT ACCESS
 INSERT INTO role_feature_permissions (role, feature_id, can_access)
-SELECT 'client', id, TRUE FROM app_features
+SELECT 'client', id, TRUE
+FROM app_features
 WHERE feature_key IN (
-  'dashboard', 'payments_view', 'documents_view', 'documents_upload', 'soa_view'
+  'dashboard',
+
+  'payments_view',
+
+  'documents_view',
+  'documents_upload',
+
+  'soa_view',
+  'balances_view'
 );
 
--- Joined views for the admin system
+-- =====================================================
+-- VIEWS
+-- =====================================================
 
-CREATE OR REPLACE VIEW v_effective_user_permissions AS
-SELECT
-  u.id AS user_id,
-  u.full_name,
-  u.email,
-  u.role,
-  u.status AS user_status,
-  f.feature_key,
-  f.module,
-  f.label,
-  COALESCE(ufp.is_allowed, rfp.can_access, FALSE) AS can_access,
-  CASE
-    WHEN ufp.id IS NOT NULL THEN 'user_override'
-    WHEN rfp.id IS NOT NULL THEN 'role_default'
-    ELSE 'no_access'
-  END AS permission_source
-FROM users u
-CROSS JOIN app_features f
-LEFT JOIN role_feature_permissions rfp
-  ON rfp.role = u.role AND rfp.feature_id = f.id
-LEFT JOIN user_feature_permissions ufp
-  ON ufp.user_id = u.id AND ufp.feature_id = f.id
-WHERE f.status = 'active';
-
-CREATE OR REPLACE VIEW v_client_accounts AS
+CREATE VIEW v_client_balances AS
 SELECT
   cu.id AS client_unit_id,
-  c.id AS client_id,
-  c.full_name AS client_name,
-  c.email,
-  c.contact_no,
-  seller.id AS seller_id,
-  seller.full_name AS assigned_seller,
-  p.id AS project_id,
-  p.name AS project_name,
-  p.location AS project_location,
-  l.id AS listing_id,
+  c.buyer_name,
+  c.spouse_co_owner_name,
   l.unit_id,
-  l.lot_type,
-  l.lot_area_sqm,
-  cu.reservation_date,
-  cu.contract_date,
-  cu.selling_price,
-  cu.downpayment,
-  COALESCE(SUM(CASE WHEN pay.status = 'verified' THEN pay.amount ELSE 0 END), 0) AS verified_payments,
-  cu.balance,
-  cu.status AS account_status
+  p.name AS project_name,
+
+  l.total_contract_price,
+
+  COALESCE(
+    SUM(
+      CASE 
+        WHEN pay.status = 'verified' THEN pay.amount 
+        ELSE 0 
+      END
+    ),
+    0
+  ) AS total_paid,
+
+  l.total_contract_price - COALESCE(
+    SUM(
+      CASE 
+        WHEN pay.status = 'verified' THEN pay.amount 
+        ELSE 0 
+      END
+    ),
+    0
+  ) AS balance,
+
+  cu.mode_of_payment,
+  cu.payment_status,
+  cu.account_status
+
 FROM client_units cu
 JOIN clients c ON c.id = cu.client_id
 JOIN listings l ON l.id = cu.listing_id
 JOIN projects p ON p.id = l.project_id
-JOIN users seller ON seller.id = cu.assigned_seller_id
 LEFT JOIN payments pay ON pay.client_unit_id = cu.id
+
 GROUP BY
-  cu.id, c.id, seller.id, p.id, l.id;
-
-CREATE OR REPLACE VIEW v_document_checklist AS
-SELECT
-  cud.id AS client_unit_document_id,
-  cu.id AS client_unit_id,
-  c.full_name AS client_name,
+  cu.id,
+  c.buyer_name,
+  c.spouse_co_owner_name,
   l.unit_id,
-  d.name AS document_name,
-  d.is_required,
-  cud.status,
-  cud.file_url,
-  cud.remarks,
-  cud.submitted_at,
-  reviewer.full_name AS reviewed_by,
-  cud.reviewed_at
-FROM client_unit_documents cud
-JOIN client_units cu ON cu.id = cud.client_unit_id
-JOIN clients c ON c.id = cu.client_id
-JOIN listings l ON l.id = cu.listing_id
-JOIN documents d ON d.id = cud.document_id
-LEFT JOIN users reviewer ON reviewer.id = cud.reviewed_by;
+  p.name,
+  l.total_contract_price,
+  cu.mode_of_payment,
+  cu.payment_status,
+  cu.account_status;
 
-CREATE OR REPLACE VIEW v_payment_ledger AS
+CREATE VIEW v_commission_summary AS
 SELECT
-  pay.id AS payment_id,
-  cu.id AS client_unit_id,
-  c.full_name AS client_name,
-  l.unit_id,
-  p.name AS project_name,
-  pay.payment_date,
-  pay.payment_type,
-  pay.amount,
-  pay.payment_method,
-  pay.bank_name,
-  pay.reference_no,
-  pay.status,
-  verifier.full_name AS verified_by,
-  pay.verified_at
-FROM payments pay
-JOIN client_units cu ON cu.id = pay.client_unit_id
-JOIN clients c ON c.id = cu.client_id
-JOIN listings l ON l.id = cu.listing_id
-JOIN projects p ON p.id = l.project_id
-LEFT JOIN users verifier ON verifier.id = pay.verified_by;
-
-CREATE OR REPLACE VIEW v_commission_releases AS
-SELECT
-  cr.id AS release_id,
   com.id AS commission_id,
-  earner.full_name AS commission_earner,
-  com.commission_type,
-  com.rate,
-  com.amount AS commission_amount,
-  cr.gross_amount,
-  cr.cash_advance_deduction,
-  cr.net_released_amount,
-  releaser.full_name AS released_by,
-  cr.released_at,
-  c.full_name AS client_name,
-  l.unit_id,
-  p.name AS project_name
-FROM commission_releases cr
-JOIN commissions com ON com.id = cr.commission_id
-JOIN users earner ON earner.id = com.user_id
-JOIN users releaser ON releaser.id = cr.released_by
-JOIN client_units cu ON cu.id = com.client_unit_id
-JOIN clients c ON c.id = cu.client_id
-JOIN listings l ON l.id = cu.listing_id
-JOIN projects p ON p.id = l.project_id;
+  cu.id AS client_unit_id,
+  seller.full_name AS seller_name,
+  seller.role AS seller_role,
 
+  com.commission_type,
+  com.sale_type,
+  com.rate,
+  com.gross_commission,
+
+  COALESCE(SUM(cr.gross_release_amount), 0) AS total_gross_released,
+  COALESCE(SUM(cr.cash_advance_deduction), 0) AS total_cash_advance_deduction,
+  COALESCE(SUM(cr.net_release_amount), 0) AS total_net_released,
+
+  com.gross_commission - COALESCE(SUM(cr.gross_release_amount), 0) AS remaining_commission,
+
+  com.status
+
+FROM commissions com
+JOIN users seller ON seller.id = com.user_id
+JOIN client_units cu ON cu.id = com.client_unit_id
+LEFT JOIN commission_releases cr ON cr.commission_id = com.id
+
+GROUP BY
+  com.id,
+  cu.id,
+  seller.full_name,
+  seller.role,
+  com.commission_type,
+  com.sale_type,
+  com.rate,
+  com.gross_commission,
+  com.status;
+
+CREATE VIEW v_cash_advance_balances AS
+SELECT
+  ca.id AS cash_advance_id,
+  ca.user_id,
+  u.full_name AS user_name,
+  u.role,
+
+  ca.amount AS cash_advance_amount,
+
+  COALESCE(SUM(cad.deducted_amount), 0) AS total_deducted,
+
+  ca.amount - COALESCE(SUM(cad.deducted_amount), 0) AS remaining_balance,
+
+  ca.status,
+  ca.reason,
+  ca.created_at
+
+FROM cash_advances ca
+JOIN users u ON u.id = ca.user_id
+LEFT JOIN cash_advance_deductions cad ON cad.cash_advance_id = ca.id
+
+GROUP BY
+  ca.id,
+  ca.user_id,
+  u.full_name,
+  u.role,
+  ca.amount,
+  ca.status,
+  ca.reason,
+  ca.created_at;

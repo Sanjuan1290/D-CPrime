@@ -14,7 +14,7 @@ function DataTable({ headers, rows, searchPlaceholder, searchable = true }: Data
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
-  const pageSize = Number(localStorage.getItem('dcprime_page_size') ?? 20)
+  const pageSize = 20
 
   const handleSearchChange = useCallback((value: string) => {
     setSearch(value)

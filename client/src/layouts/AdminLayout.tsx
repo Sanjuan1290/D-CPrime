@@ -8,6 +8,7 @@ import {
   FileText,
   Home,
   LayoutGrid,
+  Clock,
   LogOut,
   Menu,
   Percent,
@@ -262,6 +263,7 @@ const iconByName: Record<string, typeof LayoutGrid> = {
   userCog: UserCog,
   settings: Settings,
   userGroup: UserGroup,
+  clock: Clock,
 }
 
 function NavIcon({ name }: { name: string }) {

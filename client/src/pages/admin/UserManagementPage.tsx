@@ -6,6 +6,8 @@ import { useToast } from '../../components/admin/Toast'
 import { featureKeys, featureLabels, rolePresets, users as initialUsers } from '../../data/adminMockData'
 import type { AdminUser, Role, UserStatus } from '../../data/adminMockData'
 
+type PresetRole = keyof typeof rolePresets
+
 function UserManagementPage() {
   const toast = useToast()
   const [users, setUsers] = useState<AdminUser[]>(() => {
@@ -28,7 +30,7 @@ function UserManagementPage() {
     setUsers((current) => current.map((user) => (user.id === selectedUser.id ? { ...user, ...updates } : user)))
   }
 
-  function applyPreset(role: Exclude<Role, 'admin'>) {
+  function applyPreset(role: PresetRole) {
     updateSelected({ role, permissions: { ...rolePresets[role] } })
   }
 
@@ -111,9 +113,12 @@ function UserManagementPage() {
               onChange={(event) => updateSelected({ role: event.target.value as Role })}
               className="mt-2 w-full rounded-md border border-white/10 bg-black px-3 py-3 text-white"
             >
+              <option value="owner">owner</option>
               <option value="admin">admin</option>
-              <option value="agent">agent</option>
               <option value="treasury">treasury</option>
+              <option value="broker">broker</option>
+              <option value="manager">manager</option>
+              <option value="agent">agent</option>
               <option value="client">client</option>
             </select>
           </label>
@@ -140,6 +145,8 @@ function UserManagementPage() {
         <div className="mt-6 flex flex-wrap gap-2">
           <button onClick={() => applyPreset('agent')} className="rounded-md border border-white/10 px-3 py-2 text-sm font-semibold text-zinc-200">Apply Agent Defaults</button>
           <button onClick={() => applyPreset('treasury')} className="rounded-md border border-white/10 px-3 py-2 text-sm font-semibold text-zinc-200">Apply Treasury Defaults</button>
+          <button onClick={() => applyPreset('broker')} className="rounded-md border border-white/10 px-3 py-2 text-sm font-semibold text-zinc-200">Apply Broker Defaults</button>
+          <button onClick={() => applyPreset('manager')} className="rounded-md border border-white/10 px-3 py-2 text-sm font-semibold text-zinc-200">Apply Manager Defaults</button>
           <button onClick={() => applyPreset('client')} className="rounded-md border border-white/10 px-3 py-2 text-sm font-semibold text-zinc-200">Apply Client Defaults</button>
         </div>
 

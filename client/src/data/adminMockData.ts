@@ -1,8 +1,8 @@
-export type Role = 'admin' | 'agent' | 'treasury' | 'client'
+export type Role = 'owner' | 'admin' | 'treasury' | 'broker' | 'manager' | 'agent' | 'client'
 export type UserStatus = 'Active' | 'Inactive'
 export type FeatureKey = keyof typeof featureLabels
 
-export const mockDataVersion = 'source-workbook-v7'
+export const mockDataVersion = 'source-workbook-v8'
 
 export function ensureMockDataVersion() {
   if (typeof localStorage === 'undefined') return
@@ -36,6 +36,7 @@ export const featureLabels = {
   dashboard: 'Dashboard',
   projects: 'Projects',
   listings: 'Listings',
+  reservations: 'Reservations',
   clients_view: 'Clients: View',
   clients_manage: 'Clients: Manage',
   payments_view: 'Payments: View',
@@ -44,14 +45,18 @@ export const featureLabels = {
   commissions_view: 'Commissions: View',
   commissions_approve: 'Commissions: Approve',
   commissions_release: 'Commissions: Release',
+  cash_advances_view: 'Cash Advances: View',
+  cash_advances_manage: 'Cash Advances: Manage',
   documents_view: 'Documents: View',
   documents_upload: 'Documents: Upload',
   documents_approve: 'Documents: Approve',
   soa_view: 'SOA: View',
+  balances_view: 'Balances',
   reports_view: 'Reports',
-  audit_logs: 'Audit Logs',
+  audit_logs_view: 'Audit Logs: View',
   user_management: 'User Management',
   settings: 'Settings',
+  lookups: 'Lookup Tables',
 }
 
 export const featureKeys = Object.keys(featureLabels) as FeatureKey[]
@@ -59,18 +64,7 @@ export const featureKeys = Object.keys(featureLabels) as FeatureKey[]
 const allOff = Object.fromEntries(featureKeys.map((key) => [key, false])) as Record<FeatureKey, boolean>
 const allOn = Object.fromEntries(featureKeys.map((key) => [key, true])) as Record<FeatureKey, boolean>
 
-export const rolePresets: Record<Exclude<Role, 'admin'>, Record<FeatureKey, boolean>> = {
-  agent: {
-    ...allOff,
-    dashboard: true,
-    listings: true,
-    clients_view: true,
-    payments_view: true,
-    commissions_view: true,
-    documents_view: true,
-    documents_upload: true,
-    soa_view: true,
-  },
+export const rolePresets: Record<Exclude<Role, 'owner' | 'admin'>, Record<FeatureKey, boolean>> = {
   treasury: {
     ...allOff,
     dashboard: true,
@@ -78,9 +72,58 @@ export const rolePresets: Record<Exclude<Role, 'admin'>, Record<FeatureKey, bool
     payments_view: true,
     payments_record: true,
     payments_verify: true,
+    commissions_view: true,
+    commissions_approve: true,
+    commissions_release: true,
+    cash_advances_view: true,
+    cash_advances_manage: true,
+    documents_view: true,
+    documents_approve: true,
+    soa_view: true,
+    balances_view: true,
+    reports_view: true,
+  },
+  broker: {
+    ...allOff,
+    dashboard: true,
+    listings: true,
+    clients_view: true,
+    payments_view: true,
+    commissions_view: true,
+    cash_advances_view: true,
     documents_view: true,
     soa_view: true,
+    balances_view: true,
+  },
+  manager: {
+    ...allOff,
+    dashboard: true,
+    projects: true,
+    listings: true,
+    clients_view: true,
+    clients_manage: true,
+    payments_view: true,
+    commissions_view: true,
+    commissions_approve: true,
+    cash_advances_view: true,
+    documents_view: true,
+    documents_approve: true,
+    soa_view: true,
+    balances_view: true,
     reports_view: true,
+  },
+  agent: {
+    ...allOff,
+    dashboard: true,
+    listings: true,
+    clients_view: true,
+    payments_view: true,
+    commissions_view: true,
+    cash_advances_view: true,
+    documents_view: true,
+    documents_upload: true,
+    soa_view: true,
+    balances_view: true,
   },
   client: {
     ...allOff,
@@ -89,6 +132,7 @@ export const rolePresets: Record<Exclude<Role, 'admin'>, Record<FeatureKey, bool
     documents_view: true,
     documents_upload: true,
     soa_view: true,
+    balances_view: true,
   },
 }
 
@@ -18940,27 +18984,45 @@ export const auditLogsV2 = auditActions.flatMap((action, actionIndex) =>
 )
 
 export type MockDbTimestamp = string
-export type MockDbUserRole = 'admin' | 'treasury' | 'manager' | 'broker' | 'agent' | 'client'
 export type MockDbActiveStatus = 'active' | 'inactive'
-export type MockDbProjectStatus = 'active' | 'inactive' | 'completed'
-export type MockDbListingStatus = 'available' | 'reserved' | 'sold' | 'inactive'
-export type MockDbClientStatus = 'lead' | 'reserved' | 'active' | 'completed' | 'cancelled'
-export type MockDbClientUnitStatus = 'reserved' | 'active' | 'fully_paid' | 'cancelled'
-export type MockDbDocumentMasterStatus = 'active' | 'inactive'
-export type MockDbClientUnitDocumentStatus = 'missing' | 'submitted' | 'approved' | 'rejected' | 'not_required'
-export type MockDbPaymentType = 'reservation' | 'downpayment' | 'monthly' | 'full_payment' | 'legal_misc' | 'other'
+export type MockDbProjectStatus = MockDbActiveStatus
+export type MockDbListingStatusName = 'available' | 'reserved' | 'hold' | 'sold' | 'inactive'
+export type MockDbClientLifecycleStatus = 'lead' | 'reserved' | 'active' | 'completed' | 'cancelled'
+export type MockDbClientUnitPaymentMode = 'cash' | 'installment'
+export type MockDbClientUnitDocumentState = 'complete' | 'incomplete'
+export type MockDbClientUnitAccountStatus = 'active' | 'cancelled' | 'closed'
+export type MockDbClientUnitPaymentStatus = 'unpaid' | 'partially_paid' | 'complete_paid'
+export type MockDbClientUnitSalesStatus = 'good_sale' | 'bad_sale' | 'cancelled'
+export type MockDbReservationStatus = 'pending' | 'confirmed' | 'converted' | 'expired' | 'cancelled'
+export type MockDbClientUnitDocumentStatus = 'not_submitted' | 'pending' | 'approved' | 'rejected'
 export type MockDbPaymentStatus = 'pending' | 'verified' | 'rejected'
 export type MockDbPaymentScheduleStatus = 'unpaid' | 'partial' | 'paid' | 'overdue'
-export type MockDbCommissionType = 'agent' | 'broker' | 'manager'
-export type MockDbCommissionStatus = 'pending' | 'approved' | 'released' | 'cancelled'
-export type MockDbCashAdvanceStatus = 'pending' | 'approved' | 'deducted' | 'rejected'
+export type MockDbPaymentTypeName = 'reservation' | 'downpayment' | 'monthly' | 'legal_misc' | 'full_payment' | 'other'
+export type MockDbCommissionStatus = 'pending' | 'approved' | 'partially_released' | 'released' | 'cancelled'
+export type MockDbCommissionSaleType = 'direct' | 'distributed'
+export type MockDbCommissionReleaseStage = 'first_20' | 'second_40' | 'third_60' | 'fourth_75' | 'retention_25' | 'manual'
+export type MockDbCashAdvanceStatus = 'pending' | 'approved' | 'partially_deducted' | 'deducted' | 'disapproved'
+export type MockDbSellerRole = 'agent' | 'broker' | 'manager'
+export type MockDbSettingInputType = 'text' | 'number' | 'boolean' | 'select'
 
 export type MockDbUser = {
   id: number
   full_name: string
-  email: string
-  password_hash: string
-  role: MockDbUserRole
+  email: string | null
+  contact_no: string | null
+  password_hash: string | null
+  role: Role
+  status: MockDbActiveStatus
+  accreditation_date: string | null
+  last_login: MockDbTimestamp | null
+  created_at: MockDbTimestamp
+  updated_at: MockDbTimestamp
+}
+
+export type MockDbUserSupervisor = {
+  id: number
+  user_id: number
+  supervisor_id: number
   status: MockDbActiveStatus
   created_at: MockDbTimestamp
   updated_at: MockDbTimestamp
@@ -18970,10 +19032,9 @@ export type MockDbProject = {
   id: number
   name: string
   location: string | null
-  administrator: string
-  tax_declaration_no: string
-  pin: string
-  description: string | null
+  administrator: string | null
+  tax_declaration_no: string | null
+  pin: string | null
   status: MockDbProjectStatus
   created_at: MockDbTimestamp
   updated_at: MockDbTimestamp
@@ -18982,26 +19043,34 @@ export type MockDbProject = {
 export type MockDbListing = {
   id: number
   project_id: number
+  cadastral_lot_no: string | null
+  administrator_group: string | null
   unit_id: string
+  reloc_unit_id: string | null
   lot_type: string | null
-  lot_area_sqm: number
-  price_per_sqm: number
+  lot_area_sqm: number | null
+  new_area_sqm: number | null
+  price_per_sqm: number | null
+  net_selling_price: number | null
+  legal_misc_rate: number
+  legal_misc_fee: number | null
+  total_contract_price: number | null
   reservation_fee: number
-  legal_misc_fee: number
-  net_selling_price: number
-  status: MockDbListingStatus
+  promo_discount: number
+  status: MockDbListingStatusName
   created_at: MockDbTimestamp
   updated_at: MockDbTimestamp
 }
 
 export type MockDbClient = {
   id: number
-  full_name: string
+  buyer_name: string
+  spouse_co_owner_name: string | null
+  aif_administrator_name: string | null
   email: string | null
   contact_no: string | null
+  age: number | null
   address: string | null
-  assigned_seller_id: number | null
-  status: MockDbClientStatus
   created_at: MockDbTimestamp
   updated_at: MockDbTimestamp
 }
@@ -19010,13 +19079,48 @@ export type MockDbClientUnit = {
   id: number
   client_id: number
   listing_id: number
-  assigned_seller_id: number
+  assigned_agent_id: number | null
+  assigned_manager_id: number | null
   reservation_date: string | null
-  contract_date: string | null
-  selling_price: number | null
-  downpayment: number | null
-  balance: number | null
-  status: MockDbClientUnitStatus
+  mode_of_payment: MockDbClientUnitPaymentMode
+  document_status: MockDbClientUnitDocumentState
+  account_status: MockDbClientUnitAccountStatus
+  payment_status: MockDbClientUnitPaymentStatus
+  sales_status: MockDbClientUnitSalesStatus
+  remarks: string | null
+  created_at: MockDbTimestamp
+  updated_at: MockDbTimestamp
+}
+
+export type MockDbReservation = {
+  id: number
+  listing_id: number
+  client_id: number
+  reserved_by: number
+  reservation_date: string
+  expiry_date: string | null
+  reservation_fee: number
+  status: MockDbReservationStatus
+  converted_to_client_unit_id: number | null
+  remarks: string | null
+  created_at: MockDbTimestamp
+  updated_at: MockDbTimestamp
+}
+
+export type MockDbClientUnitSeller = {
+  id: number
+  client_unit_id: number
+  user_id: number
+  role: MockDbSellerRole
+  assigned_at: MockDbTimestamp
+}
+
+export type MockDbProjectDocument = {
+  id: number
+  project_id: number
+  document_id: number
+  is_required: boolean
+  status: MockDbActiveStatus
 }
 
 export type MockDbDocument = {
@@ -19024,7 +19128,7 @@ export type MockDbDocument = {
   name: string
   description: string | null
   is_required: boolean
-  status: MockDbDocumentMasterStatus
+  status: MockDbActiveStatus
   created_at: MockDbTimestamp
   updated_at: MockDbTimestamp
 }
@@ -19035,8 +19139,6 @@ export type MockDbClientUnitDocument = {
   document_id: number
   file_url: string | null
   status: MockDbClientUnitDocumentStatus
-  remarks: string | null
-  submitted_at: MockDbTimestamp | null
   reviewed_by: number | null
   reviewed_at: MockDbTimestamp | null
   created_at: MockDbTimestamp
@@ -19046,26 +19148,27 @@ export type MockDbClientUnitDocument = {
 export type MockDbPayment = {
   id: number
   client_unit_id: number
-  amount: number
   payment_date: string
-  payment_type: MockDbPaymentType
+  amount: number
+  payment_type: MockDbPaymentTypeName
   payment_method: string | null
   bank_name: string | null
   reference_no: string | null
-  remarks: string | null
   status: MockDbPaymentStatus
   verified_by: number | null
   verified_at: MockDbTimestamp | null
+  remarks: string | null
   created_at: MockDbTimestamp
+  updated_at: MockDbTimestamp
 }
 
 export type MockDbPaymentSchedule = {
   id: number
   client_unit_id: number
   due_date: string
-  amount_due: number
-  amount_paid: number
-  balance: number
+  description: string | null
+  due_amount: number
+  penalty: number
   status: MockDbPaymentScheduleStatus
   created_at: MockDbTimestamp
   updated_at: MockDbTimestamp
@@ -19075,52 +19178,253 @@ export type MockDbCommissionPlan = {
   id: number
   project_id: number
   name: string
-  agent_rate: number
-  broker_rate: number
+  direct_agent_rate: number
+  distributed_agent_rate: number
   manager_rate: number
   status: MockDbActiveStatus
   created_at: MockDbTimestamp
+  updated_at: MockDbTimestamp
 }
 
 export type MockDbCommission = {
   id: number
   client_unit_id: number
   user_id: number
-  commission_type: MockDbCommissionType
+  commission_type: MockDbSellerRole
+  sale_type: MockDbCommissionSaleType
   rate: number
-  amount: number
+  gross_commission: number
   status: MockDbCommissionStatus
   approved_by: number | null
   approved_at: MockDbTimestamp | null
   created_at: MockDbTimestamp
+  updated_at: MockDbTimestamp
 }
 
 export type MockDbCashAdvance = {
   id: number
   user_id: number
+  client_unit_id: number | null
+  commission_id: number | null
   amount: number
   reason: string | null
   status: MockDbCashAdvanceStatus
   approved_by: number | null
   approved_at: MockDbTimestamp | null
   created_at: MockDbTimestamp
+  updated_at: MockDbTimestamp
 }
 
 export type MockDbCommissionRelease = {
   id: number
   commission_id: number
-  cash_advance_id: number | null
-  gross_amount: number
+  release_stage: MockDbCommissionReleaseStage
+  release_percentage: number | null
+  gross_release_amount: number
   cash_advance_deduction: number
-  net_released_amount: number
+  net_release_amount: number
   released_by: number
   released_at: MockDbTimestamp
   remarks: string | null
 }
 
+export type MockDbCashAdvanceDeduction = {
+  id: number
+  cash_advance_id: number
+  commission_release_id: number
+  deducted_amount: number
+  created_at: MockDbTimestamp
+}
+
+export type MockDbAppFeature = {
+  id: number
+  feature_key: string
+  module_name: string
+  display_name: string
+  created_at: MockDbTimestamp
+}
+
+export type MockDbRoleFeaturePermission = {
+  id: number
+  role: Role
+  feature_id: number
+  can_access: boolean
+  created_at: MockDbTimestamp
+}
+
+export type MockDbUserFeaturePermission = {
+  id: number
+  user_id: number
+  feature_id: number
+  can_access: boolean
+  granted_by: number | null
+  created_at: MockDbTimestamp
+}
+
+export type MockDbSetting = {
+  id: number
+  setting_key: string
+  setting_value: string
+  display_label: string
+  input_type: MockDbSettingInputType
+  module_group: string
+  updated_by: number | null
+  updated_at: MockDbTimestamp
+}
+
+export type MockDbLotType = {
+  id: number
+  name: string
+  display_name: string
+  status: MockDbActiveStatus
+  sort_order: number
+}
+
+export type MockDbPaymentMethod = {
+  id: number
+  name: string
+  display_name: string
+  status: MockDbActiveStatus
+  sort_order: number
+}
+
+export type MockDbPaymentType = {
+  id: number
+  name: string
+  display_name: string
+  status: MockDbActiveStatus
+  sort_order: number
+}
+
+export type MockDbPaymentMode = {
+  id: number
+  name: string
+  display_name: string
+  status: MockDbActiveStatus
+  sort_order: number
+}
+
+export type MockDbCommissionType = {
+  id: number
+  name: string
+  display_name: string
+  status: MockDbActiveStatus
+  sort_order: number
+}
+
+export type MockDbUserRole = {
+  id: number
+  name: Role
+  display_name: string
+  description: string | null
+  status: MockDbActiveStatus
+  sort_order: number
+}
+
+export type MockDbClientStatus = {
+  id: number
+  name: MockDbClientLifecycleStatus
+  display_name: string
+  color_hex: string
+  status: MockDbActiveStatus
+  sort_order: number
+}
+
+export type MockDbListingStatus = {
+  id: number
+  name: MockDbListingStatusName
+  display_name: string
+  color_hex: string
+  status: MockDbActiveStatus
+  sort_order: number
+}
+
+export type MockDbAuditLog = {
+  id: number
+  user_id: number | null
+  action: string
+  module_name: string | null
+  entity_table: string | null
+  entity_id: number | null
+  old_values: Record<string, unknown> | null
+  new_values: Record<string, unknown> | null
+  ip_address: string | null
+  created_at: MockDbTimestamp
+}
+
 const mockDbCreatedAt = '2026-01-01 08:00:00'
 const mockDbUpdatedAt = '2026-06-05 09:00:00'
-const defaultReservationFee = 50000
+const defaultReservationFee = 5000
+
+export const mockDbUserRoles: MockDbUserRole[] = [
+  { id: 1, name: 'owner', display_name: 'Owner', description: 'Business owner with full system access.', status: 'active', sort_order: 1 },
+  { id: 2, name: 'admin', display_name: 'Administrator', description: 'Full system access.', status: 'active', sort_order: 2 },
+  { id: 3, name: 'treasury', display_name: 'Treasury', description: 'Payments, balances, and finance operations.', status: 'active', sort_order: 3 },
+  { id: 4, name: 'manager', display_name: 'Sales Manager', description: 'Sales team oversight and approvals.', status: 'active', sort_order: 4 },
+  { id: 5, name: 'broker', display_name: 'Broker', description: 'Broker participation in sales.', status: 'active', sort_order: 5 },
+  { id: 6, name: 'agent', display_name: 'Agent', description: 'Agent-level sales and client activity.', status: 'active', sort_order: 6 },
+  { id: 7, name: 'client', display_name: 'Client', description: 'Client self-service access.', status: 'active', sort_order: 7 },
+]
+
+export const mockDbClientStatuses: MockDbClientStatus[] = [
+  { id: 1, name: 'lead', display_name: 'Lead', color_hex: '#2563EB', status: 'active', sort_order: 1 },
+  { id: 2, name: 'reserved', display_name: 'Reserved', color_hex: '#D97706', status: 'active', sort_order: 2 },
+  { id: 3, name: 'active', display_name: 'Active', color_hex: '#059669', status: 'active', sort_order: 3 },
+  { id: 4, name: 'completed', display_name: 'Completed', color_hex: '#4F46E5', status: 'active', sort_order: 4 },
+  { id: 5, name: 'cancelled', display_name: 'Cancelled', color_hex: '#DC2626', status: 'active', sort_order: 5 },
+]
+
+export const mockDbListingStatuses: MockDbListingStatus[] = [
+  { id: 1, name: 'available', display_name: 'Available', color_hex: '#059669', status: 'active', sort_order: 1 },
+  { id: 2, name: 'reserved', display_name: 'Reserved', color_hex: '#D97706', status: 'active', sort_order: 2 },
+  { id: 3, name: 'hold', display_name: 'Hold', color_hex: '#7C3AED', status: 'active', sort_order: 3 },
+  { id: 4, name: 'sold', display_name: 'Sold', color_hex: '#4F46E5', status: 'active', sort_order: 4 },
+  { id: 5, name: 'inactive', display_name: 'Inactive', color_hex: '#6B7280', status: 'active', sort_order: 5 },
+]
+
+export const mockDbLotTypes: MockDbLotType[] = [
+  { id: 1, name: 'residential', display_name: 'Residential', status: 'active', sort_order: 1 },
+  { id: 2, name: 'commercial', display_name: 'Commercial', status: 'active', sort_order: 2 },
+  { id: 3, name: 'corner_lot', display_name: 'Corner Lot', status: 'active', sort_order: 3 },
+  { id: 4, name: 'inner_lot', display_name: 'Inner Lot', status: 'active', sort_order: 4 },
+  { id: 5, name: 'end_lot', display_name: 'End Lot', status: 'active', sort_order: 5 },
+  { id: 6, name: 'client_allocation', display_name: 'Client Allocation', status: 'inactive', sort_order: 6 },
+]
+
+export const mockDbPaymentMethods: MockDbPaymentMethod[] = [
+  { id: 1, name: 'cash', display_name: 'Cash', status: 'active', sort_order: 1 },
+  { id: 2, name: 'bank_deposit', display_name: 'Bank Deposit', status: 'active', sort_order: 2 },
+  { id: 3, name: 'check', display_name: 'Check', status: 'active', sort_order: 3 },
+]
+
+export const mockDbPaymentTypes: MockDbPaymentType[] = [
+  { id: 1, name: 'reservation', display_name: 'Reservation', status: 'active', sort_order: 1 },
+  { id: 2, name: 'downpayment', display_name: 'Downpayment', status: 'active', sort_order: 2 },
+  { id: 3, name: 'monthly', display_name: 'Monthly', status: 'active', sort_order: 3 },
+  { id: 4, name: 'full_payment', display_name: 'Full Payment', status: 'active', sort_order: 4 },
+  { id: 5, name: 'legal_misc', display_name: 'Legal / Misc', status: 'active', sort_order: 5 },
+  { id: 6, name: 'other', display_name: 'Other', status: 'active', sort_order: 6 },
+]
+
+export const mockDbPaymentModes: MockDbPaymentMode[] = [
+  { id: 1, name: 'cash', display_name: 'Cash', status: 'active', sort_order: 1 },
+  { id: 2, name: 'installment', display_name: 'Installment', status: 'active', sort_order: 2 },
+]
+
+export const mockDbCommissionTypes: MockDbCommissionType[] = [
+  { id: 1, name: 'agent', display_name: 'Agent', status: 'active', sort_order: 1 },
+  { id: 2, name: 'broker', display_name: 'Broker', status: 'active', sort_order: 2 },
+  { id: 3, name: 'manager', display_name: 'Manager', status: 'active', sort_order: 3 },
+]
+
+export const mockDbSettings: MockDbSetting[] = [
+  { id: 1, setting_key: 'company_name', setting_value: 'DC Prime Realty', display_label: 'Company Name', input_type: 'text', module_group: 'Company', updated_by: 1, updated_at: mockDbUpdatedAt },
+  { id: 2, setting_key: 'default_reservation_fee', setting_value: '5000', display_label: 'Default Reservation Fee', input_type: 'number', module_group: 'Reservations', updated_by: 1, updated_at: mockDbUpdatedAt },
+  { id: 3, setting_key: 'vat_rate', setting_value: '0', display_label: 'VAT Rate', input_type: 'number', module_group: 'Finance', updated_by: 1, updated_at: mockDbUpdatedAt },
+  { id: 4, setting_key: 'installment_interest_rate', setting_value: '0', display_label: 'Installment Interest Rate', input_type: 'number', module_group: 'Finance', updated_by: 1, updated_at: mockDbUpdatedAt },
+  { id: 5, setting_key: 'max_reservation_expiry_days', setting_value: '30', display_label: 'Max Reservation Expiry Days', input_type: 'number', module_group: 'Reservations', updated_by: 1, updated_at: mockDbUpdatedAt },
+  { id: 6, setting_key: 'system_email', setting_value: 'admin@dcprimerealty.test', display_label: 'System Email', input_type: 'text', module_group: 'Notifications', updated_by: 1, updated_at: mockDbUpdatedAt },
+]
 
 function mockDbTimestampFromDate(date: string | null | undefined, fallback = mockDbCreatedAt): MockDbTimestamp {
   if (!date) return fallback
@@ -19157,32 +19461,44 @@ function mockActiveStatus(status?: string): MockDbActiveStatus {
   return status?.toLowerCase().includes('inactive') || status?.toLowerCase().includes('suspended') ? 'inactive' : 'active'
 }
 
-function mockListingStatus(status: Listing['status']): MockDbListingStatus {
+function lookupId<T extends { id: number; name: string }>(rows: T[], name: string, fallbackId = 1) {
+  return rows.find((row) => row.name === name)?.id ?? fallbackId
+}
+
+function mockListingStatusName(status: Listing['status']): MockDbListingStatusName {
   if (status === 'Available') return 'available'
   if (status === 'Reserved') return 'reserved'
   if (status === 'Sold') return 'sold'
+  if (status === 'Hold') return 'hold'
   return 'inactive'
 }
 
-function mockClientStatus(client: ClientRecord): MockDbClientStatus {
-  if (client.accountStatus === 'COMPLETE PAID') return 'completed'
-  if (client.salesStatus === 'FOR REVIEW') return 'reserved'
-  if (client.paymentMade > 0) return 'active'
-  return 'lead'
+function mockLotTypeName(lotType: string | null | undefined) {
+  const normalized = (lotType ?? '').trim().toLowerCase()
+  if (normalized.includes('corner')) return 'corner_lot'
+  if (normalized.includes('inner')) return 'inner_lot'
+  if (normalized.includes('end')) return 'end_lot'
+  if (normalized.includes('commercial')) return 'commercial'
+  if (normalized.includes('allocation')) return 'client_allocation'
+  return 'residential'
 }
 
-function mockClientUnitStatus(client: ClientRecord): MockDbClientUnitStatus {
-  if (client.accountStatus === 'COMPLETE PAID') return 'fully_paid'
-  if (client.salesStatus === 'FOR REVIEW') return 'reserved'
-  if (client.paymentMade > 0) return 'active'
-  return 'reserved'
+function mockClientUnitPaymentStatus(client: ClientRecord): MockDbClientUnitPaymentStatus {
+  if (client.accountStatus === 'COMPLETE PAID') return 'complete_paid'
+  if (client.paymentMade > 0) return 'partially_paid'
+  return 'unpaid'
+}
+
+function mockClientUnitSalesStatus(client: ClientRecord): MockDbClientUnitSalesStatus {
+  if (client.salesStatus === 'FOR REVIEW') return 'bad_sale'
+  return 'good_sale'
 }
 
 function mockDocumentStatus(status: DocumentStatus): MockDbClientUnitDocumentStatus {
   if (status === 'Approved') return 'approved'
-  if (status === 'Submitted') return 'submitted'
+  if (status === 'Submitted') return 'pending'
   if (status === 'Rejected') return 'rejected'
-  return 'missing'
+  return 'not_submitted'
 }
 
 function mockPaymentStatus(status: string): MockDbPaymentStatus {
@@ -19191,12 +19507,18 @@ function mockPaymentStatus(status: string): MockDbPaymentStatus {
   return 'pending'
 }
 
-function mockPaymentType(paymentIndex: number, paymentDescription: string): MockDbPaymentType {
+function mockPaymentTypeName(paymentIndex: number, paymentDescription: string): MockDbPaymentTypeName {
   const description = paymentDescription.toLowerCase()
   if (description.includes('reservation')) return 'reservation'
   if (description.includes('legal')) return 'legal_misc'
   if (paymentIndex % 17 === 0) return 'downpayment'
   return 'monthly'
+}
+
+function mockPaymentMethodName(bank: string | null | undefined) {
+  if (!bank) return null
+  if (bank.toLowerCase().includes('check')) return 'check'
+  return 'bank_deposit'
 }
 
 const mockDbManagerUserId = 3
@@ -19208,9 +19530,12 @@ export const mockDbUsers: MockDbUser[] = [
     id: 1,
     full_name: 'Admin User',
     email: 'admin@dcprime.test',
+    contact_no: null,
     password_hash: 'mock_hash_admin',
     role: 'admin',
     status: 'active',
+    accreditation_date: null,
+    last_login: mockDbUpdatedAt,
     created_at: mockDbCreatedAt,
     updated_at: mockDbUpdatedAt,
   },
@@ -19218,9 +19543,12 @@ export const mockDbUsers: MockDbUser[] = [
     id: 2,
     full_name: company.preparedBy,
     email: 'treasury@dcprime.test',
+    contact_no: company.phone,
     password_hash: 'mock_hash_treasury',
     role: 'treasury',
     status: 'active',
+    accreditation_date: null,
+    last_login: mockDbUpdatedAt,
     created_at: mockDbCreatedAt,
     updated_at: mockDbUpdatedAt,
   },
@@ -19228,9 +19556,12 @@ export const mockDbUsers: MockDbUser[] = [
     id: mockDbManagerUserId,
     full_name: 'Sales Manager',
     email: 'manager@dcprime.test',
+    contact_no: null,
     password_hash: 'mock_hash_manager',
     role: 'manager',
     status: 'active',
+    accreditation_date: '2026-01-01',
+    last_login: mockDbUpdatedAt,
     created_at: mockDbCreatedAt,
     updated_at: mockDbUpdatedAt,
   },
@@ -19238,9 +19569,12 @@ export const mockDbUsers: MockDbUser[] = [
     id: mockDbBrokerUserId,
     full_name: 'Accredited Broker',
     email: 'broker@dcprime.test',
+    contact_no: null,
     password_hash: 'mock_hash_broker',
     role: 'broker',
     status: 'active',
+    accreditation_date: '2026-01-01',
+    last_login: mockDbUpdatedAt,
     created_at: mockDbCreatedAt,
     updated_at: mockDbUpdatedAt,
   },
@@ -19248,9 +19582,12 @@ export const mockDbUsers: MockDbUser[] = [
     id: mockDbFirstSellerUserId + index,
     full_name: agent.fullName,
     email: agent.email || `seller${index + 1}@dcprime.test`,
+    contact_no: agent.phone || null,
     password_hash: `mock_hash_seller_${index + 1}`,
     role: 'agent' as const,
     status: mockActiveStatus(agent.status),
+    accreditation_date: null,
+    last_login: null,
     created_at: mockDbCreatedAt,
     updated_at: mockDbUpdatedAt,
   })),
@@ -19258,13 +19595,25 @@ export const mockDbUsers: MockDbUser[] = [
     id: 1000 + index,
     full_name: client.buyer,
     email: client.email || `client${index + 1}@dcprime.test`,
+    contact_no: client.contactNo || null,
     password_hash: `mock_hash_client_${index + 1}`,
     role: 'client' as const,
-    status: mockClientStatus(client) === 'cancelled' ? 'inactive' as const : 'active' as const,
+    status: 'active' as const,
+    accreditation_date: null,
+    last_login: null,
     created_at: mockDbTimestampFromDate(client.reservationDate),
     updated_at: mockDbUpdatedAt,
   })),
 ]
+
+export const mockDbUserSupervisors: MockDbUserSupervisor[] = agents.slice(0, 12).map((_, index) => ({
+  id: index + 1,
+  user_id: mockDbFirstSellerUserId + index,
+  supervisor_id: mockDbManagerUserId,
+  status: 'active',
+  created_at: mockDbCreatedAt,
+  updated_at: mockDbUpdatedAt,
+}))
 
 const mockDbSellerIdByName = new Map(
   agents.map((agent, index) => [agent.fullName, mockDbFirstSellerUserId + index]),
@@ -19278,14 +19627,13 @@ export const mockDbProjects: MockDbProject[] = [
     administrator: company.preparedBy,
     tax_declaration_no: 'MOCK-TD-2026-0001',
     pin: 'MOCK-PIN-2026-0001',
-    description: 'Mock project row for Pantihan 4 inventory, clients, payments, documents, and commissions.',
     status: 'active',
     created_at: mockDbCreatedAt,
     updated_at: mockDbUpdatedAt,
   },
 ]
 
-const mockDbListingSeeds = new Map<string, Pick<Listing, 'unitId' | 'lotType' | 'area' | 'pricePerSqm' | 'netSellingPrice' | 'legalMiscFee' | 'status'>>()
+const mockDbListingSeeds = new Map<string, Pick<Listing, 'unitId' | 'lotType' | 'area' | 'pricePerSqm' | 'netSellingPrice' | 'legalMiscFee' | 'totalContractPrice' | 'status'>>()
 
 listings.forEach((listing) => {
   if (!listing.unitId || mockDbListingSeeds.has(listing.unitId)) return
@@ -19303,6 +19651,7 @@ clients.forEach((client) => {
     pricePerSqm: client.pricePerSqm,
     netSellingPrice: client.totalContractPrice,
     legalMiscFee: 0,
+    totalContractPrice: client.totalContractPrice,
     status: client.accountStatus === 'COMPLETE PAID' ? 'Sold' : 'Reserved',
   })
 })
@@ -19311,18 +19660,30 @@ export const mockDbListings: MockDbListing[] = Array.from(mockDbListingSeeds.val
   const legalMiscFee = listing.legalMiscFee > 0 && listing.legalMiscFee <= 1
     ? listing.netSellingPrice * listing.legalMiscFee
     : listing.legalMiscFee
+  const legalMiscRate = listing.legalMiscFee > 0 && listing.legalMiscFee <= 1
+    ? listing.legalMiscFee * 100
+    : listing.netSellingPrice > 0
+      ? (legalMiscFee / listing.netSellingPrice) * 100
+      : 0
 
   return {
     id: index + 1,
     project_id: 1,
+    cadastral_lot_no: null,
+    administrator_group: null,
     unit_id: listing.unitId,
-    lot_type: listing.lotType || null,
+    reloc_unit_id: null,
+    lot_type: mockLotTypeName(listing.lotType),
     lot_area_sqm: listing.area,
+    new_area_sqm: null,
     price_per_sqm: listing.pricePerSqm,
-    reservation_fee: defaultReservationFee,
-    legal_misc_fee: roundMockCurrency(legalMiscFee),
     net_selling_price: roundMockCurrency(listing.netSellingPrice),
-    status: mockListingStatus(listing.status),
+    legal_misc_rate: roundMockCurrency(legalMiscRate),
+    legal_misc_fee: roundMockCurrency(legalMiscFee),
+    total_contract_price: roundMockCurrency(listing.totalContractPrice || listing.netSellingPrice + legalMiscFee),
+    reservation_fee: defaultReservationFee,
+    promo_discount: 0,
+    status: mockListingStatusName(listing.status),
     created_at: mockDbCreatedAt,
     updated_at: mockDbUpdatedAt,
   }
@@ -19332,32 +19693,127 @@ const mockDbListingIdByUnitId = new Map(mockDbListings.map((listing) => [listing
 
 export const mockDbClients: MockDbClient[] = clients.map((client, index) => ({
   id: index + 1,
-  full_name: client.buyer,
+  buyer_name: client.buyer,
+  spouse_co_owner_name: client.spouse || null,
+  aif_administrator_name: null,
   email: client.email || null,
   contact_no: client.contactNo || null,
+  age: null,
   address: client.address || null,
-  assigned_seller_id: mockDbSellerIdByName.get(client.agent) ?? mockDbFirstSellerUserId,
-  status: mockClientStatus(client),
   created_at: mockDbTimestampFromDate(client.reservationDate),
   updated_at: mockDbUpdatedAt,
 }))
 
 export const mockDbClientUnits: MockDbClientUnit[] = clients.map((client, index) => {
   const reservationDate = mockDbIsoDate(client.reservationDate, '2026-01-01')
-  const clientUnitStatus = mockClientUnitStatus(client)
+  const paymentStatus = mockClientUnitPaymentStatus(client)
+  const salesStatus = mockClientUnitSalesStatus(client)
 
   return {
     id: index + 1,
     client_id: index + 1,
     listing_id: mockDbListingIdByUnitId.get(client.unitId) ?? 1,
-    assigned_seller_id: mockDbSellerIdByName.get(client.agent) ?? mockDbFirstSellerUserId,
+    assigned_agent_id: mockDbSellerIdByName.get(client.agent) ?? mockDbFirstSellerUserId,
+    assigned_manager_id: mockDbManagerUserId,
     reservation_date: reservationDate,
-    contract_date: addMonthsToMockDbDate(reservationDate, 1),
-    selling_price: roundMockCurrency(client.totalContractPrice),
-    downpayment: roundMockCurrency(client.paymentMade),
-    balance: roundMockCurrency(client.balance),
-    status: clientUnitStatus,
+    mode_of_payment: client.paymentMode.toLowerCase() as MockDbClientUnitPaymentMode,
+    document_status: client.documentStatus === 'COMPLETE' ? 'complete' : 'incomplete',
+    account_status: client.accountStatus === 'COMPLETE PAID' ? 'closed' : 'active',
+    payment_status: paymentStatus,
+    sales_status: salesStatus,
+    remarks: client.salesStatus === 'FOR REVIEW' ? 'Marked for sales review from workbook data.' : null,
+    created_at: mockDbTimestampFromDate(client.reservationDate),
+    updated_at: mockDbUpdatedAt,
   }
+})
+
+const mockDbAvailableListingIds = mockDbListings
+  .filter((listing) => listing.status === 'available')
+  .map((listing) => listing.id)
+
+export const mockDbReservations: MockDbReservation[] = [
+  {
+    id: 1,
+    listing_id: mockDbAvailableListingIds[0] ?? 1,
+    client_id: 1,
+    reserved_by: mockDbSellerIdByName.get(clients[0]?.agent) ?? mockDbFirstSellerUserId,
+    reservation_date: '2026-06-05',
+    expiry_date: '2026-07-05',
+    reservation_fee: defaultReservationFee,
+    status: 'pending',
+    converted_to_client_unit_id: null,
+    remarks: 'Pending reservation; listing remains available until confirmation.',
+    created_at: mockDbUpdatedAt,
+    updated_at: mockDbUpdatedAt,
+  },
+  {
+    id: 2,
+    listing_id: mockDbAvailableListingIds[1] ?? 2,
+    client_id: 2,
+    reserved_by: mockDbSellerIdByName.get(clients[1]?.agent) ?? mockDbFirstSellerUserId,
+    reservation_date: '2026-06-01',
+    expiry_date: '2026-07-01',
+    reservation_fee: defaultReservationFee,
+    status: 'confirmed',
+    converted_to_client_unit_id: null,
+    remarks: 'Confirmed reservation awaiting contract conversion.',
+    created_at: '2026-06-01 10:00:00',
+    updated_at: mockDbUpdatedAt,
+  },
+  {
+    id: 3,
+    listing_id: mockDbClientUnits[0]?.listing_id ?? 1,
+    client_id: mockDbClientUnits[0]?.client_id ?? 1,
+    reserved_by: mockDbSellerIdByName.get(clients[0]?.agent) ?? mockDbFirstSellerUserId,
+    reservation_date: mockDbClientUnits[0]?.reservation_date ?? '2026-01-05',
+    expiry_date: addMonthsToMockDbDate(mockDbClientUnits[0]?.reservation_date, 1),
+    reservation_fee: defaultReservationFee,
+    status: 'converted',
+    converted_to_client_unit_id: mockDbClientUnits[0]?.id ?? 1,
+    remarks: 'Converted from reservation to contract.',
+    created_at: mockDbTimestampFromDate(mockDbClientUnits[0]?.reservation_date),
+    updated_at: mockDbUpdatedAt,
+  },
+  {
+    id: 4,
+    listing_id: mockDbClientUnits[1]?.listing_id ?? 2,
+    client_id: mockDbClientUnits[1]?.client_id ?? 2,
+    reserved_by: mockDbSellerIdByName.get(clients[1]?.agent) ?? mockDbFirstSellerUserId,
+    reservation_date: mockDbClientUnits[1]?.reservation_date ?? '2026-01-10',
+    expiry_date: addMonthsToMockDbDate(mockDbClientUnits[1]?.reservation_date, 1),
+    reservation_fee: defaultReservationFee,
+    status: 'converted',
+    converted_to_client_unit_id: mockDbClientUnits[1]?.id ?? 2,
+    remarks: 'Converted from reservation to contract.',
+    created_at: mockDbTimestampFromDate(mockDbClientUnits[1]?.reservation_date),
+    updated_at: mockDbUpdatedAt,
+  },
+  {
+    id: 5,
+    listing_id: mockDbAvailableListingIds[2] ?? 3,
+    client_id: 3,
+    reserved_by: mockDbSellerIdByName.get(clients[2]?.agent) ?? mockDbFirstSellerUserId,
+    reservation_date: '2026-05-20',
+    expiry_date: '2026-06-19',
+    reservation_fee: defaultReservationFee,
+    status: 'cancelled',
+    converted_to_client_unit_id: null,
+    remarks: 'Cancelled by client; listing returned to available inventory.',
+    created_at: '2026-05-20 11:00:00',
+    updated_at: mockDbUpdatedAt,
+  },
+]
+
+export const mockDbClientUnitSellers: MockDbClientUnitSeller[] = mockDbClientUnits.flatMap((clientUnit, index) => {
+  const sourceClient = clients[index]
+  const agentId = mockDbSellerIdByName.get(sourceClient?.agent) ?? mockDbFirstSellerUserId
+  const assignedAt = mockDbTimestampFromDate(sourceClient?.reservationDate, mockDbCreatedAt)
+
+  return [
+    { id: (index * 3) + 1, client_unit_id: clientUnit.id, user_id: agentId, role: 'agent' as const, assigned_at: assignedAt },
+    { id: (index * 3) + 2, client_unit_id: clientUnit.id, user_id: mockDbBrokerUserId, role: 'broker' as const, assigned_at: assignedAt },
+    { id: (index * 3) + 3, client_unit_id: clientUnit.id, user_id: mockDbManagerUserId, role: 'manager' as const, assigned_at: assignedAt },
+  ]
 })
 
 const mockDbClientUnitIdByLegacyKey = new Map(
@@ -19374,6 +19830,14 @@ export const mockDbDocuments: MockDbDocument[] = documentRequirements.map((docum
   updated_at: mockDbUpdatedAt,
 }))
 
+export const mockDbProjectDocuments: MockDbProjectDocument[] = mockDbDocuments.map((document, index) => ({
+  id: index + 1,
+  project_id: 1,
+  document_id: document.id,
+  is_required: true,
+  status: 'active',
+}))
+
 const mockDbDocumentIdByRequirementId = new Map(
   documentRequirements.map((document, index) => [document.id, index + 1]),
 )
@@ -19387,10 +19851,8 @@ export const mockDbClientUnitDocuments: MockDbClientUnitDocument[] = clientDocum
     id: index + 1,
     client_unit_id: mockDbClientUnitIdByLegacyKey.get(`${document.clientId}|${document.unitId}`) ?? 1,
     document_id: mockDbDocumentIdByRequirementId.get(document.requirementId) ?? 1,
-    file_url: clientUnitDocumentStatus === 'missing' ? null : `/mock-documents/${document.clientId}/${document.requirementId}.pdf`,
+    file_url: clientUnitDocumentStatus === 'not_submitted' ? null : `/mock-documents/${document.clientId}/${document.requirementId}.pdf`,
     status: clientUnitDocumentStatus,
-    remarks: document.rejectionRemark || null,
-    submitted_at: submittedAt,
     reviewed_by: reviewedAt ? 2 : null,
     reviewed_at: reviewedAt,
     created_at: mockDbCreatedAt,
@@ -19400,33 +19862,39 @@ export const mockDbClientUnitDocuments: MockDbClientUnitDocument[] = clientDocum
 
 export const mockDbPayments: MockDbPayment[] = payments.map((payment, index) => {
   const paymentStatus = mockPaymentStatus(payment.status)
+  const clientUnitId = mockDbClientUnitIdByLegacyKey.get(`${payment.clientId}|${payment.unitId}`) ?? 1
 
   return {
     id: index + 1,
-    client_unit_id: mockDbClientUnitIdByLegacyKey.get(`${payment.clientId}|${payment.unitId}`) ?? 1,
-    amount: roundMockCurrency(payment.amount),
+    client_unit_id: clientUnitId,
     payment_date: mockDbIsoDate(payment.date, '2026-01-15'),
-    payment_type: mockPaymentType(index, payment.description),
-    payment_method: payment.bank ? 'Bank Deposit' : null,
+    amount: roundMockCurrency(payment.amount),
+    payment_type: mockPaymentTypeName(index, payment.description),
+    payment_method: mockPaymentMethodName(payment.bank),
     bank_name: payment.bank && payment.bank !== 'BANK' ? payment.bank : 'Mock Bank',
     reference_no: payment.referenceNumber || payment.id,
-    remarks: payment.description || null,
     status: paymentStatus,
     verified_by: paymentStatus === 'verified' ? 2 : null,
     verified_at: paymentStatus === 'verified' ? mockDbTimestampFromDate(payment.date, mockDbUpdatedAt) : null,
+    remarks: payment.description || null,
     created_at: mockDbTimestampFromDate(payment.date, mockDbCreatedAt),
+    updated_at: mockDbUpdatedAt,
   }
 })
 
 export const mockDbPaymentSchedules: MockDbPaymentSchedule[] = mockDbClientUnits.flatMap((clientUnit) => {
   const scheduleLength = 6
-  const monthlyDue = roundMockCurrency((clientUnit.balance ?? 0) / scheduleLength)
+  const listing = mockDbListings.find((item) => item.id === clientUnit.listing_id)
+  const totalContractPrice = listing?.total_contract_price ?? 0
+  const paidSoFar = payments
+    .filter((payment) => mockDbClientUnitIdByLegacyKey.get(`${payment.clientId}|${payment.unitId}`) === clientUnit.id)
+    .reduce((total, payment) => total + payment.amount, 0)
+  const remaining = Math.max(totalContractPrice - paidSoFar, 0)
+  const monthlyDue = roundMockCurrency(remaining / scheduleLength)
 
   return Array.from({ length: scheduleLength }, (_, monthIndex) => {
-    const amountPaid = clientUnit.status === 'fully_paid' ? monthlyDue : 0
-    const balance = roundMockCurrency(Math.max(monthlyDue - amountPaid, 0))
     const dueDate = addMonthsToMockDbDate(clientUnit.reservation_date, monthIndex + 1)
-    const status: MockDbPaymentScheduleStatus = amountPaid >= monthlyDue && monthlyDue > 0
+    const status: MockDbPaymentScheduleStatus = clientUnit.payment_status === 'complete_paid'
       ? 'paid'
       : dueDate < '2026-06-05'
         ? 'overdue'
@@ -19436,9 +19904,9 @@ export const mockDbPaymentSchedules: MockDbPaymentSchedule[] = mockDbClientUnits
       id: ((clientUnit.id - 1) * scheduleLength) + monthIndex + 1,
       client_unit_id: clientUnit.id,
       due_date: dueDate,
-      amount_due: monthlyDue,
-      amount_paid: amountPaid,
-      balance,
+      description: `Month ${monthIndex + 1} amortization`,
+      due_amount: monthlyDue,
+      penalty: status === 'overdue' ? roundMockCurrency(monthlyDue * 0.02) : 0,
       status,
       created_at: mockDbCreatedAt,
       updated_at: mockDbUpdatedAt,
@@ -19451,54 +19919,65 @@ export const mockDbCommissionPlans: MockDbCommissionPlan[] = [
     id: 1,
     project_id: 1,
     name: 'Standard Land Sales Commission',
-    agent_rate: 5,
-    broker_rate: 2,
-    manager_rate: 1,
+    direct_agent_rate: 7,
+    distributed_agent_rate: 2,
+    manager_rate: 5,
     status: 'active',
     created_at: mockDbCreatedAt,
+    updated_at: mockDbUpdatedAt,
   },
 ]
 
 export const mockDbCommissions: MockDbCommission[] = mockDbClientUnits.flatMap((clientUnit, index) => {
-  const sellingPrice = clientUnit.selling_price ?? 0
-  const baseStatus: MockDbCommissionStatus = clientUnit.status === 'fully_paid' ? 'released' : index % 3 === 0 ? 'approved' : 'pending'
+  const listing = mockDbListings.find((item) => item.id === clientUnit.listing_id)
+  const sellingPrice = listing?.net_selling_price ?? listing?.total_contract_price ?? 0
+  const baseStatus: MockDbCommissionStatus = clientUnit.payment_status === 'complete_paid' ? 'released' : index % 3 === 0 ? 'approved' : 'pending'
+  const agentSeller = mockDbClientUnitSellers.find((seller) => seller.client_unit_id === clientUnit.id && seller.role === 'agent')
+  const brokerSeller = mockDbClientUnitSellers.find((seller) => seller.client_unit_id === clientUnit.id && seller.role === 'broker')
+  const managerSeller = mockDbClientUnitSellers.find((seller) => seller.client_unit_id === clientUnit.id && seller.role === 'manager')
 
   return [
     {
       id: (index * 3) + 1,
       client_unit_id: clientUnit.id,
-      user_id: clientUnit.assigned_seller_id,
+      user_id: agentSeller?.user_id ?? mockDbFirstSellerUserId,
       commission_type: 'agent' as const,
-      rate: 5,
-      amount: roundMockCurrency(sellingPrice * 0.05),
+      sale_type: 'direct' as const,
+      rate: 7,
+      gross_commission: roundMockCurrency(sellingPrice * 0.07),
       status: baseStatus,
       approved_by: baseStatus === 'pending' ? null : 1,
       approved_at: baseStatus === 'pending' ? null : mockDbUpdatedAt,
       created_at: mockDbCreatedAt,
+      updated_at: mockDbUpdatedAt,
     },
     {
       id: (index * 3) + 2,
       client_unit_id: clientUnit.id,
-      user_id: mockDbBrokerUserId,
+      user_id: brokerSeller?.user_id ?? mockDbBrokerUserId,
       commission_type: 'broker' as const,
+      sale_type: 'distributed' as const,
       rate: 2,
-      amount: roundMockCurrency(sellingPrice * 0.02),
+      gross_commission: roundMockCurrency(sellingPrice * 0.02),
       status: baseStatus,
       approved_by: baseStatus === 'pending' ? null : 1,
       approved_at: baseStatus === 'pending' ? null : mockDbUpdatedAt,
       created_at: mockDbCreatedAt,
+      updated_at: mockDbUpdatedAt,
     },
     {
       id: (index * 3) + 3,
       client_unit_id: clientUnit.id,
-      user_id: mockDbManagerUserId,
+      user_id: managerSeller?.user_id ?? mockDbManagerUserId,
       commission_type: 'manager' as const,
-      rate: 1,
-      amount: roundMockCurrency(sellingPrice * 0.01),
+      sale_type: 'distributed' as const,
+      rate: 5,
+      gross_commission: roundMockCurrency(sellingPrice * 0.05),
       status: baseStatus,
       approved_by: baseStatus === 'pending' ? null : 1,
       approved_at: baseStatus === 'pending' ? null : mockDbUpdatedAt,
       created_at: mockDbCreatedAt,
+      updated_at: mockDbUpdatedAt,
     },
   ]
 })
@@ -19507,22 +19986,28 @@ export const mockDbCashAdvances: MockDbCashAdvance[] = [
   {
     id: 1,
     user_id: mockDbFirstSellerUserId,
+    client_unit_id: mockDbClientUnits[0]?.id ?? null,
+    commission_id: mockDbCommissions[0]?.id ?? null,
     amount: 10000,
     reason: 'Mock advance against upcoming commission release.',
     status: 'deducted',
     approved_by: 1,
     approved_at: mockDbUpdatedAt,
     created_at: '2026-05-15 10:00:00',
+    updated_at: mockDbUpdatedAt,
   },
   {
     id: 2,
     user_id: mockDbFirstSellerUserId + 1,
+    client_unit_id: mockDbClientUnits[1]?.id ?? null,
+    commission_id: mockDbCommissions[3]?.id ?? null,
     amount: 7500,
     reason: 'Transportation and client processing allowance.',
     status: 'approved',
     approved_by: 1,
     approved_at: mockDbUpdatedAt,
     created_at: '2026-05-20 10:00:00',
+    updated_at: mockDbUpdatedAt,
   },
 ]
 
@@ -19536,28 +20021,320 @@ export const mockDbCommissionReleases: MockDbCommissionRelease[] = mockDbCommiss
     return {
       id: index + 1,
       commission_id: commission.id,
-      cash_advance_id: cashAdvance?.id ?? null,
-      gross_amount: commission.amount,
+      release_stage: index % 5 === 0 ? 'retention_25' : index % 3 === 0 ? 'third_60' : 'first_20',
+      release_percentage: index % 5 === 0 ? 25 : index % 3 === 0 ? 60 : 20,
+      gross_release_amount: commission.gross_commission,
       cash_advance_deduction: deduction,
-      net_released_amount: roundMockCurrency(Math.max(commission.amount - deduction, 0)),
+      net_release_amount: roundMockCurrency(Math.max(commission.gross_commission - deduction, 0)),
       released_by: 2,
       released_at: mockDbUpdatedAt,
       remarks: cashAdvance ? 'Released with cash advance deduction.' : 'Released in full.',
     }
   })
 
+export const mockDbCashAdvanceDeductions: MockDbCashAdvanceDeduction[] = mockDbCommissionReleases
+  .filter((release) => release.cash_advance_deduction > 0)
+  .map((release, index) => ({
+    id: index + 1,
+    cash_advance_id: mockDbCashAdvances[0]?.id ?? 1,
+    commission_release_id: release.id,
+    deducted_amount: release.cash_advance_deduction,
+    created_at: release.released_at,
+  }))
+
+const mockDbFeatureModuleByKey: Record<string, string> = {
+  dashboard: 'Dashboard',
+  projects: 'Management',
+  listings: 'Management',
+  reservations: 'Management',
+  clients_view: 'Clients',
+  clients_manage: 'Clients',
+  payments_view: 'Finance',
+  payments_record: 'Finance',
+  payments_verify: 'Finance',
+  commissions_view: 'Finance',
+  commissions_approve: 'Finance',
+  commissions_release: 'Finance',
+  documents_view: 'Compliance',
+  documents_upload: 'Compliance',
+  documents_approve: 'Compliance',
+  soa_view: 'Records',
+  balances_view: 'Records',
+  reports_view: 'Records',
+  audit_logs_view: 'Administration',
+  user_management: 'Administration',
+  settings: 'Administration',
+  lookups: 'Administration',
+}
+
+export const mockDbAppFeatures: MockDbAppFeature[] = Object.entries(featureLabels).map(([featureKey, label], index) => ({
+  id: index + 1,
+  feature_key: featureKey,
+  module_name: mockDbFeatureModuleByKey[featureKey] ?? 'General',
+  display_name: label,
+  created_at: mockDbCreatedAt,
+}))
+
+const mockDbAccessByRole: Record<string, string[]> = {
+  owner: mockDbAppFeatures.map((feature) => feature.feature_key),
+  admin: mockDbAppFeatures.map((feature) => feature.feature_key),
+  treasury: ['dashboard', 'clients_view', 'payments_view', 'payments_record', 'payments_verify', 'commissions_view', 'commissions_approve', 'commissions_release', 'cash_advances_view', 'cash_advances_manage', 'documents_view', 'documents_approve', 'soa_view', 'balances_view', 'reports_view'],
+  manager: ['dashboard', 'projects', 'listings', 'reservations', 'clients_view', 'clients_manage', 'payments_view', 'commissions_view', 'commissions_approve', 'cash_advances_view', 'documents_view', 'documents_approve', 'soa_view', 'balances_view', 'reports_view'],
+  broker: ['dashboard', 'listings', 'reservations', 'clients_view', 'payments_view', 'commissions_view', 'cash_advances_view', 'documents_view', 'soa_view', 'balances_view'],
+  agent: ['dashboard', 'listings', 'reservations', 'clients_view', 'payments_view', 'commissions_view', 'cash_advances_view', 'documents_view', 'documents_upload', 'soa_view', 'balances_view'],
+  client: ['dashboard', 'payments_view', 'documents_view', 'documents_upload', 'soa_view', 'balances_view'],
+}
+
+export const mockDbRoleFeaturePermissions: MockDbRoleFeaturePermission[] = mockDbUserRoles.flatMap((role) =>
+  mockDbAppFeatures.map((feature) => ({
+    id: ((role.id - 1) * mockDbAppFeatures.length) + feature.id,
+    role: role.name,
+    feature_id: feature.id,
+    can_access: mockDbAccessByRole[role.name]?.includes(feature.feature_key) ?? false,
+    created_at: mockDbCreatedAt,
+  })),
+)
+
+export const mockDbUserFeaturePermissions: MockDbUserFeaturePermission[] = [
+  {
+    id: 1,
+    user_id: mockDbManagerUserId,
+    feature_id: mockDbAppFeatures.find((feature) => feature.feature_key === 'commissions_approve')?.id ?? 1,
+    can_access: true,
+    granted_by: 1,
+    created_at: mockDbCreatedAt,
+  },
+  {
+    id: 2,
+    user_id: mockDbBrokerUserId,
+    feature_id: mockDbAppFeatures.find((feature) => feature.feature_key === 'reports_view')?.id ?? 1,
+    can_access: false,
+    granted_by: 1,
+    created_at: mockDbCreatedAt,
+  },
+  {
+    id: 3,
+    user_id: mockDbFirstSellerUserId,
+    feature_id: mockDbAppFeatures.find((feature) => feature.feature_key === 'payments_record')?.id ?? 1,
+    can_access: false,
+    granted_by: 1,
+    created_at: mockDbCreatedAt,
+  },
+]
+
+export const mockDbAuditLogs: MockDbAuditLog[] = auditLogsV2.slice(0, 20).map((log, index) => ({
+  id: index + 1,
+  user_id: 1,
+  action: log.action,
+  module_name: log.role || 'Administration',
+  entity_table: null,
+  entity_id: null,
+  old_values: null,
+  new_values: { description: log.details },
+  ip_address: log.ipAddress,
+  created_at: mockDbTimestampFromDate(log.timestamp, mockDbUpdatedAt),
+}))
+
 export const dcPrimeMockDb = {
   users: mockDbUsers,
+  user_supervisors: mockDbUserSupervisors,
   projects: mockDbProjects,
   listings: mockDbListings,
   clients: mockDbClients,
   client_units: mockDbClientUnits,
   documents: mockDbDocuments,
-  client_unit_documents: mockDbClientUnitDocuments,
+  client_document_listings: mockDbClientUnitDocuments,
   payments: mockDbPayments,
   payment_schedules: mockDbPaymentSchedules,
   commission_plans: mockDbCommissionPlans,
   commissions: mockDbCommissions,
   cash_advances: mockDbCashAdvances,
   commission_releases: mockDbCommissionReleases,
+  cash_advance_deductions: mockDbCashAdvanceDeductions,
+  reservations: mockDbReservations,
+  client_unit_sellers: mockDbClientUnitSellers,
+  project_documents: mockDbProjectDocuments,
+  app_features: mockDbAppFeatures,
+  role_feature_permissions: mockDbRoleFeaturePermissions,
+  user_feature_permissions: mockDbUserFeaturePermissions,
+  settings: mockDbSettings,
+  lot_types: mockDbLotTypes,
+  payment_methods: mockDbPaymentMethods,
+  payment_types: mockDbPaymentTypes,
+  payment_modes: mockDbPaymentModes,
+  commission_types: mockDbCommissionTypes,
+  user_roles: mockDbUserRoles,
+  client_statuses: mockDbClientStatuses,
+  listing_statuses: mockDbListingStatuses,
+  audit_logs: mockDbAuditLogs,
+}
+
+export function getListingStatus(statusNameOrId: MockDbListingStatusName | number): MockDbListingStatus {
+  return typeof statusNameOrId === 'number'
+    ? mockDbListingStatuses.find((status) => status.id === statusNameOrId) ?? mockDbListingStatuses[0]
+    : mockDbListingStatuses.find((status) => status.name === statusNameOrId) ?? mockDbListingStatuses[0]
+}
+
+export function getClientStatus(statusNameOrId: MockDbClientLifecycleStatus | number): MockDbClientStatus {
+  return typeof statusNameOrId === 'number'
+    ? mockDbClientStatuses.find((status) => status.id === statusNameOrId) ?? mockDbClientStatuses[0]
+    : mockDbClientStatuses.find((status) => status.name === statusNameOrId) ?? mockDbClientStatuses[0]
+}
+
+export function getLotType(nameOrId: string | number | null | undefined): MockDbLotType {
+  if (typeof nameOrId === 'number') return mockDbLotTypes.find((lotType) => lotType.id === nameOrId) ?? mockDbLotTypes[0]
+  return mockDbLotTypes.find((lotType) => lotType.name === nameOrId) ?? mockDbLotTypes[0]
+}
+
+export function getUserRole(nameOrId: Role | number): MockDbUserRole {
+  return typeof nameOrId === 'number'
+    ? mockDbUserRoles.find((role) => role.id === nameOrId) ?? mockDbUserRoles[0]
+    : mockDbUserRoles.find((role) => role.name === nameOrId) ?? mockDbUserRoles[0]
+}
+
+export function getUserRoleId(name: string): number {
+  return lookupId(mockDbUserRoles, name)
+}
+
+export function getListingStatusId(name: string): MockDbListingStatusName {
+  return (mockDbListingStatuses.find((status) => status.name === name)?.name ?? 'available') as MockDbListingStatusName
+}
+
+export function getClientStatusId(name: string): MockDbClientLifecycleStatus {
+  return (mockDbClientStatuses.find((status) => status.name === name)?.name ?? 'lead') as MockDbClientLifecycleStatus
+}
+
+export function getPaymentTypeId(name: string): number {
+  return lookupId(mockDbPaymentTypes, name)
+}
+
+export function getPaymentMethodId(name: string): number {
+  return lookupId(mockDbPaymentMethods, name)
+}
+
+export function getPaymentModeId(name: string): number {
+  return lookupId(mockDbPaymentModes, name)
+}
+
+export function getCommissionTypeId(name: MockDbSellerRole): number {
+  return lookupId(mockDbCommissionTypes, name)
+}
+
+export function getSellersForClientUnit(clientUnitId: number): {
+  agent: MockDbUser | null
+  broker: MockDbUser | null
+  manager: MockDbUser | null
+} {
+  const sellers = mockDbClientUnitSellers.filter((seller) => seller.client_unit_id === clientUnitId)
+  const userByRole = (role: MockDbSellerRole) => {
+    const seller = sellers.find((item) => item.role === role)
+    return mockDbUsers.find((user) => user.id === seller?.user_id) ?? null
+  }
+
+  return {
+    agent: userByRole('agent'),
+    broker: userByRole('broker'),
+    manager: userByRole('manager'),
+  }
+}
+
+export function getActiveReservation(listingId: number): MockDbReservation | null {
+  return mockDbReservations.find((reservation) =>
+    reservation.listing_id === listingId && (reservation.status === 'pending' || reservation.status === 'confirmed'),
+  ) ?? null
+}
+
+export function getClientUnitsForClient(clientId: number): MockDbClientUnit[] {
+  return mockDbClientUnits.filter((clientUnit) => clientUnit.client_id === clientId)
+}
+
+export function getClientLifecycleStatus(
+  clientId: number,
+  clientUnits: MockDbClientUnit[] = mockDbClientUnits,
+): MockDbClientStatus {
+  const units = clientUnits.filter((clientUnit) => clientUnit.client_id === clientId)
+  if (units.length === 0) return getClientStatus('lead')
+  if (units.some((clientUnit) => clientUnit.account_status === 'cancelled' || clientUnit.sales_status === 'cancelled')) {
+    return getClientStatus('cancelled')
+  }
+  if (units.every((clientUnit) => clientUnit.payment_status === 'complete_paid' || clientUnit.account_status === 'closed')) {
+    return getClientStatus('completed')
+  }
+  if (units.some((clientUnit) => clientUnit.payment_status === 'partially_paid' || clientUnit.account_status === 'active')) {
+    return getClientStatus('active')
+  }
+  return getClientStatus('reserved')
+}
+
+export function computeCommissions(clientUnitId: number): Array<{
+  user_id: number
+  commission_type: MockDbSellerRole
+  sale_type: MockDbCommissionSaleType
+  rate: number
+  gross_commission: number
+}> {
+  const clientUnit = mockDbClientUnits.find((item) => item.id === clientUnitId)
+  const listing = mockDbListings.find((item) => item.id === clientUnit?.listing_id)
+  const plan = mockDbCommissionPlans.find((item) => item.project_id === listing?.project_id)
+  if (!clientUnit || !listing || !plan) return []
+
+  const sellingPrice = listing.net_selling_price ?? listing.total_contract_price ?? 0
+  const rateByRole: Record<MockDbSellerRole, number> = {
+    agent: plan.direct_agent_rate,
+    broker: plan.distributed_agent_rate,
+    manager: plan.manager_rate,
+  }
+
+  return mockDbClientUnitSellers
+    .filter((seller) => seller.client_unit_id === clientUnitId)
+    .map((seller) => ({
+      user_id: seller.user_id,
+      commission_type: seller.role,
+      sale_type: seller.role === 'agent' ? 'direct' : 'distributed',
+      rate: rateByRole[seller.role],
+      gross_commission: roundMockCurrency((sellingPrice * rateByRole[seller.role]) / 100),
+    }))
+}
+
+export function getScheduleSummary(clientUnitId: number): {
+  total: number
+  paid: number
+  overdue: number
+  remaining: number
+} {
+  const schedules = mockDbPaymentSchedules.filter((schedule) => schedule.client_unit_id === clientUnitId)
+  return schedules.reduce(
+    (summary, schedule) => {
+      const scheduledAmount = roundMockCurrency(schedule.due_amount + schedule.penalty)
+      const paidAmount = schedule.status === 'paid' ? scheduledAmount : schedule.status === 'partial' ? roundMockCurrency(scheduledAmount / 2) : 0
+      const balance = roundMockCurrency(Math.max(scheduledAmount - paidAmount, 0))
+
+      return {
+        total: roundMockCurrency(summary.total + scheduledAmount),
+        paid: roundMockCurrency(summary.paid + paidAmount),
+        overdue: roundMockCurrency(summary.overdue + (schedule.status === 'overdue' ? balance : 0)),
+        remaining: roundMockCurrency(summary.remaining + balance),
+      }
+    },
+    { total: 0, paid: 0, overdue: 0, remaining: 0 },
+  )
+}
+
+export function getNextMockId(rows: Array<{ id: number }>) {
+  return Math.max(0, ...rows.map((row) => row.id)) + 1
+}
+
+export function createMockDbAuditLog(action: string, moduleName: string, description: string, id = Date.now()): MockDbAuditLog {
+  return {
+    id,
+    user_id: 1,
+    action,
+    module_name: moduleName,
+    entity_table: null,
+    entity_id: null,
+    old_values: null,
+    new_values: { description },
+    ip_address: '127.0.0.1',
+    created_at: new Date().toISOString().slice(0, 19).replace('T', ' '),
+  }
 }
