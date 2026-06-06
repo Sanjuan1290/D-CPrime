@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
-import type { FeatureKey, Role } from '../data/mockData'
 import Panel from '../components/admin/Panel'
+import { useAuth } from '../hooks/useAuth'
+import type { FeatureKey, Role } from '../types'
 
 type AdminRouteGateProps = {
   allowedRoles: Role[]
@@ -11,18 +12,20 @@ type AdminRouteGateProps = {
 
 function AdminRouteGate({ allowedRoles, feature, children }: AdminRouteGateProps) {
   const location = useLocation()
-  const role = localStorage.getItem('dcprime_role') as Role | null
+  const { user, role } = useAuth()
 
   if (!role) {
     return <Navigate to="/login" replace state={{ from: location.pathname }} />
   }
 
-  if (!allowedRoles.includes(role)) {
+  const hasFeature = user?.permissions?.[feature] ?? true
+
+  if (!allowedRoles.includes(role) || !hasFeature) {
     return (
-      <Panel title="Access Restricted" subtitle="Your mock user role does not have access to this page.">
-        <div className="rounded-lg border border-white/10 bg-black p-5 text-sm text-zinc-300">
+      <Panel title="Access Restricted" subtitle="Your user role does not have access to this page.">
+        <div className="rounded-lg border border-[#E8E4DC] bg-white p-5 text-sm text-[#374151]">
           <p>Required feature: {feature}</p>
-          <p className="mt-2 text-zinc-500">Current role: {role}</p>
+          <p className="mt-2 text-[#6B7280]">Current role: {role}</p>
         </div>
       </Panel>
     )

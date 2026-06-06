@@ -1,5 +1,15 @@
+/* eslint-disable react-hooks/incompatible-library */
 import { isValidElement, useCallback, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
+import {
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from '@tanstack/react-table'
+import type { ColumnDef, SortingState } from '@tanstack/react-table'
 import FilterBar from './FilterBar'
 
 type DataTableProps = {
@@ -9,57 +19,75 @@ type DataTableProps = {
   searchable?: boolean
 }
 
+type TableRow = {
+  id: number
+  cells: ReactNode[]
+  searchText: string
+}
+
 function DataTable({ headers, rows, searchPlaceholder, searchable = true }: DataTableProps) {
-  const [sortIndex, setSortIndex] = useState<number | null>(null)
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
-  const [page, setPage] = useState(1)
-  const [search, setSearch] = useState('')
-  const pageSize = 20
+  const [sorting, setSorting] = useState<SortingState>([])
+  const [globalFilter, setGlobalFilter] = useState('')
 
   const handleSearchChange = useCallback((value: string) => {
-    setSearch(value)
-    setPage(1)
+    setGlobalFilter(value)
   }, [])
 
-  const filteredRows = useMemo(() => {
-    if (!search.trim()) return rows
-    const term = search.trim().toLowerCase()
-    return rows.filter((row) => row.map(normalizeCell).join(' ').toLowerCase().includes(term))
-  }, [rows, search])
+  const data = useMemo<TableRow[]>(
+    () =>
+      rows.map((cells, index) => ({
+        id: index,
+        cells,
+        searchText: cells.map(normalizeCell).join(' ').toLowerCase(),
+      })),
+    [rows],
+  )
 
-  const totalPages = Math.max(1, Math.ceil(filteredRows.length / pageSize))
-  const currentPage = Math.min(page, totalPages)
+  const columns = useMemo<ColumnDef<TableRow>[]>(
+    () =>
+      headers.map((header, index) => ({
+        id: `column-${index}`,
+        header,
+        accessorFn: (row) => normalizeCell(row.cells[index]),
+        cell: ({ row }) => row.original.cells[index],
+        sortingFn: 'alphanumeric',
+      })),
+    [headers],
+  )
 
-  const sortedRows = useMemo(() => {
-    if (sortIndex === null) return filteredRows
+  const table = useReactTable({
+    data,
+    columns,
+    state: {
+      sorting,
+      globalFilter,
+    },
+    initialState: {
+      pagination: {
+        pageSize: 20,
+      },
+    },
+    onSortingChange: setSorting,
+    onGlobalFilterChange: setGlobalFilter,
+    globalFilterFn: (row, _columnId, filterValue) => {
+      const term = String(filterValue ?? '').trim().toLowerCase()
+      return !term || row.original.searchText.includes(term)
+    },
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+  })
 
-    return [...filteredRows].sort((a, b) => {
-      const aValue = normalizeCell(a[sortIndex])
-      const bValue = normalizeCell(b[sortIndex])
-      const result = aValue.localeCompare(bValue, undefined, { numeric: true, sensitivity: 'base' })
-      return sortDirection === 'asc' ? result : -result
-    })
-  }, [filteredRows, sortDirection, sortIndex])
-
-  const visibleRows = sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize)
-
-  function handleSort(index: number) {
-    setPage(1)
-    if (sortIndex === index) {
-      if (sortDirection === 'asc') {
-        setSortDirection('desc')
-      } else {
-        setSortIndex(null)
-        setSortDirection('asc')
-      }
-      return
-    }
-    setSortIndex(index)
-    setSortDirection('asc')
-  }
+  const filteredRows = table.getFilteredRowModel().rows
+  const visibleRows = table.getRowModel().rows
+  const currentPage = table.getState().pagination.pageIndex + 1
+  const pageSize = table.getState().pagination.pageSize
+  const totalPages = Math.max(1, table.getPageCount())
 
   function resetFilters() {
     handleSearchChange('')
+    table.setPageIndex(0)
   }
 
   const paginationPages = Array.from({ length: totalPages }, (_, index) => index + 1).filter((pageNumber) => {
@@ -70,7 +98,7 @@ function DataTable({ headers, rows, searchPlaceholder, searchable = true }: Data
     <div className="space-y-3">
       {searchable && (
         <FilterBar
-          search={search}
+          search={globalFilter}
           onSearchChange={handleSearchChange}
           placeholder={searchPlaceholder}
           onReset={resetFilters}
@@ -86,10 +114,10 @@ function DataTable({ headers, rows, searchPlaceholder, searchable = true }: Data
             </svg>
           </div>
           <h3 className="mt-4 text-lg font-semibold text-[#374151]">
-            {search.trim() ? `No results for "${search.trim()}"` : 'No results found'}
+            {globalFilter.trim() ? `No results for "${globalFilter.trim()}"` : 'No results found'}
           </h3>
           <p className="mt-1 text-sm text-[#6B7280]">Try adjusting your search or filters.</p>
-          {search.trim() && (
+          {globalFilter.trim() && (
             <button onClick={resetFilters} className="mt-3 text-sm font-semibold text-[#9A7A22] hover:text-[#C9A84C]">
               Clear filters
             </button>
@@ -100,25 +128,30 @@ function DataTable({ headers, rows, searchPlaceholder, searchable = true }: Data
           <div className="overflow-x-auto rounded-xl border border-[#E8E4DC] bg-white">
             <table className="w-full min-w-[760px] text-left text-sm">
               <thead className="bg-[#F3F0EB] text-[10px] uppercase tracking-widest text-[#374151]">
-                <tr>
-                  {headers.map((header, index) => (
-                    <th key={header} className="px-4 py-3.5 font-semibold">
-                      <button onClick={() => handleSort(index)} className="flex items-center gap-1 text-left hover:text-[#1A1A2E]">
-                        {header}
-                        <span className={sortIndex === index ? 'text-[#1A1A2E]' : 'text-gray-300'}>
-                          {sortIndex === index ? (sortDirection === 'asc' ? '↑' : '↓') : '↕'}
-                        </span>
-                      </button>
-                    </th>
-                  ))}
-                </tr>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <tr key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <th key={header.id} className="px-4 py-3.5 font-semibold">
+                        <button
+                          onClick={header.column.getToggleSortingHandler()}
+                          className="flex items-center gap-1 text-left hover:text-[#1A1A2E]"
+                        >
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                          <span className={header.column.getIsSorted() ? 'text-[#1A1A2E]' : 'text-gray-300'}>
+                            {header.column.getIsSorted() === 'asc' ? '↑' : header.column.getIsSorted() === 'desc' ? '↓' : '↕'}
+                          </span>
+                        </button>
+                      </th>
+                    ))}
+                  </tr>
+                ))}
               </thead>
               <tbody className="divide-y divide-[#F0EDE8] bg-white">
-                {visibleRows.map((row, rowIndex) => (
-                  <tr key={rowIndex} className="text-[#111827] hover:bg-[#FAF8F5]">
-                    {row.map((cell, cellIndex) => (
-                      <td key={cellIndex} className="px-4 py-3.5 align-top">
-                        {cell}
+                {visibleRows.map((row) => (
+                  <tr key={row.original.id} className="text-[#111827] hover:bg-[#FAF8F5]">
+                    {row.getVisibleCells().map((cell) => (
+                      <td key={cell.id} className="px-4 py-3.5 align-top">
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </td>
                     ))}
                   </tr>
@@ -128,12 +161,24 @@ function DataTable({ headers, rows, searchPlaceholder, searchable = true }: Data
           </div>
           <div className="flex flex-col gap-3 text-xs text-[#6B7280] sm:flex-row sm:items-center sm:justify-between">
             <span>
-              Showing {(currentPage - 1) * pageSize + 1}-{Math.min(currentPage * pageSize, filteredRows.length)} of {filteredRows.length} records
+              Showing {filteredRows.length === 0 ? 0 : (currentPage - 1) * pageSize + 1}-{Math.min(currentPage * pageSize, filteredRows.length)} of {filteredRows.length} records
             </span>
-            <div className="flex flex-wrap gap-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <select
+                value={pageSize}
+                onChange={(event) => table.setPageSize(Number(event.target.value))}
+                className="rounded-md border border-[#E8E4DC] bg-white px-2 py-1.5 font-semibold text-[#374151]"
+                aria-label="Rows per page"
+              >
+                {[10, 20, 50, 100].map((size) => (
+                  <option key={size} value={size}>
+                    {size} / page
+                  </option>
+                ))}
+              </select>
               <button
-                onClick={() => setPage(Math.max(1, currentPage - 1))}
-                disabled={currentPage === 1}
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
                 className="rounded-md px-3 py-1.5 font-semibold text-[#374151] hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Previous
@@ -142,7 +187,7 @@ function DataTable({ headers, rows, searchPlaceholder, searchable = true }: Data
                 <span key={pageNumber} className="flex items-center gap-1">
                   {index > 0 && pageNumber - paginationPages[index - 1] > 1 && <span className="px-1 text-[#9CA3AF]">...</span>}
                   <button
-                    onClick={() => setPage(pageNumber)}
+                    onClick={() => table.setPageIndex(pageNumber - 1)}
                     className={`rounded-md px-3 py-1.5 font-semibold ${
                       pageNumber === currentPage ? 'bg-[#1A1A2E] text-white' : 'text-[#374151] hover:bg-gray-100'
                     }`}
@@ -152,8 +197,8 @@ function DataTable({ headers, rows, searchPlaceholder, searchable = true }: Data
                 </span>
               ))}
               <button
-                onClick={() => setPage(Math.min(totalPages, currentPage + 1))}
-                disabled={currentPage === totalPages}
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
                 className="rounded-md px-3 py-1.5 font-semibold text-[#374151] hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Next
@@ -169,7 +214,7 @@ function DataTable({ headers, rows, searchPlaceholder, searchable = true }: Data
 function normalizeCell(cell: ReactNode): string {
   if (typeof cell === 'string' || typeof cell === 'number') return String(cell)
   if (Array.isArray(cell)) return cell.map(normalizeCell).join(' ')
-  if (isValidElement<{ children?: ReactNode }>(cell)) return normalizeCell(cell.props.children)
+  if (isValidElement(cell)) return normalizeCell((cell.props as { children?: ReactNode }).children)
   return ''
 }
 

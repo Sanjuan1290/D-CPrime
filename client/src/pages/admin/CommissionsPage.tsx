@@ -1,658 +1,403 @@
-import { useEffect, useState } from 'react'
+import { useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
-import { useNavigate } from 'react-router-dom'
 import Badge from '../../components/admin/Badge'
-import ConfirmModal from '../../components/admin/ConfirmModal'
 import DataTable from '../../components/admin/DataTable'
 import FormField from '../../components/admin/FormField'
-import InfoRow from '../../components/admin/InfoRow'
 import Modal from '../../components/admin/Modal'
 import Panel from '../../components/admin/Panel'
 import StatCard from '../../components/admin/StatCard'
 import { useToast } from '../../components/admin/Toast'
-import { formatCurrency, formatPercent } from '../../components/admin/formatters'
+import { formatCurrency } from '../../components/admin/formatters'
+import ErrorState from '../../components/shared/ErrorState'
+import LoadingSkeleton from '../../components/shared/LoadingSkeleton'
 import {
-  commissionRules as initialCommissionRules,
-  commissions,
-  getNextMockId,
-  mockStorageKeys,
-  mockDbCashAdvanceDeductions,
-  mockDbCashAdvances,
-  mockDbCommissions,
-  mockDbCommissionReleases,
-  mockDbUsers,
-  projects,
-  readMockStorage,
-  writeMockStorage,
-} from '../../data/adminMockData'
-import type { CommissionRule, MockDbCashAdvance, MockDbCashAdvanceDeduction, MockDbCommissionRelease } from '../../data/adminMockData'
-import { commissionDetails } from '../../data/sourceDetails'
-import type { CommissionDetail, CommissionPartyRelease } from '../../data/sourceDetails'
+  useCashAdvances,
+  useCommissionReleases,
+  useCommissions,
+  useCreateCashAdvance,
+  useCreateCommission,
+  useCreateCommissionRelease,
+  useUpdateCashAdvance,
+  useUpdateCommission,
+  useUpdateCommissionRelease,
+  useUsers,
+} from '../../hooks/useAdminResources'
+import type {
+  CashAdvancePayload,
+  CashAdvanceRecord,
+  CommissionPayload,
+  CommissionRecord,
+  CommissionReleasePayload,
+  CommissionReleaseRecord,
+} from '../../hooks/useAdminResources'
+import { useBalances } from '../../hooks/useBalances'
 
-const CASH_ADVANCES_STORAGE_KEY = 'dcprime_cash_advances'
-const CASH_ADVANCE_DEDUCTIONS_STORAGE_KEY = 'dcprime_cash_advance_deductions'
-const COMMISSION_RELEASES_STORAGE_KEY = 'dcprime_commission_releases'
-const COMMISSION_RULES_STORAGE_KEY = 'dcprime_commission_rules'
+type CommissionEditor = CommissionRecord | 'new' | null
+type ReleaseEditor = CommissionReleaseRecord | 'new' | null
+type CashAdvanceEditor = CashAdvanceRecord | 'new' | null
 
-type StoredCommissionRule = Omit<Partial<CommissionRule>, 'status'> & {
-  agentRate?: number
-  releaseThreshold?: number
-  retentionRate?: number
-  status?: string
-}
-
-function timestamp() {
-  return new Date().toISOString().slice(0, 19).replace('T', ' ')
-}
-
-function titleCase(value: string) {
-  return value.replace(/_/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase())
-}
-
-function normalizeCommissionRule(rule: StoredCommissionRule, index: number): CommissionRule {
-  return {
-    id: rule.id ?? `rule-${index + 1}`,
-    projectId: rule.projectId ?? projects[0]?.id ?? 'project-1',
-    name: rule.name?.trim() || `Standard Plan ${index + 1}`,
-    directAgentRate: rule.directAgentRate ?? rule.agentRate ?? 0.07,
-    distributedAgentRate: rule.distributedAgentRate ?? 0.02,
-    managerRate: rule.managerRate ?? 0.05,
-    status: rule.status === 'Inactive' || rule.status === 'Paused' ? 'Inactive' : 'Active',
-  }
-}
-
-function loadCommissionRules(): CommissionRule[] {
-  try {
-    const saved = localStorage.getItem(COMMISSION_RULES_STORAGE_KEY)
-    const source = saved ? JSON.parse(saved) : initialCommissionRules
-    return Array.isArray(source) ? source.map((rule, index) => normalizeCommissionRule(rule, index)) : initialCommissionRules
-  } catch {
-    return initialCommissionRules
-  }
-}
+const commissionTypes = ['agent', 'manager', 'broker']
+const saleTypes = ['direct', 'distributed']
+const commissionStatuses = ['pending', 'approved', 'partially_released', 'released', 'cancelled']
+const releaseStages = ['first_20', 'second_40', 'third_60', 'fourth_75', 'retention_25', 'manual']
+const cashAdvanceStatuses = ['pending', 'approved', 'partially_deducted', 'deducted', 'disapproved']
 
 function CommissionsPage() {
   const toast = useToast()
-  const navigate = useNavigate()
-  const [tracker, setTracker] = useState(() => readMockStorage(mockStorageKeys.commissionTracker, commissions))
-  const [rules, setRules] = useState<CommissionRule[]>(loadCommissionRules)
-  const [selectedRule, setSelectedRule] = useState<CommissionRule | null>(null)
-  const [selectedDetail, setSelectedDetail] = useState<CommissionDetail | null>(null)
-  const [rulePendingDelete, setRulePendingDelete] = useState<CommissionRule | null>(null)
-  const [cashAdvances, setCashAdvances] = useState<MockDbCashAdvance[]>(() => loadRows(CASH_ADVANCES_STORAGE_KEY, mockDbCashAdvances))
-  const [cashAdvanceDeductions, setCashAdvanceDeductions] = useState<MockDbCashAdvanceDeduction[]>(() =>
-    loadRows(CASH_ADVANCE_DEDUCTIONS_STORAGE_KEY, mockDbCashAdvanceDeductions),
-  )
-  const [commissionReleases, setCommissionReleases] = useState<MockDbCommissionRelease[]>(() => loadRows(COMMISSION_RELEASES_STORAGE_KEY, mockDbCommissionReleases))
-  const [isCashAdvanceModalOpen, setIsCashAdvanceModalOpen] = useState(false)
-  const [deductionTarget, setDeductionTarget] = useState<MockDbCashAdvance | null>(null)
-  const totalCommissionPayable = commissionDetails.reduce((total, detail) => total + detail.manager.commission + detail.agent.commission, 0)
-  const totalCommissionReleased = commissionDetails.reduce(
-    (total, detail) =>
-      total +
-      detail.manager.firstRelease20 +
-      detail.manager.secondRelease40 +
-      detail.manager.thirdRelease60 +
-      detail.manager.fourthRelease75 +
-      detail.agent.firstRelease20 +
-      detail.agent.secondRelease40 +
-      detail.agent.thirdRelease60 +
-      detail.agent.fourthRelease75,
-    0,
-  )
-  const totalCommissionRemaining = commissionDetails.reduce((total, detail) => total + detail.manager.totalRemaining + detail.agent.totalRemaining, 0)
-  const totalCashAdvance = cashAdvances.reduce((total, advance) => total + advance.amount, 0)
-  const totalCashAdvanceDeducted = cashAdvanceDeductions.reduce((total, deduction) => total + deduction.deducted_amount, 0)
-  const totalRetention = commissionDetails.reduce((total, detail) => total + detail.manager.retention25 + detail.agent.retention25, 0)
-  const sellers = mockDbUsers.filter((user) => ['agent', 'broker', 'manager'].includes(user.role) && user.status === 'active')
+  const commissionsQuery = useCommissions()
+  const releasesQuery = useCommissionReleases()
+  const cashAdvancesQuery = useCashAdvances()
+  const usersQuery = useUsers()
+  const balancesQuery = useBalances()
+  const createCommission = useCreateCommission()
+  const updateCommission = useUpdateCommission()
+  const createRelease = useCreateCommissionRelease()
+  const updateRelease = useUpdateCommissionRelease()
+  const createCashAdvance = useCreateCashAdvance()
+  const updateCashAdvance = useUpdateCashAdvance()
+  const [commissionEditor, setCommissionEditor] = useState<CommissionEditor>(null)
+  const [releaseEditor, setReleaseEditor] = useState<ReleaseEditor>(null)
+  const [cashAdvanceEditor, setCashAdvanceEditor] = useState<CashAdvanceEditor>(null)
 
-  useEffect(() => {
-    localStorage.setItem(COMMISSION_RULES_STORAGE_KEY, JSON.stringify(rules))
-  }, [rules])
-
-  useEffect(() => {
-    writeMockStorage(mockStorageKeys.commissionTracker, tracker)
-  }, [tracker])
-
-  useEffect(() => {
-    localStorage.setItem(CASH_ADVANCES_STORAGE_KEY, JSON.stringify(cashAdvances))
-  }, [cashAdvances])
-
-  useEffect(() => {
-    localStorage.setItem(CASH_ADVANCE_DEDUCTIONS_STORAGE_KEY, JSON.stringify(cashAdvanceDeductions))
-  }, [cashAdvanceDeductions])
-
-  useEffect(() => {
-    localStorage.setItem(COMMISSION_RELEASES_STORAGE_KEY, JSON.stringify(commissionReleases))
-  }, [commissionReleases])
-
-  function openRule(rule?: CommissionRule) {
-    setSelectedRule(
-      rule ?? {
-        id: `rule-${Date.now()}`,
-        projectId: projects[0].id,
-        name: 'Standard Plan',
-        directAgentRate: 0.07,
-        distributedAgentRate: 0.02,
-        managerRate: 0.05,
-        status: 'Active',
-      },
-    )
-  }
-
-  function saveRule(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    if (!selectedRule) return
-
-    const formData = new FormData(event.currentTarget)
-    const rule: CommissionRule = {
-      ...selectedRule,
-      projectId: String(formData.get('projectId')),
-      name: String(formData.get('name')).trim() || 'Standard Plan',
-      directAgentRate: Number(formData.get('directAgentRate')) / 100,
-      distributedAgentRate: Number(formData.get('distributedAgentRate')) / 100,
-      managerRate: Number(formData.get('managerRate')) / 100,
-      status: String(formData.get('status')) as CommissionRule['status'],
+  const commissions = commissionsQuery.data?.data ?? []
+  const releases = releasesQuery.data?.data ?? []
+  const cashAdvances = cashAdvancesQuery.data?.data ?? []
+  const users = usersQuery.data?.data ?? []
+  const balances = balancesQuery.data?.data ?? []
+  const userById = useMemo(() => new Map(users.map((user) => [user.id, user])), [users])
+  const balanceByClientUnit = useMemo(() => new Map(balances.map((balance) => [balance.client_unit_id, balance])), [balances])
+  const releasedByCommission = useMemo(() => {
+    const map = new Map<number, number>()
+    for (const release of releases) {
+      map.set(release.commission_id, (map.get(release.commission_id) ?? 0) + Number(release.net_release_amount || 0))
     }
+    return map
+  }, [releases])
+  const totals = useMemo(() => {
+    const gross = commissions.reduce((total, commission) => total + Number(commission.gross_commission || 0), 0)
+    const released = releases.reduce((total, release) => total + Number(release.net_release_amount || 0), 0)
+    const advances = cashAdvances.reduce((total, advance) => total + Number(advance.amount || 0), 0)
+    return { gross, released, remaining: gross - released, advances }
+  }, [cashAdvances, commissions, releases])
 
-    setRules((current) => {
-      const exists = current.some((item) => item.id === rule.id)
-      return exists ? current.map((item) => (item.id === rule.id ? rule : item)) : [rule, ...current]
-    })
-    setSelectedRule(null)
-    toast.success('Commission rule saved.')
-  }
-
-  function deleteRule() {
-    if (!rulePendingDelete) return
-
-    setRules((current) => current.filter((item) => item.id !== rulePendingDelete.id))
-    setRulePendingDelete(null)
-    toast.success('Commission rule deleted.')
-  }
-
-  function approveCommission(unitId: string) {
-    setTracker((current) =>
-      current.map((commission) =>
-        commission.unitId === unitId ? { ...commission, releasedPercent: Math.max(commission.releasedPercent, 0.75) } : commission,
-      ),
-    )
-    toast.success('Commission approved.')
-  }
-
-  function releaseCommission(unitId: string) {
-    setTracker((current) =>
-      current.map((commission) => (commission.unitId === unitId ? { ...commission, releasedPercent: 1 } : commission)),
-    )
-    toast.success('Commission released.')
-  }
-
-  function getProjectName(projectId: string) {
-    return projects.find((project) => project.id === projectId)?.name ?? projectId
-  }
-
-  function getCommissionDetail(unitId: string, buyer: string) {
-    return commissionDetails.find((detail) => detail.unitId === unitId && detail.buyer === buyer)
-  }
-
-  function userName(userId: number) {
-    return mockDbUsers.find((user) => user.id === userId)?.full_name ?? `User #${userId}`
-  }
-
-  function commissionLabel(commissionId: number | null) {
-    if (!commissionId) return 'Unlinked'
-    const commission = mockDbCommissions.find((item) => item.id === commissionId)
-    if (!commission) return `Commission #${commissionId}`
-    return `${titleCase(commission.commission_type)} - ${userName(commission.user_id)} (${formatCurrency(commission.gross_commission)})`
-  }
-
-  function releaseLabel(releaseId: number) {
-    const release = commissionReleases.find((item) => item.id === releaseId)
-    if (!release) return `Release #${releaseId}`
-    return `#${release.id} ${titleCase(release.release_stage)} - ${formatCurrency(release.net_release_amount)} net`
-  }
-
-  function deductedAmount(cashAdvanceId: number) {
-    return cashAdvanceDeductions
-      .filter((deduction) => deduction.cash_advance_id === cashAdvanceId)
-      .reduce((total, deduction) => total + deduction.deducted_amount, 0)
-  }
-
-  function remainingAdvance(cashAdvance: MockDbCashAdvance) {
-    return Math.max(cashAdvance.amount - deductedAmount(cashAdvance.id), 0)
-  }
-
-  function saveCashAdvance(event: FormEvent<HTMLFormElement>) {
+  async function saveCommission(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const formData = new FormData(event.currentTarget)
-    const amount = Number(formData.get('amount'))
-
-    if (!amount || amount <= 0) {
-      toast.error('Enter a valid cash advance amount.')
-      return
-    }
-
-    const commissionId = Number(formData.get('commission_id')) || null
-    const commission = commissionId ? mockDbCommissions.find((item) => item.id === commissionId) : null
-    const cashAdvance: MockDbCashAdvance = {
-      id: getNextMockId(cashAdvances),
+    const status = String(formData.get('status')) as CommissionRecord['status']
+    const payload: CommissionPayload = {
+      client_unit_id: Number(formData.get('client_unit_id')),
       user_id: Number(formData.get('user_id')),
-      client_unit_id: commission?.client_unit_id ?? null,
-      commission_id: commission?.id ?? null,
-      amount,
-      reason: String(formData.get('reason') || '').trim() || null,
-      status: 'pending',
-      approved_by: null,
-      approved_at: null,
-      created_at: timestamp(),
-      updated_at: timestamp(),
+      commission_type: String(formData.get('commission_type')) as CommissionRecord['commission_type'],
+      sale_type: String(formData.get('sale_type')) as CommissionRecord['sale_type'],
+      rate: Number(formData.get('rate')) || 0,
+      gross_commission: Number(formData.get('gross_commission')) || 0,
+      status,
+      approved_by: numberOrNull(formData.get('approved_by')),
+      approved_at: ['approved', 'partially_released', 'released'].includes(status) ? normalizeDateTime(clean(formData.get('approved_at'))) ?? new Date().toISOString().slice(0, 19).replace('T', ' ') : null,
     }
 
-    setCashAdvances((current) => [cashAdvance, ...current])
-    setIsCashAdvanceModalOpen(false)
-    toast.success('Cash advance request added.')
+    try {
+      if (commissionEditor === 'new') {
+        await createCommission.mutateAsync(payload)
+      } else if (commissionEditor) {
+        await updateCommission.mutateAsync({ id: commissionEditor.id, ...payload })
+      }
+      toast.success('Commission saved.')
+      setCommissionEditor(null)
+    } catch {
+      toast.error('Commission could not be saved.')
+    }
   }
 
-  function updateCashAdvance(cashAdvanceId: number, updates: Partial<MockDbCashAdvance>) {
-    setCashAdvances((current) =>
-      current.map((advance) => (advance.id === cashAdvanceId ? { ...advance, ...updates, updated_at: timestamp() } : advance)),
-    )
-  }
-
-  function approveCashAdvance(cashAdvance: MockDbCashAdvance) {
-    updateCashAdvance(cashAdvance.id, { status: 'approved', approved_by: 1, approved_at: timestamp() })
-    toast.success('Cash advance approved.')
-  }
-
-  function disapproveCashAdvance(cashAdvance: MockDbCashAdvance) {
-    updateCashAdvance(cashAdvance.id, { status: 'disapproved', approved_by: 1, approved_at: timestamp() })
-    toast.success('Cash advance disapproved.')
-  }
-
-  function applyCashAdvanceDeduction(event: FormEvent<HTMLFormElement>) {
+  async function saveRelease(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    if (!deductionTarget) return
-
     const formData = new FormData(event.currentTarget)
-    const commissionReleaseId = Number(formData.get('commission_release_id'))
-    const amount = Number(formData.get('amount'))
-    const release = commissionReleases.find((item) => item.id === commissionReleaseId)
-
-    if (!release || !amount || amount <= 0) {
-      toast.error('Choose a release and enter a valid deduction amount.')
-      return
+    const gross = Number(formData.get('gross_release_amount')) || 0
+    const deduction = Number(formData.get('cash_advance_deduction')) || 0
+    const payload: CommissionReleasePayload = {
+      commission_id: Number(formData.get('commission_id')),
+      release_stage: String(formData.get('release_stage')) as CommissionReleaseRecord['release_stage'],
+      release_percentage: numberOrNull(formData.get('release_percentage')),
+      gross_release_amount: gross,
+      cash_advance_deduction: deduction,
+      net_release_amount: Number(formData.get('net_release_amount')) || gross - deduction,
+      released_by: Number(formData.get('released_by')),
+      released_at: normalizeDateTime(clean(formData.get('released_at'))) ?? new Date().toISOString().slice(0, 19).replace('T', ' '),
+      remarks: clean(formData.get('remarks')),
     }
 
-    const remaining = remainingAdvance(deductionTarget)
-    if (amount > remaining) {
-      toast.error('Deduction exceeds the remaining cash advance balance.')
-      return
+    try {
+      if (releaseEditor === 'new') {
+        await createRelease.mutateAsync(payload)
+      } else if (releaseEditor) {
+        await updateRelease.mutateAsync({ id: releaseEditor.id, ...payload })
+      }
+      toast.success('Commission release saved.')
+      setReleaseEditor(null)
+    } catch {
+      toast.error('Commission release could not be saved.')
     }
-
-    if (amount > release.net_release_amount) {
-      toast.error('Deduction exceeds the release net amount.')
-      return
-    }
-
-    const deduction: MockDbCashAdvanceDeduction = {
-      id: getNextMockId(cashAdvanceDeductions),
-      cash_advance_id: deductionTarget.id,
-      commission_release_id: release.id,
-      deducted_amount: amount,
-      created_at: timestamp(),
-    }
-    const nextRemaining = remaining - amount
-
-    setCashAdvanceDeductions((current) => [deduction, ...current])
-    setCommissionReleases((current) =>
-      current.map((item) =>
-        item.id === release.id
-          ? {
-              ...item,
-              cash_advance_deduction: item.cash_advance_deduction + amount,
-              net_release_amount: Math.max(item.net_release_amount - amount, 0),
-            }
-          : item,
-      ),
-    )
-    updateCashAdvance(deductionTarget.id, { status: nextRemaining <= 0 ? 'deducted' : 'partially_deducted' })
-    setDeductionTarget(null)
-    toast.success('Cash advance deduction applied.')
   }
+
+  async function saveCashAdvance(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    const formData = new FormData(event.currentTarget)
+    const status = String(formData.get('status')) as CashAdvanceRecord['status']
+    const payload: CashAdvancePayload = {
+      user_id: Number(formData.get('user_id')),
+      client_unit_id: numberOrNull(formData.get('client_unit_id')),
+      commission_id: numberOrNull(formData.get('commission_id')),
+      amount: Number(formData.get('amount')) || 0,
+      reason: clean(formData.get('reason')),
+      status,
+      approved_by: numberOrNull(formData.get('approved_by')),
+      approved_at: ['approved', 'partially_deducted', 'deducted'].includes(status) ? normalizeDateTime(clean(formData.get('approved_at'))) ?? new Date().toISOString().slice(0, 19).replace('T', ' ') : null,
+    }
+
+    try {
+      if (cashAdvanceEditor === 'new') {
+        await createCashAdvance.mutateAsync(payload)
+      } else if (cashAdvanceEditor) {
+        await updateCashAdvance.mutateAsync({ id: cashAdvanceEditor.id, ...payload })
+      }
+      toast.success('Cash advance saved.')
+      setCashAdvanceEditor(null)
+    } catch {
+      toast.error('Cash advance could not be saved.')
+    }
+  }
+
+  const isLoading = commissionsQuery.isLoading || releasesQuery.isLoading || cashAdvancesQuery.isLoading || usersQuery.isLoading || balancesQuery.isLoading
+  const isError = commissionsQuery.isError || releasesQuery.isError || cashAdvancesQuery.isError || usersQuery.isError || balancesQuery.isError
+
+  if (isLoading) return <LoadingSkeleton rows={8} />
+  if (isError) return <ErrorState message="Commissions could not be loaded from MySQL." onRetry={() => window.location.reload()} />
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-        <StatCard label="Commission Payable" value={formatCurrency(totalCommissionPayable)} note="Manager + agent commissions" />
-        <StatCard label="Released" value={formatCurrency(totalCommissionReleased)} note="1st to 4th release total" />
-        <StatCard label="Remaining" value={formatCurrency(totalCommissionRemaining)} note="Total remaining from workbook" />
-        <StatCard label="Retention" value={formatCurrency(totalRetention)} note="25% retention total" />
-        <StatCard label="Cash Advance" value={formatCurrency(totalCashAdvance)} note={`${formatCurrency(totalCashAdvanceDeducted)} deducted`} />
+      <div className="grid gap-4 md:grid-cols-4">
+        <StatCard label="Gross Commission" value={formatCurrency(totals.gross)} note="Earned commission records" />
+        <StatCard label="Released" value={formatCurrency(totals.released)} note="Net releases posted" />
+        <StatCard label="Remaining" value={formatCurrency(totals.remaining)} note="Gross less releases" />
+        <StatCard label="Cash Advances" value={formatCurrency(totals.advances)} note="Open and historical advances" />
       </div>
 
-      <Panel title="Commission Settings" subtitle="Admin-controlled commission plans by project">
-        <div className="mb-5 flex justify-end">
-          <button onClick={() => openRule()} className="rounded-lg bg-[#C9A84C] px-4 py-2 text-sm font-bold text-[#1A1A2E] shadow-sm hover:bg-[#B9973C]">
-            Add Rule
-          </button>
-        </div>
+      <Panel
+        title="Commissions"
+        subtitle="Editable commissions imported from company sheets"
+        actions={<button onClick={() => setCommissionEditor('new')} className="rounded-lg bg-[#1A1A2E] px-4 py-2 text-sm font-bold text-white">Add Commission</button>}
+      >
         <DataTable
-          headers={['Project', 'Plan Name', 'Direct Agent %', 'Distributed Agent %', 'Manager %', 'Status', 'Action']}
-          rows={rules.map((rule) => [
-            getProjectName(rule.projectId),
-            rule.name,
-            formatPercent(rule.directAgentRate),
-            formatPercent(rule.distributedAgentRate),
-            formatPercent(rule.managerRate),
-            <Badge key={`${rule.id}-status`}>{rule.status}</Badge>,
-            <div key={`${rule.id}-actions`} className="flex gap-2">
-              <button
-                onClick={() => openRule(rule)}
-                className="rounded-lg border border-[#C9A84C]/40 px-3 py-1 text-xs font-semibold text-[#9A7A22] hover:bg-[#C9A84C]/10"
-              >
-                Edit
-              </button>
-              <button
-                onClick={() => setRulePendingDelete(rule)}
-                className="rounded-lg border border-rose-200 px-3 py-1 text-xs font-semibold text-rose-600 hover:bg-rose-50"
-              >
-                Delete
-              </button>
-            </div>,
-          ])}
-        />
-      </Panel>
-
-      <Panel title="Commission Tracker" subtitle="Manager and agent commission rows from workbook">
-        <DataTable
-          headers={['Buyer', 'Unit', 'Agent', 'Manager', 'Net Selling Price', 'Agent Commission', 'Released', 'Action']}
-          rows={tracker.map((commission) => [
-            commission.buyer,
-            commission.unitId,
-            <div key={`${commission.unitId}-agent`} className="flex items-center gap-2">
-              <span>{commission.agent}</span>
-              <button onClick={() => navigate('/admin/people')} className="rounded-md border border-gray-200 bg-gray-50 px-2 py-1 text-[11px] font-semibold text-[#374151] hover:bg-gray-100">
-                View Agent
-              </button>
-            </div>,
-            commission.manager,
-            formatCurrency(commission.netSellingPrice),
-            formatCurrency(commission.agentCommission),
-            formatPercent(commission.releasedPercent),
-            <div key={`${commission.unitId}-actions`} className="flex gap-2">
-              <button
-                onClick={() => {
-                  const detail = getCommissionDetail(commission.unitId, commission.buyer)
-                  if (detail) setSelectedDetail(detail)
-                }}
-                className="rounded-lg border border-[#E8E4DC] px-3 py-1 text-xs font-semibold text-[#374151] hover:bg-[#F8F7F4]"
-              >
-                Details
-              </button>
-              <button
-                onClick={() => approveCommission(commission.unitId)}
-                className="rounded-lg border border-[#C9A84C]/40 px-3 py-1 text-xs font-semibold text-[#9A7A22] hover:bg-[#C9A84C]/10"
-              >
-                Approve
-              </button>
-              <button
-                onClick={() => releaseCommission(commission.unitId)}
-                className="rounded-lg border border-emerald-200 px-3 py-1 text-xs font-semibold text-emerald-700 hover:bg-emerald-50"
-              >
-                Release
-              </button>
-            </div>,
-          ])}
-        />
-      </Panel>
-
-      <Panel title="Cash Advances" subtitle="Requests, approvals, and deductions against commission releases">
-        <div className="mb-5 flex justify-end">
-          <button onClick={() => setIsCashAdvanceModalOpen(true)} className="rounded-lg bg-[#1A1A2E] px-4 py-2 text-sm font-bold text-white hover:bg-[#2A2A4E]">
-            Add Cash Advance
-          </button>
-        </div>
-        <DataTable
-          searchable={false}
-          headers={['Seller', 'Amount', 'Deducted', 'Remaining', 'Status', 'Linked Commission', 'Created', 'Actions']}
-          rows={cashAdvances.map((advance) => {
-            const remaining = remainingAdvance(advance)
+          headers={['Seller', 'Client / Unit', 'Type', 'Rate', 'Gross', 'Released', 'Remaining', 'Status', 'Actions']}
+          rows={commissions.map((commission) => {
+            const released = releasedByCommission.get(commission.id) ?? 0
+            const balance = balanceByClientUnit.get(commission.client_unit_id)
             return [
-              userName(advance.user_id),
-              formatCurrency(advance.amount),
-              formatCurrency(deductedAmount(advance.id)),
-              formatCurrency(remaining),
-              <Badge key={`${advance.id}-status`}>{titleCase(advance.status)}</Badge>,
-              commissionLabel(advance.commission_id),
-              advance.created_at,
-              <div key={`${advance.id}-actions`} className="flex flex-wrap gap-2">
-                {advance.status === 'pending' && (
-                  <>
-                    <button onClick={() => approveCashAdvance(advance)} className="rounded-lg border border-emerald-200 px-3 py-1 text-xs font-semibold text-emerald-700 hover:bg-emerald-50">
-                      Approve
-                    </button>
-                    <button onClick={() => disapproveCashAdvance(advance)} className="rounded-lg border border-rose-200 px-3 py-1 text-xs font-semibold text-rose-600 hover:bg-rose-50">
-                      Disapprove
-                    </button>
-                  </>
-                )}
-                {(advance.status === 'approved' || advance.status === 'partially_deducted') && remaining > 0 && (
-                  <button onClick={() => setDeductionTarget(advance)} className="rounded-lg border border-[#C9A84C]/40 px-3 py-1 text-xs font-semibold text-[#9A7A22] hover:bg-[#C9A84C]/10">
-                    Deduct
-                  </button>
-                )}
-              </div>,
+              userById.get(commission.user_id)?.full_name ?? `User #${commission.user_id}`,
+              balance ? `${balance.buyer_name} | ${balance.unit_id}` : `Account #${commission.client_unit_id}`,
+              titleCase(commission.commission_type),
+              `${Number(commission.rate || 0).toLocaleString()}%`,
+              formatCurrency(Number(commission.gross_commission || 0)),
+              formatCurrency(released),
+              formatCurrency(Number(commission.gross_commission || 0) - released),
+              <Badge key={`${commission.id}-status`}>{titleCase(commission.status)}</Badge>,
+              <button key={commission.id} onClick={() => setCommissionEditor(commission)} className="rounded-md border border-[#1A1A2E]/20 px-3 py-1.5 text-xs font-semibold text-[#1A1A2E]">
+                Edit
+              </button>,
             ]
           })}
         />
-
-        <div className="mt-5">
-          <DataTable
-            searchable={false}
-            headers={['Cash Advance', 'Commission Release', 'Deducted Amount', 'Date']}
-            rows={cashAdvanceDeductions.map((deduction) => [
-              `Advance #${deduction.cash_advance_id} - ${userName(cashAdvances.find((advance) => advance.id === deduction.cash_advance_id)?.user_id ?? 0)}`,
-              releaseLabel(deduction.commission_release_id),
-              formatCurrency(deduction.deducted_amount),
-              deduction.created_at,
-            ])}
-          />
-        </div>
       </Panel>
 
-      <Modal title="Commission Rule" isOpen={selectedRule !== null} onClose={() => setSelectedRule(null)}>
-        {selectedRule && (
-          <form onSubmit={saveRule} className="grid gap-4 text-sm md:grid-cols-2">
-            <label className="block font-semibold text-[#374151]">
-              Project
-              <select
-                name="projectId"
-                defaultValue={selectedRule.projectId}
-                className="mt-2 w-full rounded-lg border border-[#E8E4DC] bg-white px-3 py-3 text-[#111827] outline-none focus:border-[#C9A84C]"
-              >
-                {projects.map((project) => (
-                  <option key={project.id} value={project.id}>
-                    {project.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <FormField label="Plan Name" name="name" defaultValue={selectedRule.name} required />
-            <PercentInput label="Direct Agent Rate" name="directAgentRate" value={selectedRule.directAgentRate} />
-            <PercentInput label="Distributed Agent Rate" name="distributedAgentRate" value={selectedRule.distributedAgentRate} />
-            <PercentInput label="Manager Rate" name="managerRate" value={selectedRule.managerRate} />
-            <label className="block font-semibold text-[#374151]">
-              Status
-              <select
-                name="status"
-                defaultValue={selectedRule.status}
-                className="mt-2 w-full rounded-lg border border-[#E8E4DC] bg-white px-3 py-3 text-[#111827] outline-none focus:border-[#C9A84C]"
-              >
-                <option>Active</option>
-                <option>Inactive</option>
-              </select>
-            </label>
-            <div className="flex items-end justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setSelectedRule(null)}
-                className="rounded-lg border border-[#E8E4DC] px-4 py-2 font-semibold text-[#374151] hover:bg-[#F8F7F4]"
-              >
-                Cancel
-              </button>
-              <button className="rounded-lg bg-[#C9A84C] px-4 py-2 font-bold text-[#1A1A2E] hover:bg-[#B9973C]">Save Rule</button>
-            </div>
-          </form>
-        )}
-      </Modal>
+      <Panel
+        title="Commission Releases"
+        subtitle="Editable release records and deductions"
+        actions={<button onClick={() => setReleaseEditor('new')} className="rounded-lg bg-[#1A1A2E] px-4 py-2 text-sm font-bold text-white">Add Release</button>}
+      >
+        <DataTable
+          headers={['Commission', 'Stage', 'Gross', 'Deduction', 'Net', 'Released By', 'Released At', 'Actions']}
+          rows={releases.map((release) => [
+            `#${release.commission_id}`,
+            titleCase(release.release_stage),
+            formatCurrency(Number(release.gross_release_amount || 0)),
+            formatCurrency(Number(release.cash_advance_deduction || 0)),
+            formatCurrency(Number(release.net_release_amount || 0)),
+            userById.get(release.released_by)?.full_name ?? `User #${release.released_by}`,
+            release.released_at ? new Date(release.released_at).toLocaleDateString('en-PH') : '-',
+            <button key={release.id} onClick={() => setReleaseEditor(release)} className="rounded-md border border-[#1A1A2E]/20 px-3 py-1.5 text-xs font-semibold text-[#1A1A2E]">
+              Edit
+            </button>,
+          ])}
+        />
+      </Panel>
 
-      <Modal title="Commission Release Breakdown" isOpen={selectedDetail !== null} onClose={() => setSelectedDetail(null)}>
-        {selectedDetail && (
-          <div className="space-y-5">
-            <div className="grid gap-3 text-sm md:grid-cols-2">
-              <InfoRow label="Buyer" value={selectedDetail.buyer} />
-              <InfoRow label="Unit" value={selectedDetail.unitId} />
-              <InfoRow label="Mode" value={selectedDetail.mode || '-'} />
-              <InfoRow label="Sale Type" value={selectedDetail.saleType || '-'} />
-              <InfoRow label="Net Selling Price" value={formatCurrency(selectedDetail.netSellingPrice)} />
-              <InfoRow label="Cash Kaliwaan" value={formatCurrency(selectedDetail.cashKaliwaan)} />
-            </div>
-            <div className="grid gap-4 xl:grid-cols-2">
-              <ReleaseCard title="Manager Release" release={selectedDetail.manager} />
-              <ReleaseCard title="Agent Release" release={selectedDetail.agent} />
-            </div>
-          </div>
-        )}
-      </Modal>
+      <Panel
+        title="Cash Advances"
+        subtitle="Editable advances connected to sellers and commissions"
+        actions={<button onClick={() => setCashAdvanceEditor('new')} className="rounded-lg bg-[#1A1A2E] px-4 py-2 text-sm font-bold text-white">Add Cash Advance</button>}
+      >
+        <DataTable
+          headers={['Seller', 'Amount', 'Status', 'Related Account', 'Commission', 'Reason', 'Actions']}
+          rows={cashAdvances.map((advance) => [
+            userById.get(advance.user_id)?.full_name ?? `User #${advance.user_id}`,
+            formatCurrency(Number(advance.amount || 0)),
+            <Badge key={`${advance.id}-status`}>{titleCase(advance.status)}</Badge>,
+            advance.client_unit_id ? balanceByClientUnit.get(advance.client_unit_id)?.unit_id ?? `Account #${advance.client_unit_id}` : '-',
+            advance.commission_id ?? '-',
+            advance.reason ?? '-',
+            <button key={advance.id} onClick={() => setCashAdvanceEditor(advance)} className="rounded-md border border-[#1A1A2E]/20 px-3 py-1.5 text-xs font-semibold text-[#1A1A2E]">
+              Edit
+            </button>,
+          ])}
+        />
+      </Panel>
 
-      <Modal title="Cash Advance Request" isOpen={isCashAdvanceModalOpen} onClose={() => setIsCashAdvanceModalOpen(false)}>
-        <form onSubmit={saveCashAdvance} className="grid gap-4 text-sm md:grid-cols-2">
-          <FormField
-            label="Seller"
-            name="user_id"
-            required
-            selectOptions={sellers.map((seller) => ({ label: `${seller.full_name} (${titleCase(seller.role)})`, value: String(seller.id) }))}
-          />
-          <FormField
-            label="Linked Commission"
-            name="commission_id"
-            selectOptions={[
-              { label: 'Unlinked', value: '' },
-              ...mockDbCommissions.map((commission) => ({ label: commissionLabel(commission.id), value: String(commission.id) })),
-            ]}
-          />
-          <FormField label="Amount" name="amount" type="number" min="0" step="0.01" defaultValue="5000" required />
-          <div className="md:col-span-2">
-            <FormField label="Reason" name="reason" textarea placeholder="Transportation, processing allowance, or advance note" />
-          </div>
-          <div className="flex justify-end gap-2 border-t border-[#E8E4DC] pt-4 md:col-span-2">
-            <button type="button" onClick={() => setIsCashAdvanceModalOpen(false)} className="rounded-lg border border-[#E8E4DC] px-4 py-2 font-semibold text-[#374151] hover:bg-[#F8F7F4]">
-              Cancel
-            </button>
-            <button className="rounded-lg bg-[#1A1A2E] px-4 py-2 font-bold text-white hover:bg-[#2A2A4E]">Save Request</button>
-          </div>
-        </form>
-      </Modal>
-
-      <Modal title="Apply Cash Advance Deduction" isOpen={deductionTarget !== null} onClose={() => setDeductionTarget(null)}>
-        {deductionTarget && (
-          <form onSubmit={applyCashAdvanceDeduction} className="grid gap-4 text-sm md:grid-cols-2">
-            <div className="rounded-lg border border-[#E8E4DC] bg-[#F8F7F4] p-4 md:col-span-2">
-              <InfoRow label="Seller" value={userName(deductionTarget.user_id)} />
-              <InfoRow label="Remaining Advance" value={formatCurrency(remainingAdvance(deductionTarget))} />
-            </div>
-            <FormField
-              label="Commission Release"
-              name="commission_release_id"
-              required
-              selectOptions={commissionReleases.map((release) => ({ label: releaseLabel(release.id), value: String(release.id) }))}
-            />
-            <FormField
-              label="Deduction Amount"
-              name="amount"
-              type="number"
-              min="0"
-              step="0.01"
-              defaultValue={String(Math.min(remainingAdvance(deductionTarget), commissionReleases[0]?.net_release_amount ?? 0))}
-              required
-            />
-            <div className="flex justify-end gap-2 border-t border-[#E8E4DC] pt-4 md:col-span-2">
-              <button type="button" onClick={() => setDeductionTarget(null)} className="rounded-lg border border-[#E8E4DC] px-4 py-2 font-semibold text-[#374151] hover:bg-[#F8F7F4]">
-                Cancel
-              </button>
-              <button className="rounded-lg bg-[#1A1A2E] px-4 py-2 font-bold text-white hover:bg-[#2A2A4E]">Apply Deduction</button>
-            </div>
-          </form>
-        )}
-      </Modal>
-
-      <ConfirmModal
-        title="Delete Commission Rule"
-        message={`Delete ${rulePendingDelete?.name ?? 'this commission plan'}? This only changes the mock data in this browser.`}
-        confirmLabel="Delete Rule"
-        isOpen={rulePendingDelete !== null}
-        onClose={() => setRulePendingDelete(null)}
-        onConfirm={deleteRule}
-      />
+      <CommissionModal editor={commissionEditor} balances={balances} users={users} isSaving={createCommission.isPending || updateCommission.isPending} onClose={() => setCommissionEditor(null)} onSubmit={saveCommission} />
+      <ReleaseModal editor={releaseEditor} commissions={commissions} users={users} isSaving={createRelease.isPending || updateRelease.isPending} onClose={() => setReleaseEditor(null)} onSubmit={saveRelease} />
+      <CashAdvanceModal editor={cashAdvanceEditor} commissions={commissions} balances={balances} users={users} isSaving={createCashAdvance.isPending || updateCashAdvance.isPending} onClose={() => setCashAdvanceEditor(null)} onSubmit={saveCashAdvance} />
     </div>
   )
 }
 
-function ReleaseCard({ title, release }: { title: string; release: CommissionPartyRelease }) {
-  const released =
-    release.firstRelease20 + release.secondRelease40 + release.thirdRelease60 + release.fourthRelease75
-
+function CommissionModal({
+  editor,
+  balances,
+  users,
+  isSaving,
+  onClose,
+  onSubmit,
+}: {
+  editor: CommissionEditor
+  balances: Array<{ client_unit_id: number; buyer_name: string; unit_id: string }>
+  users: Array<{ id: number; full_name: string; role: string }>
+  isSaving: boolean
+  onClose: () => void
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void
+}) {
+  const commission = editor === 'new' ? null : editor
+  const sellers = users.filter((user) => ['agent', 'broker', 'manager'].includes(user.role))
   return (
-    <section className="rounded-lg border border-[#E8E4DC] bg-[#F8F7F4] p-4">
-      <div className="mb-4 flex items-start justify-between gap-3 border-b border-[#E8E4DC] pb-3">
-        <div>
-          <h3 className="font-bold text-[#1A1A2E]">{title}</h3>
-          <p className="mt-1 text-xs text-[#6B7280]">{release.name || '-'}</p>
-        </div>
-        <Badge>{formatPercent(release.totalReceivedPercent)}</Badge>
-      </div>
-      <div className="space-y-1 text-sm">
-        <InfoRow label="Rate" value={formatPercent(release.rate)} />
-        <InfoRow label="Commission" value={formatCurrency(release.commission)} />
-        <InfoRow label="Payment %" value={formatPercent(release.paymentPercentage)} />
-        <InfoRow label="1st Release 20%" value={formatCurrency(release.firstRelease20)} />
-        <InfoRow label="2nd Release 40%" value={formatCurrency(release.secondRelease40)} />
-        <InfoRow label="3rd Release 60%" value={formatCurrency(release.thirdRelease60)} />
-        <InfoRow label="4th Release 75%" value={formatCurrency(release.fourthRelease75)} />
-        <InfoRow label="Released Total" value={formatCurrency(released)} />
-        <InfoRow label="Retention 25%" value={formatCurrency(release.retention25)} />
-        <InfoRow label="Cash Advance" value={formatCurrency(release.cashAdvance)} />
-        <InfoRow label="Remaining" value={formatCurrency(release.totalRemaining)} />
-      </div>
-    </section>
+    <Modal title={editor === 'new' ? 'Add Commission' : 'Edit Commission'} isOpen={editor !== null} onClose={onClose}>
+      <form onSubmit={onSubmit} className="grid gap-4 md:grid-cols-2">
+        <FormField label="Client Account" name="client_unit_id" defaultValue={String(commission?.client_unit_id ?? balances[0]?.client_unit_id ?? '')} selectOptions={balances.map((balance) => ({ label: `${balance.buyer_name} | ${balance.unit_id}`, value: String(balance.client_unit_id) }))} required />
+        <FormField label="Seller" name="user_id" defaultValue={String(commission?.user_id ?? sellers[0]?.id ?? '')} selectOptions={sellers.map((user) => ({ label: `${user.full_name} (${titleCase(user.role)})`, value: String(user.id) }))} required />
+        <FormField label="Commission Type" name="commission_type" defaultValue={commission?.commission_type ?? 'agent'} selectOptions={commissionTypes.map((type) => ({ label: titleCase(type), value: type }))} />
+        <FormField label="Sale Type" name="sale_type" defaultValue={commission?.sale_type ?? 'distributed'} selectOptions={saleTypes.map((type) => ({ label: titleCase(type), value: type }))} />
+        <FormField label="Rate %" name="rate" type="number" defaultValue={String(commission?.rate ?? 0)} />
+        <FormField label="Gross Commission" name="gross_commission" type="number" defaultValue={String(commission?.gross_commission ?? 0)} />
+        <FormField label="Status" name="status" defaultValue={commission?.status ?? 'pending'} selectOptions={commissionStatuses.map((status) => ({ label: titleCase(status), value: status }))} />
+        <FormField label="Approved By User ID" name="approved_by" type="number" defaultValue={commission?.approved_by ? String(commission.approved_by) : ''} />
+        <FormField label="Approved At" name="approved_at" type="datetime-local" defaultValue={toDateTimeLocal(commission?.approved_at)} />
+        <SubmitActions isSaving={isSaving} onClose={onClose} label="Save Commission" />
+      </form>
+    </Modal>
   )
 }
 
-function PercentInput({ label, name, value }: { label: string; name: string; value: number }) {
+function ReleaseModal({
+  editor,
+  commissions,
+  users,
+  isSaving,
+  onClose,
+  onSubmit,
+}: {
+  editor: ReleaseEditor
+  commissions: CommissionRecord[]
+  users: Array<{ id: number; full_name: string }>
+  isSaving: boolean
+  onClose: () => void
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void
+}) {
+  const release = editor === 'new' ? null : editor
   return (
-    <label className="block font-semibold text-[#374151]">
-      {label}
-      <input
-        name={name}
-        type="number"
-        min="0"
-        step="0.01"
-        defaultValue={(value * 100).toFixed(2)}
-        className="mt-2 w-full rounded-lg border border-[#E8E4DC] bg-white px-3 py-3 text-[#111827] outline-none focus:border-[#C9A84C]"
-      />
-    </label>
+    <Modal title={editor === 'new' ? 'Add Release' : 'Edit Release'} isOpen={editor !== null} onClose={onClose}>
+      <form onSubmit={onSubmit} className="grid gap-4 md:grid-cols-2">
+        <FormField label="Commission" name="commission_id" defaultValue={String(release?.commission_id ?? commissions[0]?.id ?? '')} selectOptions={commissions.map((commission) => ({ label: `#${commission.id} | ${titleCase(commission.commission_type)} | ${formatCurrency(Number(commission.gross_commission || 0))}`, value: String(commission.id) }))} required />
+        <FormField label="Stage" name="release_stage" defaultValue={release?.release_stage ?? 'manual'} selectOptions={releaseStages.map((stage) => ({ label: titleCase(stage), value: stage }))} />
+        <FormField label="Release %" name="release_percentage" type="number" defaultValue={release?.release_percentage ? String(release.release_percentage) : ''} />
+        <FormField label="Gross Release" name="gross_release_amount" type="number" defaultValue={String(release?.gross_release_amount ?? 0)} required />
+        <FormField label="Cash Advance Deduction" name="cash_advance_deduction" type="number" defaultValue={String(release?.cash_advance_deduction ?? 0)} />
+        <FormField label="Net Release" name="net_release_amount" type="number" defaultValue={String(release?.net_release_amount ?? 0)} />
+        <FormField label="Released By" name="released_by" defaultValue={String(release?.released_by ?? users[0]?.id ?? '')} selectOptions={users.map((user) => ({ label: user.full_name, value: String(user.id) }))} required />
+        <FormField label="Released At" name="released_at" type="datetime-local" defaultValue={toDateTimeLocal(release?.released_at) || new Date().toISOString().slice(0, 16)} />
+        <FormField label="Remarks" name="remarks" defaultValue={release?.remarks ?? ''} textarea />
+        <SubmitActions isSaving={isSaving} onClose={onClose} label="Save Release" />
+      </form>
+    </Modal>
   )
 }
 
-function loadRows<T>(key: string, fallback: T[]): T[] {
-  try {
-    const stored = localStorage.getItem(key)
-    if (!stored) return fallback
-    const parsed = JSON.parse(stored)
-    return Array.isArray(parsed) ? parsed : fallback
-  } catch {
-    return fallback
-  }
+function CashAdvanceModal({
+  editor,
+  commissions,
+  balances,
+  users,
+  isSaving,
+  onClose,
+  onSubmit,
+}: {
+  editor: CashAdvanceEditor
+  commissions: CommissionRecord[]
+  balances: Array<{ client_unit_id: number; buyer_name: string; unit_id: string }>
+  users: Array<{ id: number; full_name: string; role: string }>
+  isSaving: boolean
+  onClose: () => void
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void
+}) {
+  const advance = editor === 'new' ? null : editor
+  const sellers = users.filter((user) => ['agent', 'broker', 'manager'].includes(user.role))
+  return (
+    <Modal title={editor === 'new' ? 'Add Cash Advance' : 'Edit Cash Advance'} isOpen={editor !== null} onClose={onClose}>
+      <form onSubmit={onSubmit} className="grid gap-4 md:grid-cols-2">
+        <FormField label="Seller" name="user_id" defaultValue={String(advance?.user_id ?? sellers[0]?.id ?? '')} selectOptions={sellers.map((user) => ({ label: `${user.full_name} (${titleCase(user.role)})`, value: String(user.id) }))} required />
+        <FormField label="Amount" name="amount" type="number" defaultValue={String(advance?.amount ?? 0)} required />
+        <FormField label="Client Account" name="client_unit_id" defaultValue={advance?.client_unit_id ? String(advance.client_unit_id) : ''} selectOptions={[{ label: 'None', value: '' }, ...balances.map((balance) => ({ label: `${balance.buyer_name} | ${balance.unit_id}`, value: String(balance.client_unit_id) }))]} />
+        <FormField label="Commission" name="commission_id" defaultValue={advance?.commission_id ? String(advance.commission_id) : ''} selectOptions={[{ label: 'None', value: '' }, ...commissions.map((commission) => ({ label: `#${commission.id} | ${titleCase(commission.commission_type)}`, value: String(commission.id) }))]} />
+        <FormField label="Status" name="status" defaultValue={advance?.status ?? 'pending'} selectOptions={cashAdvanceStatuses.map((status) => ({ label: titleCase(status), value: status }))} />
+        <FormField label="Approved By User ID" name="approved_by" type="number" defaultValue={advance?.approved_by ? String(advance.approved_by) : ''} />
+        <FormField label="Approved At" name="approved_at" type="datetime-local" defaultValue={toDateTimeLocal(advance?.approved_at)} />
+        <FormField label="Reason" name="reason" defaultValue={advance?.reason ?? ''} textarea />
+        <SubmitActions isSaving={isSaving} onClose={onClose} label="Save Cash Advance" />
+      </form>
+    </Modal>
+  )
+}
+
+function SubmitActions({ isSaving, onClose, label }: { isSaving: boolean; onClose: () => void; label: string }) {
+  return (
+    <div className="flex justify-end gap-2 border-t border-[#E8E4DC] pt-4 md:col-span-2">
+      <button type="button" onClick={onClose} className="rounded-lg border border-[#E8E4DC] px-4 py-2 text-sm font-semibold text-[#374151]">
+        Cancel
+      </button>
+      <button disabled={isSaving} className="rounded-lg bg-[#1A1A2E] px-4 py-2 text-sm font-bold text-white disabled:opacity-60">
+        {isSaving ? 'Saving...' : label}
+      </button>
+    </div>
+  )
+}
+
+function titleCase(value?: string | null) {
+  return String(value ?? '-').replace(/_/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase())
+}
+
+function toDateTimeLocal(value?: string | null) {
+  if (!value) return ''
+  return value.replace(' ', 'T').slice(0, 16)
+}
+
+function normalizeDateTime(value?: string | null) {
+  return value ? value.replace('T', ' ') : null
+}
+
+function clean(value: FormDataEntryValue | null) {
+  const text = String(value ?? '').trim()
+  return text || null
+}
+
+function numberOrNull(value: FormDataEntryValue | null) {
+  const number = Number(value)
+  return Number.isFinite(number) && String(value ?? '').trim() ? number : null
 }
 
 export default CommissionsPage

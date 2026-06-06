@@ -1,4 +1,6 @@
 import { useMemo, useState } from 'react'
+import type { CSSProperties } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import {
   BarChart3,
@@ -18,31 +20,64 @@ import {
   UserGroup,
   Users,
 } from '../components/admin/Icons'
-import {
-  agentRecords,
-  auditLogsV2,
-  brokerRecords,
-  employeeRecords,
-  listingsV2,
-  mockDbClients,
-  mockStorageKeys,
-  paymentTracker,
-  readMockStorage,
-} from '../data/adminMockData'
-import { company } from '../data/mockData'
+import { useAuth } from '../hooks/useAuth'
+import { useClients } from '../hooks/useClients'
+import { useListings } from '../hooks/useListings'
+import { company } from '../lib/brand'
+import api from '../lib/api'
 import { adminNavGroups, getActiveAdminPage, getAdminRouteLabel, routeByKey } from '../routes/adminRoutes'
-import type { AdminPageKey } from '../routes/adminRoutes'
+import type { AdminNavGroup, AdminPageKey } from '../routes/adminRoutes'
+import type { PaginatedResponse } from '../types'
+import type { Role } from '../types'
+
+type AuditLogRow = {
+  id: number
+  action: string
+  module_name?: string | null
+  entity_table?: string | null
+  created_at?: string
+}
+
+const roleTheme: Record<Role, { primary: string; light: string; label: string }> = {
+  owner: { primary: '#0F172A', light: '#E2E8F0', label: 'Owner' },
+  admin: { primary: '#C9A84C', light: '#FFF8E1', label: 'Administrator' },
+  manager: { primary: '#4F46E5', light: '#EEF2FF', label: 'Manager' },
+  treasury: { primary: '#059669', light: '#ECFDF5', label: 'Treasury' },
+  broker: { primary: '#D97706', light: '#FFFBEB', label: 'Broker' },
+  agent: { primary: '#0284C7', light: '#F0F9FF', label: 'Agent' },
+  client: { primary: '#E11D48', light: '#FFF1F2', label: 'Client' },
+}
 
 function AdminLayout() {
   const location = useLocation()
   const navigate = useNavigate()
+  const { logout, role, user } = useAuth()
+  const currentRole = role ?? 'admin'
+  const theme = roleTheme[currentRole]
   const activePage = getActiveAdminPage(location.pathname)
   const activeLabel = getAdminRouteLabel(activePage)
   const [isMobileOpen, setIsMobileOpen] = useState(false)
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false)
   const [globalSearch, setGlobalSearch] = useState('')
-  const adminName = localStorage.getItem('dcprime_name') ?? 'Admin'
-  const clientSearchRows = readMockStorage(mockStorageKeys.clients, mockDbClients)
+  const adminName = user?.full_name ?? user?.fullName ?? 'Admin'
+  const clientsQuery = useClients()
+  const listingsQuery = useListings()
+  const auditLogsQuery = useQuery({
+    queryKey: ['audit-logs', 'recent'],
+    queryFn: () => api.get<PaginatedResponse<AuditLogRow>>('/audit-logs', { params: { limit: 5 } }),
+  })
+  const clientSearchRows = clientsQuery.data?.data ?? []
+  const listingSearchRows = listingsQuery.data?.data ?? []
+  const visibleNavGroups = useMemo(
+    () =>
+      adminNavGroups
+        .map((group) => ({
+          ...group,
+          items: group.items.filter((item) => item.allowedRoles.includes(currentRole)),
+        }))
+        .filter((group) => group.items.length > 0),
+    [currentRole],
+  )
   const globalResults = useMemo(() => {
     const term = globalSearch.trim().toLowerCase()
     if (!term) return []
@@ -52,38 +87,30 @@ function AdminLayout() {
         type: 'Client',
         label: client.buyer_name,
         detail: `${client.email ?? 'No email'} | ${client.contact_no ?? 'No contact'}`,
-        path: `/admin/clients/${client.id}`,
+        path: '/admin/clients',
       })),
-      ...listingsV2.map((listing) => ({
+      ...listingSearchRows.map((listing) => ({
         type: 'Listing',
-        label: listing.unitId,
-        detail: `${listing.status} | ${listing.areaSqm} sqm`,
+        label: listing.unit_id,
+        detail: `${listing.status} | ${listing.lot_area_sqm ?? 0} sqm`,
         path: '/admin/listings',
-      })),
-      ...paymentTracker.map((payment) => ({
-        type: 'Payment',
-        label: payment.buyer,
-        detail: `${payment.unitId} | ${payment.mode}`,
-        path: '/admin/payments',
       })),
     ]
 
     return records
       .filter((record) => `${record.type} ${record.label} ${record.detail}`.toLowerCase().includes(term))
       .slice(0, 6)
-  }, [clientSearchRows, globalSearch])
-  const notificationItems = auditLogsV2.slice(0, 5)
+  }, [clientSearchRows, globalSearch, listingSearchRows])
+  const notificationItems = auditLogsQuery.data?.data ?? []
 
   function handleNavigate(page: AdminPageKey) {
     navigate(routeByKey[page])
     setIsMobileOpen(false)
   }
 
-  function handleLogout() {
-    localStorage.removeItem('dcprime_role')
-    localStorage.removeItem('dcprime_name')
-    localStorage.removeItem('dcprime_token')
-    window.location.reload()
+  async function handleLogout() {
+    await logout()
+    navigate('/login', { replace: true })
   }
 
   function openGlobalResult(path: string) {
@@ -92,17 +119,38 @@ function AdminLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F7F4] text-[#111827]">
+    <div
+      className="min-h-screen bg-[#F8F7F4] text-[#111827]"
+      style={
+        {
+          '--role-primary': theme.primary,
+          '--role-primary-light': theme.light,
+        } as CSSProperties
+      }
+      data-role={currentRole}
+    >
       <div className="flex min-h-screen">
         <aside className="hidden w-[260px] shrink-0 border-r border-[#0F1020] bg-[#1A1A2E] text-[#E8E8F0] shadow-xl lg:flex lg:flex-col">
-          <SidebarContent activePage={activePage} onNavigate={handleNavigate} />
+          <SidebarContent
+            activePage={activePage}
+            navGroups={visibleNavGroups}
+            clientCount={clientSearchRows.length}
+            listingCount={listingSearchRows.length}
+            onNavigate={handleNavigate}
+          />
         </aside>
 
         {isMobileOpen && (
           <div className="fixed inset-0 z-40 lg:hidden">
             <button className="absolute inset-0 bg-black/35 backdrop-blur-[1px]" onClick={() => setIsMobileOpen(false)} aria-label="Close menu" />
             <aside className="relative z-10 h-full w-[280px] border-r border-[#0F1020] bg-[#1A1A2E] shadow-2xl">
-              <SidebarContent activePage={activePage} onNavigate={handleNavigate} />
+              <SidebarContent
+                activePage={activePage}
+                navGroups={visibleNavGroups}
+                clientCount={clientSearchRows.length}
+                listingCount={listingSearchRows.length}
+                onNavigate={handleNavigate}
+              />
             </aside>
           </div>
         )}
@@ -119,14 +167,14 @@ function AdminLayout() {
                   <Menu className="h-5 w-5" />
                 </button>
                 <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#C9A84C]">{company.name}</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--role-primary)]">{company.name}</p>
                   <h2 className="mt-0.5 truncate font-serif text-2xl text-[#1A1A2E]">{activeLabel}</h2>
                 </div>
               </div>
               <div className="flex flex-1 items-center justify-end gap-2 sm:flex-none">
                 <div className="relative hidden md:block">
                   <label className="flex h-10 min-w-[260px] items-center gap-2 rounded-lg border border-[#E8E4DC] bg-[#F8F7F4] px-3 text-sm text-[#6B7280]">
-                    <Search className="h-4 w-4 text-[#C9A84C]" />
+                    <Search className="h-4 w-4 text-[var(--role-primary)]" />
                     <input
                       value={globalSearch}
                       onChange={(event) => setGlobalSearch(event.target.value)}
@@ -146,7 +194,7 @@ function AdminLayout() {
                             onClick={() => openGlobalResult(result.path)}
                             className="block w-full border-b border-[#F0EDE8] px-4 py-3 text-left last:border-b-0 hover:bg-[#FAF8F5]"
                           >
-                            <span className="text-[11px] font-bold uppercase tracking-widest text-[#C9A84C]">{result.type}</span>
+                            <span className="text-[11px] font-bold uppercase tracking-widest text-[var(--role-primary)]">{result.type}</span>
                             <span className="mt-1 block text-sm font-semibold text-[#1A1A2E]">{result.label}</span>
                             <span className="mt-0.5 block text-xs text-[#6B7280]">{result.detail}</span>
                           </button>
@@ -178,14 +226,14 @@ function AdminLayout() {
                         <button
                           key={item.id}
                           onClick={() => {
-                            navigate('/admin/settings')
+                            navigate('/admin/audit-logs')
                             setIsNotificationsOpen(false)
                           }}
                           className="block w-full border-b border-[#F0EDE8] px-4 py-3 text-left last:border-b-0 hover:bg-[#FAF8F5]"
                         >
                           <span className="text-sm font-semibold text-[#111827]">{item.action}</span>
-                          <span className="mt-0.5 block text-xs text-[#6B7280]">{item.details}</span>
-                          <span className="mt-1 block text-[11px] text-[#9CA3AF]">{item.timestamp}</span>
+                          <span className="mt-0.5 block text-xs text-[#6B7280]">{item.module_name ?? item.entity_table ?? 'System activity'}</span>
+                          <span className="mt-1 block text-[11px] text-[#9CA3AF]">{item.created_at ?? ''}</span>
                         </button>
                       ))}
                     </div>
@@ -193,9 +241,14 @@ function AdminLayout() {
                 </div>
                 <div className="hidden text-right sm:block">
                   <p className="text-sm font-semibold text-[#1A1A2E]">{adminName}</p>
-                  <p className="text-[11px] uppercase tracking-widest text-[#9CA3AF]">Administrator</p>
+                  <p className="text-[11px] uppercase tracking-widest text-[#9CA3AF]">{theme.label}</p>
                 </div>
-                <button onClick={handleLogout} className="grid h-10 w-10 place-items-center rounded-lg border border-[#C9A84C]/40 bg-white text-[#9A7A22] shadow-sm hover:bg-[#FFF8E1]" aria-label="Logout">
+                <button
+                  onClick={handleLogout}
+                  className="grid h-10 w-10 place-items-center rounded-lg border bg-white text-[var(--role-primary)] shadow-sm hover:bg-[var(--role-primary-light)]"
+                  style={{ borderColor: `${theme.primary}66` }}
+                  aria-label="Logout"
+                >
                   <LogOut className="h-4 w-4" />
                 </button>
               </div>
@@ -211,20 +264,30 @@ function AdminLayout() {
   )
 }
 
-function SidebarContent({ activePage, onNavigate }: { activePage: AdminPageKey; onNavigate: (page: AdminPageKey) => void }) {
-  const peopleCount = agentRecords.length + brokerRecords.length + employeeRecords.length
-  const clientCount = readMockStorage(mockStorageKeys.clients, mockDbClients).length
+function SidebarContent({
+  activePage,
+  navGroups,
+  clientCount,
+  listingCount,
+  onNavigate,
+}: {
+  activePage: AdminPageKey
+  navGroups: AdminNavGroup[]
+  clientCount: number
+  listingCount: number
+  onNavigate: (page: AdminPageKey) => void
+}) {
   const navCountByKey: Partial<Record<AdminPageKey, number>> = {
     clients: clientCount,
-    people: peopleCount,
+    listings: listingCount,
   }
 
   return (
     <>
       <div className="border-b border-white/10 p-5">
-        <div className="mb-4 h-1 w-20 rounded-full bg-gradient-to-r from-[#C9A84C] to-[#F2D77E]" />
+        <div className="mb-4 h-1 w-20 rounded-full bg-[var(--role-primary)]" />
         <div className="flex items-center gap-3">
-          <div className="grid h-10 w-10 place-items-center rounded-lg bg-[#C9A84C] text-xs font-black text-[#1A1A2E] shadow-lg shadow-black/20">DC</div>
+          <div className="grid h-10 w-10 place-items-center rounded-lg bg-[var(--role-primary)] text-xs font-black text-white shadow-lg shadow-black/20">DC</div>
           <div>
             <p className="font-serif text-lg leading-tight text-white">D&C Prime</p>
             <p className="text-xs text-white/45">Realty Admin</p>
@@ -232,9 +295,9 @@ function SidebarContent({ activePage, onNavigate }: { activePage: AdminPageKey; 
         </div>
       </div>
       <nav className="flex-1 space-y-4 overflow-y-auto px-3 pb-5 pt-4">
-        {adminNavGroups.map((group) => (
+        {navGroups.map((group) => (
           <div key={group.title} className="border-b border-white/10 pb-3 last:border-b-0">
-            <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[#C9A84C]/50">{group.title}</p>
+            <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.18em] text-white/45">{group.title}</p>
             <div className="space-y-1">
               {group.items.map((item) => (
                 <button
@@ -242,9 +305,10 @@ function SidebarContent({ activePage, onNavigate }: { activePage: AdminPageKey; 
                   onClick={() => onNavigate(item.key)}
                   className={`group flex w-full items-center gap-3 rounded-r-lg border-l-2 px-3 py-2.5 text-left text-[13px] font-semibold transition ${
                     activePage === item.key
-                      ? 'border-[#C9A84C] bg-[#C9A84C]/10 text-[#C9A84C]'
+                      ? 'bg-white/10 text-white'
                       : 'border-transparent text-white/70 hover:bg-white/10 hover:text-white'
                   }`}
+                  style={activePage === item.key ? { borderColor: 'var(--role-primary)' } : undefined}
                 >
                   <NavIcon name={item.icon} />
                   <span>{item.label}</span>

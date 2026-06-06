@@ -1,9 +1,10 @@
 /* eslint-disable react-refresh/only-export-components */
 import { lazy } from 'react'
 import type { ReactNode } from 'react'
-import type { FeatureKey, Role } from '../data/mockData'
+import type { FeatureKey, Role } from '../types'
 
 const AuditLogsPage = lazy(() => import('../pages/admin/AuditLogsPage'))
+const AttendancePage = lazy(() => import('../pages/admin/AttendancePage'))
 const BalancesPage = lazy(() => import('../pages/admin/BalancesPage'))
 const ClientDetailPage = lazy(() => import('../pages/admin/ClientDetailPage'))
 const ClientsPage = lazy(() => import('../pages/admin/ClientsPage'))
@@ -30,6 +31,7 @@ export type AdminPageKey =
   | 'reservations'
   | 'clients'
   | 'people'
+  | 'attendance'
   | 'payments'
   | 'commissions'
   | 'documents'
@@ -63,29 +65,36 @@ export type AdminNavGroup = {
   items: AdminNavItem[]
 }
 
-const adminOnly: Role[] = ['admin']
+const adminOnly: Role[] = ['owner', 'admin']
+const staffRoles: Role[] = ['owner', 'admin', 'manager', 'treasury', 'broker', 'agent']
+const managementRoles: Role[] = ['owner', 'admin', 'manager']
+const salesRoles: Role[] = ['owner', 'admin', 'manager', 'broker', 'agent']
+const financeRoles: Role[] = ['owner', 'admin', 'manager', 'treasury', 'broker', 'agent']
+const documentRoles: Role[] = ['owner', 'admin', 'manager', 'treasury', 'broker', 'agent']
+const attendanceRoles: Role[] = ['owner', 'admin', 'manager', 'treasury']
 
 export const adminRoutes: AdminRoute[] = [
-  { path: 'dashboard', label: 'Dashboard', element: <DashboardPage />, feature: 'dashboard', allowedRoles: adminOnly, activeKey: 'dashboard' },
-  { path: 'projects', label: 'Projects', element: <ProjectsPage />, feature: 'projects', allowedRoles: adminOnly, activeKey: 'projects' },
-  { path: 'listings', label: 'Listings', element: <ListingsPage />, feature: 'listings', allowedRoles: adminOnly, activeKey: 'listings' },
-  { path: 'reservations', label: 'Reservations', element: <ReservationsPage />, feature: 'reservations', allowedRoles: adminOnly, activeKey: 'reservations' },
-  { path: 'clients', label: 'Clients', element: <ClientsPage />, feature: 'clients_manage', allowedRoles: adminOnly, activeKey: 'clients' },
-  { path: 'clients/new', label: 'New Client', element: <ClientDetailPage mode="new" />, feature: 'clients_manage', allowedRoles: adminOnly, activeKey: 'clients' },
-  { path: 'clients/:clientId/edit', label: 'Edit Client', element: <ClientDetailPage mode="edit" />, feature: 'clients_manage', allowedRoles: adminOnly, activeKey: 'clients' },
-  { path: 'clients/:clientId', label: 'Client Profile', element: <ClientDetailPage />, feature: 'clients_view', allowedRoles: adminOnly, activeKey: 'clients' },
+  { path: 'dashboard', label: 'Dashboard', element: <DashboardPage />, feature: 'dashboard', allowedRoles: staffRoles, activeKey: 'dashboard' },
+  { path: 'projects', label: 'Projects', element: <ProjectsPage />, feature: 'projects', allowedRoles: managementRoles, activeKey: 'projects' },
+  { path: 'listings', label: 'Listings', element: <ListingsPage />, feature: 'listings', allowedRoles: salesRoles, activeKey: 'listings' },
+  { path: 'reservations', label: 'Reservations', element: <ReservationsPage />, feature: 'reservations', allowedRoles: salesRoles, activeKey: 'reservations' },
+  { path: 'clients', label: 'Clients', element: <ClientsPage />, feature: 'clients_manage', allowedRoles: managementRoles, activeKey: 'clients' },
+  { path: 'clients/new', label: 'New Client', element: <ClientDetailPage mode="new" />, feature: 'clients_manage', allowedRoles: managementRoles, activeKey: 'clients' },
+  { path: 'clients/:clientId/edit', label: 'Edit Client', element: <ClientDetailPage mode="edit" />, feature: 'clients_manage', allowedRoles: managementRoles, activeKey: 'clients' },
+  { path: 'clients/:clientId', label: 'Client Profile', element: <ClientDetailPage />, feature: 'clients_view', allowedRoles: financeRoles, activeKey: 'clients' },
   { path: 'people', label: 'People', element: <PeoplePage />, feature: 'clients_manage', allowedRoles: adminOnly, activeKey: 'people' },
-  { path: 'payments', label: 'Payments', element: <PaymentsPage />, feature: 'payments_view', allowedRoles: adminOnly, activeKey: 'payments' },
-  { path: 'payments/due', label: 'Due Payments', element: <PaymentsPage initialTab="due" />, feature: 'payments_view', allowedRoles: adminOnly, activeKey: 'payments' },
-  { path: 'payments/overdue', label: 'Overdue Accounts', element: <PaymentsPage initialTab="overdue" />, feature: 'payments_view', allowedRoles: adminOnly, activeKey: 'payments' },
-  { path: 'payments/soa/:clientId', label: 'Statement Of Account', element: <SoaPage />, feature: 'soa_view', allowedRoles: adminOnly, activeKey: 'payments' },
-  { path: 'commissions', label: 'Commissions', element: <CommissionsPage />, feature: 'commissions_view', allowedRoles: adminOnly, activeKey: 'commissions' },
-  { path: 'documents', label: 'Documents', element: <DocumentsPage />, feature: 'documents_view', allowedRoles: adminOnly, activeKey: 'documents' },
-  { path: 'reports', label: 'Reports', element: <ReportsPage />, feature: 'reports_view', allowedRoles: adminOnly, activeKey: 'reports' },
+  { path: 'attendance', label: 'Attendance', element: <AttendancePage />, feature: 'attendance', allowedRoles: attendanceRoles, activeKey: 'attendance' },
+  { path: 'payments', label: 'Payments', element: <PaymentsPage />, feature: 'payments_view', allowedRoles: financeRoles, activeKey: 'payments' },
+  { path: 'payments/due', label: 'Due Payments', element: <PaymentsPage initialTab="due" />, feature: 'payments_view', allowedRoles: financeRoles, activeKey: 'payments' },
+  { path: 'payments/overdue', label: 'Overdue Accounts', element: <PaymentsPage initialTab="overdue" />, feature: 'payments_view', allowedRoles: financeRoles, activeKey: 'payments' },
+  { path: 'payments/soa/:clientId', label: 'Statement Of Account', element: <SoaPage />, feature: 'soa_view', allowedRoles: financeRoles, activeKey: 'payments' },
+  { path: 'commissions', label: 'Commissions', element: <CommissionsPage />, feature: 'commissions_view', allowedRoles: financeRoles, activeKey: 'commissions' },
+  { path: 'documents', label: 'Documents', element: <DocumentsPage />, feature: 'documents_view', allowedRoles: documentRoles, activeKey: 'documents' },
+  { path: 'reports', label: 'Reports', element: <ReportsPage />, feature: 'reports_view', allowedRoles: ['owner', 'admin', 'manager', 'treasury'], activeKey: 'reports' },
   { path: 'audit-logs', label: 'Audit Logs', element: <AuditLogsPage />, feature: 'audit_logs_view', allowedRoles: adminOnly, activeKey: 'auditLogs' },
-  { path: 'records/clients', label: 'View Clients', element: <ViewClientsPage />, feature: 'clients_view', allowedRoles: adminOnly, activeKey: 'viewClients' },
-  { path: 'records/balances', label: 'Balances', element: <BalancesPage />, feature: 'payments_view', allowedRoles: adminOnly, activeKey: 'balances' },
-  { path: 'records/reports', label: 'Reports', element: <ReportsPage />, feature: 'reports_view', allowedRoles: adminOnly, activeKey: 'reports' },
+  { path: 'records/clients', label: 'View Clients', element: <ViewClientsPage />, feature: 'clients_view', allowedRoles: financeRoles, activeKey: 'viewClients' },
+  { path: 'records/balances', label: 'Balances', element: <BalancesPage />, feature: 'balances_view', allowedRoles: financeRoles, activeKey: 'balances' },
+  { path: 'records/reports', label: 'Reports', element: <ReportsPage />, feature: 'reports_view', allowedRoles: ['owner', 'admin', 'manager', 'treasury'], activeKey: 'reports' },
   { path: 'users', label: 'User Management', element: <UserManagementPage />, feature: 'user_management', allowedRoles: adminOnly, activeKey: 'users' },
   { path: 'settings', label: 'Settings', element: <SettingsPage />, feature: 'settings', allowedRoles: adminOnly, activeKey: 'settings' },
   { path: 'settings/lookups', label: 'Lookup Tables', element: <LookupsPage />, feature: 'lookups', allowedRoles: adminOnly, activeKey: 'lookups' },
@@ -107,7 +116,10 @@ export const adminNavGroups: AdminNavGroup[] = [
   },
   {
     title: 'People',
-    items: [navItem('people', 'People', 'userGroup', 'clients_manage')],
+    items: [
+      navItem('people', 'People', 'userGroup', 'clients_manage', adminOnly),
+      navItem('attendance', 'Attendance', 'clock', 'attendance', attendanceRoles),
+    ],
   },
   {
     title: 'Finance',
@@ -128,6 +140,7 @@ export const adminNavGroups: AdminNavGroup[] = [
     title: 'Admin',
     items: [
       navItem('users', 'User management', 'userCog', 'user_management'),
+      navItem('auditLogs', 'Audit logs', 'chart', 'audit_logs_view', adminOnly),
       navItem('settings', 'Settings', 'settings', 'settings'),
       navItem('lookups', 'Lookup tables', 'settings', 'lookups'),
     ],

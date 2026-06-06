@@ -1,357 +1,230 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
+import type { FormEvent } from 'react'
 import Badge from '../../components/admin/Badge'
-import ConfirmModal from '../../components/admin/ConfirmModal'
 import DataTable from '../../components/admin/DataTable'
 import FilterBar from '../../components/admin/FilterBar'
+import FormField from '../../components/admin/FormField'
+import Modal from '../../components/admin/Modal'
 import Panel from '../../components/admin/Panel'
+import StatCard from '../../components/admin/StatCard'
 import { useToast } from '../../components/admin/Toast'
-import { formatCurrency } from '../../components/admin/formatters'
-import {
-  createMockDbAuditLog,
-  getListingStatusId,
-  getNextMockId,
-  mockStorageKeys,
-  mockDbAuditLogs,
-  mockDbClients,
-  mockDbClientUnitDocuments,
-  mockDbClientUnitSellers,
-  mockDbClientUnits,
-  mockDbCommissionPlans,
-  mockDbListings,
-  mockDbPaymentSchedules,
-  mockDbProjectDocuments,
-  mockDbProjects,
-  mockDbReservations,
-  mockDbUsers,
-  readMockStorage,
-  writeMockStorage,
-} from '../../data/adminMockData'
-import type {
-  MockDbAuditLog,
-  MockDbClient,
-  MockDbClientUnit,
-  MockDbClientUnitDocument,
-  MockDbClientUnitSeller,
-  MockDbListing,
-  MockDbPaymentSchedule,
-  MockDbReservation,
-  MockDbReservationStatus,
-} from '../../data/adminMockData'
+import { formatCurrency, formatDate } from '../../components/admin/formatters'
+import ErrorState from '../../components/shared/ErrorState'
+import LoadingSkeleton from '../../components/shared/LoadingSkeleton'
+import { useCreateReservation, useReservations, useUpdateReservation, useUsers } from '../../hooks/useAdminResources'
+import type { ReservationPayload, ReservationRecord } from '../../hooks/useAdminResources'
+import { useClients } from '../../hooks/useClients'
+import { useListings } from '../../hooks/useListings'
+import { useProjects } from '../../hooks/useProjects'
 
-type ConfirmAction = 'confirm' | 'convert' | 'cancel'
+type EditorState = ReservationRecord | 'new' | null
 
-const statuses: Array<'all' | MockDbReservationStatus> = ['all', 'pending', 'confirmed', 'converted', 'expired', 'cancelled']
-
-function timestamp() {
-  return new Date().toISOString().slice(0, 19).replace('T', ' ')
-}
-
-function titleCase(value: string) {
-  return value.replace(/_/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase())
-}
+const reservationStatuses = ['pending', 'confirmed', 'converted', 'cancelled', 'expired']
 
 function ReservationsPage() {
   const toast = useToast()
-  const [reservations, setReservations] = useState<MockDbReservation[]>(() => readMockStorage(mockStorageKeys.reservations, mockDbReservations))
-  const [listings, setListings] = useState<MockDbListing[]>(() => readMockStorage(mockStorageKeys.listings, mockDbListings))
-  const [clients, setClients] = useState<MockDbClient[]>(() => readMockStorage(mockStorageKeys.clients, mockDbClients))
-  const [clientUnits, setClientUnits] = useState<MockDbClientUnit[]>(() => readMockStorage(mockStorageKeys.clientUnits, mockDbClientUnits))
-  const [clientUnitSellers, setClientUnitSellers] = useState<MockDbClientUnitSeller[]>(() => readMockStorage(mockStorageKeys.clientUnitSellers, mockDbClientUnitSellers))
-  const [clientUnitDocuments, setClientUnitDocuments] = useState<MockDbClientUnitDocument[]>(() =>
-    readMockStorage(mockStorageKeys.clientUnitDocuments, mockDbClientUnitDocuments),
-  )
-  const [paymentSchedules, setPaymentSchedules] = useState<MockDbPaymentSchedule[]>(() => readMockStorage(mockStorageKeys.paymentSchedules, mockDbPaymentSchedules))
-  const [auditLogs, setAuditLogs] = useState<MockDbAuditLog[]>(() => readMockStorage(mockStorageKeys.auditLogs, mockDbAuditLogs))
+  const reservationsQuery = useReservations()
+  const clientsQuery = useClients()
+  const listingsQuery = useListings()
+  const projectsQuery = useProjects()
+  const usersQuery = useUsers()
+  const createReservation = useCreateReservation()
+  const updateReservation = useUpdateReservation()
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
-  const [projectFilter, setProjectFilter] = useState('all')
-  const [confirmState, setConfirmState] = useState<{ action: ConfirmAction; reservation: MockDbReservation } | null>(null)
+  const [editor, setEditor] = useState<EditorState>(null)
 
-  const listingById = useMemo(() => new Map(listings.map((listing) => [listing.id, listing])), [listings])
+  const reservations = reservationsQuery.data?.data ?? []
+  const clients = clientsQuery.data?.data ?? []
+  const listings = listingsQuery.data?.data ?? []
+  const projects = projectsQuery.data?.data ?? []
+  const users = usersQuery.data?.data ?? []
   const clientById = useMemo(() => new Map(clients.map((client) => [client.id, client])), [clients])
-  const projectById = useMemo(() => new Map(mockDbProjects.map((project) => [project.id, project])), [])
+  const listingById = useMemo(() => new Map(listings.map((listing) => [listing.id, listing])), [listings])
+  const projectById = useMemo(() => new Map(projects.map((project) => [project.id, project])), [projects])
+  const userById = useMemo(() => new Map(users.map((user) => [user.id, user])), [users])
 
-  useEffect(() => {
-    writeMockStorage(mockStorageKeys.reservations, reservations)
-  }, [reservations])
-
-  useEffect(() => {
-    writeMockStorage(mockStorageKeys.listings, listings)
-  }, [listings])
-
-  useEffect(() => {
-    writeMockStorage(mockStorageKeys.clients, clients)
-  }, [clients])
-
-  useEffect(() => {
-    writeMockStorage(mockStorageKeys.clientUnits, clientUnits)
-  }, [clientUnits])
-
-  useEffect(() => {
-    writeMockStorage(mockStorageKeys.clientUnitSellers, clientUnitSellers)
-  }, [clientUnitSellers])
-
-  useEffect(() => {
-    writeMockStorage(mockStorageKeys.clientUnitDocuments, clientUnitDocuments)
-  }, [clientUnitDocuments])
-
-  useEffect(() => {
-    writeMockStorage(mockStorageKeys.paymentSchedules, paymentSchedules)
-  }, [paymentSchedules])
-
-  useEffect(() => {
-    writeMockStorage(mockStorageKeys.auditLogs, auditLogs)
-  }, [auditLogs])
-
-  const filteredReservations = useMemo(() => {
+  const visibleReservations = useMemo(() => {
     const term = search.trim().toLowerCase()
     return reservations.filter((reservation) => {
-      const listing = listingById.get(reservation.listing_id)
-      const client = clientById.get(reservation.client_id)
       if (statusFilter !== 'all' && reservation.status !== statusFilter) return false
-      if (projectFilter !== 'all' && listing?.project_id !== Number(projectFilter)) return false
       if (!term) return true
-      return `${client?.buyer_name ?? ''} ${listing?.unit_id ?? ''} ${projectById.get(listing?.project_id ?? 0)?.name ?? ''}`.toLowerCase().includes(term)
+      const client = clientById.get(reservation.client_id)
+      const listing = listingById.get(reservation.listing_id)
+      const project = listing ? projectById.get(listing.project_id) : null
+      return `${client?.buyer_name ?? ''} ${listing?.unit_id ?? ''} ${project?.name ?? ''}`.toLowerCase().includes(term)
     })
-  }, [clientById, listingById, projectById, projectFilter, reservations, search, statusFilter])
+  }, [clientById, listingById, projectById, reservations, search, statusFilter])
 
-  function log(action: string, moduleName: string, description: string) {
-    setAuditLogs((current) => [createMockDbAuditLog(action, moduleName, description, getNextMockId(current)), ...current])
-  }
+  const totals = useMemo(() => {
+    const active = reservations.filter((reservation) => ['pending', 'confirmed'].includes(reservation.status)).length
+    const converted = reservations.filter((reservation) => reservation.status === 'converted').length
+    const fees = reservations.reduce((total, reservation) => total + Number(reservation.reservation_fee || 0), 0)
+    return { active, converted, fees }
+  }, [reservations])
 
-  function confirmReservation(reservation: MockDbReservation) {
-    setReservations((current) =>
-      current.map((item) =>
-        item.id === reservation.id ? { ...item, status: 'confirmed', updated_at: timestamp() } : item,
-      ),
-    )
-    log('Confirm reservation', 'Reservations', `Reservation #${reservation.id} confirmed.`)
-    toast.success('Reservation confirmed')
-  }
-
-  function cancelReservation(reservation: MockDbReservation) {
-    setReservations((current) =>
-      current.map((item) =>
-        item.id === reservation.id ? { ...item, status: 'cancelled', updated_at: timestamp() } : item,
-      ),
-    )
-    setListings((current) =>
-      current.map((listing) =>
-        listing.id === reservation.listing_id
-          ? { ...listing, status: getListingStatusId('available'), updated_at: timestamp() }
-          : listing,
-      ),
-    )
-    log('Cancel reservation', 'Reservations', `Reservation #${reservation.id} cancelled.`)
-    toast.success('Reservation cancelled')
-  }
-
-  function convertReservation(reservation: MockDbReservation) {
-    const listing = listingById.get(reservation.listing_id)
-    const client = clientById.get(reservation.client_id)
-    if (!listing || !client) return
-
-    const plan = mockDbCommissionPlans.find((item) => item.project_id === listing.project_id) ?? mockDbCommissionPlans[0]
-    const newClientUnitId = getNextMockId(clientUnits)
-    const totalContractPrice = listing.total_contract_price ?? listing.net_selling_price ?? 0
-    const contractPrice = listing.net_selling_price ?? totalContractPrice
-    const legalMiscFee = listing.legal_misc_fee ?? Math.max(totalContractPrice - contractPrice, 0)
-    const paymentTermsMonths = 60
-    const manager = mockDbUsers.find((user) => user.role === 'manager')
-    const newClientUnit: MockDbClientUnit = {
-      id: newClientUnitId,
-      client_id: reservation.client_id,
-      listing_id: reservation.listing_id,
-      reservation_id: reservation.id,
-      assigned_agent_id: reservation.reserved_by,
-      assigned_manager_id: manager?.id ?? null,
-      reservation_date: reservation.reservation_date,
-      contract_date: new Date().toISOString().slice(0, 10),
-      mode_of_payment: 'installment',
-      contract_price: contractPrice,
-      legal_misc_fee: legalMiscFee,
-      total_contract_price: totalContractPrice,
-      payment_terms_months: paymentTermsMonths,
-      monthly_amortization: paymentTermsMonths > 0 ? Math.max(0, totalContractPrice - reservation.reservation_fee) / paymentTermsMonths : null,
-      due_day: 15,
-      document_status: 'incomplete',
-      account_status: 'active',
-      payment_status: reservation.reservation_fee >= totalContractPrice ? 'complete_paid' : 'partially_paid',
-      sales_status: 'good_sale',
-      remarks: `Converted from reservation #${reservation.id} with plan ${plan.name}.`,
-      created_at: timestamp(),
-      updated_at: timestamp(),
+  async function saveReservation(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    const formData = new FormData(event.currentTarget)
+    const payload: ReservationPayload = {
+      client_id: Number(formData.get('client_id')),
+      listing_id: Number(formData.get('listing_id')),
+      reserved_by: Number(formData.get('reserved_by')),
+      reservation_fee: Number(formData.get('reservation_fee')) || 0,
+      reservation_date: normalizeDateTime(clean(formData.get('reservation_date'))) ?? new Date().toISOString().slice(0, 19).replace('T', ' '),
+      expires_at: normalizeDateTime(clean(formData.get('expires_at'))),
+      status: String(formData.get('status')) as ReservationRecord['status'],
+      remarks: clean(formData.get('remarks')),
     }
 
-    const broker = mockDbUsers.find((user) => user.role === 'broker')
-    const nextSellerId = getNextMockId(clientUnitSellers)
-    const sellerRows: MockDbClientUnitSeller[] = [
-      { id: nextSellerId, client_unit_id: newClientUnitId, user_id: reservation.reserved_by, role: 'agent', assigned_at: timestamp() },
-      { id: nextSellerId + 1, client_unit_id: newClientUnitId, user_id: broker?.id ?? reservation.reserved_by, role: 'broker', assigned_at: timestamp() },
-      { id: nextSellerId + 2, client_unit_id: newClientUnitId, user_id: manager?.id ?? reservation.reserved_by, role: 'manager', assigned_at: timestamp() },
-    ]
+    if (!payload.client_id || !payload.listing_id || !payload.reserved_by) {
+      toast.error('Client, listing, and reserved-by user are required.')
+      return
+    }
 
-    const projectDocuments = mockDbProjectDocuments.filter((document) => document.project_id === listing.project_id)
-    const nextDocumentId = getNextMockId(clientUnitDocuments)
-    const documentRows: MockDbClientUnitDocument[] = projectDocuments.map((projectDocument, index) => ({
-      id: nextDocumentId + index,
-      client_unit_id: newClientUnitId,
-      document_id: projectDocument.document_id,
-      file_url: null,
-      status: 'not_submitted',
-      reviewed_by: null,
-      reviewed_at: null,
-      created_at: timestamp(),
-      updated_at: timestamp(),
-    }))
-    const nextScheduleId = getNextMockId(paymentSchedules)
-    const scheduleRows: MockDbPaymentSchedule[] = [
-      {
-        id: nextScheduleId,
-        client_unit_id: newClientUnitId,
-        due_date: reservation.reservation_date,
-        description: 'Reservation Fee',
-        due_amount: reservation.reservation_fee,
-        penalty: 0,
-        status: 'paid',
-        created_at: timestamp(),
-        updated_at: timestamp(),
-      },
-      {
-        id: nextScheduleId + 1,
-        client_unit_id: newClientUnitId,
-        due_date: new Date().toISOString().slice(0, 10),
-        description: 'Downpayment',
-        due_amount: Math.max(totalContractPrice * 0.2 - reservation.reservation_fee, 0),
-        penalty: 0,
-        status: 'unpaid',
-        created_at: timestamp(),
-        updated_at: timestamp(),
-      },
-    ]
-
-    setClientUnits((current) => [newClientUnit, ...current])
-    setClientUnitSellers((current) => [...sellerRows, ...current])
-    setClientUnitDocuments((current) => [...documentRows, ...current])
-    setPaymentSchedules((current) => [...scheduleRows, ...current])
-    setReservations((current) =>
-      current.map((item) =>
-        item.id === reservation.id
-          ? { ...item, status: 'converted', converted_to_client_unit_id: newClientUnitId, updated_at: timestamp() }
-          : item,
-      ),
-    )
-    setListings((current) =>
-      current.map((item) =>
-        item.id === listing.id
-          ? { ...item, status: getListingStatusId('sold'), updated_at: timestamp() }
-          : item,
-      ),
-    )
-    setClients((current) => current.map((item) => (item.id === client.id ? { ...item, updated_at: timestamp() } : item)))
-    log('Convert reservation', 'Reservations', `Contract created for ${client.buyer_name}.`)
-    toast.success(`Contract created for ${client.buyer_name}`)
+    try {
+      if (editor === 'new') {
+        await createReservation.mutateAsync(payload)
+      } else if (editor) {
+        await updateReservation.mutateAsync({ id: editor.id, ...payload })
+      }
+      toast.success('Reservation saved.')
+      setEditor(null)
+    } catch {
+      toast.error('Reservation could not be saved.')
+    }
   }
 
-  function runConfirmAction() {
-    if (!confirmState) return
-    if (confirmState.action === 'confirm') confirmReservation(confirmState.reservation)
-    if (confirmState.action === 'convert') convertReservation(confirmState.reservation)
-    if (confirmState.action === 'cancel') cancelReservation(confirmState.reservation)
-    setConfirmState(null)
-  }
+  const isLoading = reservationsQuery.isLoading || clientsQuery.isLoading || listingsQuery.isLoading || projectsQuery.isLoading || usersQuery.isLoading
+  const isError = reservationsQuery.isError || clientsQuery.isError || listingsQuery.isError || projectsQuery.isError || usersQuery.isError
+
+  if (isLoading) return <LoadingSkeleton rows={8} />
+  if (isError) return <ErrorState message="Reservations could not be loaded from MySQL." onRetry={() => window.location.reload()} />
 
   return (
-    <Panel title="Reservations" subtitle="Manage reservations before contract conversion">
-      <div className="space-y-4">
-        <div className="grid gap-3 lg:grid-cols-[1fr_auto] lg:items-start">
-          <FilterBar
-            search={search}
-            onSearchChange={setSearch}
-            placeholder="Search client, unit, or project..."
-            tabs={statuses.map((status) => ({
-              label: status === 'all' ? 'All' : titleCase(status),
-              value: status,
-              count: status === 'all' ? reservations.length : reservations.filter((reservation) => reservation.status === status).length,
-            }))}
-            activeTab={statusFilter}
-            onTabChange={setStatusFilter}
-            onReset={() => {
-              setSearch('')
-              setStatusFilter('all')
-              setProjectFilter('all')
-            }}
-          />
-          <select value={projectFilter} onChange={(event) => setProjectFilter(event.target.value)} className="rounded-lg border border-[#E8E4DC] bg-white px-3 py-2.5 text-sm text-[#111827] outline-none focus:border-[#C9A84C]">
-            <option value="all">All Projects</option>
-            {mockDbProjects.map((project) => (
-              <option key={project.id} value={project.id}>{project.name}</option>
-            ))}
-          </select>
-        </div>
+    <div className="space-y-6">
+      <div className="grid gap-4 md:grid-cols-3">
+        <StatCard label="Active Reservations" value={totals.active.toString()} note="Pending and confirmed" />
+        <StatCard label="Converted" value={totals.converted.toString()} note="Moved into client accounts" />
+        <StatCard label="Reservation Fees" value={formatCurrency(totals.fees)} note="Recorded reservation amount" />
+      </div>
+
+      <Panel
+        title="Reservations"
+        subtitle="Editable reservation workflow records stored in MySQL"
+        actions={<button onClick={() => setEditor('new')} className="rounded-lg bg-[#1A1A2E] px-4 py-2 text-sm font-bold text-white">Add Reservation</button>}
+      >
+        <FilterBar
+          search={search}
+          onSearchChange={setSearch}
+          placeholder="Search client, unit, or project..."
+          tabs={[{ label: 'All', value: 'all', count: reservations.length }, ...reservationStatuses.map((status) => ({ label: titleCase(status), value: status, count: reservations.filter((reservation) => reservation.status === status).length }))]}
+          activeTab={statusFilter}
+          onTabChange={setStatusFilter}
+          onReset={() => {
+            setSearch('')
+            setStatusFilter('all')
+          }}
+        />
 
         <DataTable
           searchable={false}
-          headers={['Client Name', 'Unit ID', 'Project', 'Reserved By', 'Reservation Date', 'Expiry Date', 'Reservation Fee', 'Status', 'Actions']}
-          rows={filteredReservations.map((reservation) => {
+          headers={['Client', 'Unit', 'Project', 'Reserved By', 'Date', 'Fee', 'Status', 'Actions']}
+          rows={visibleReservations.map((reservation) => {
             const listing = listingById.get(reservation.listing_id)
-            const client = clientById.get(reservation.client_id)
-            const project = projectById.get(listing?.project_id ?? 0)
-            const reservedBy = mockDbUsers.find((user) => user.id === reservation.reserved_by)
             return [
-              client?.buyer_name ?? `Client #${reservation.client_id}`,
+              clientById.get(reservation.client_id)?.buyer_name ?? `Client #${reservation.client_id}`,
               listing?.unit_id ?? `Listing #${reservation.listing_id}`,
-              project?.name ?? 'Unassigned',
-              reservedBy?.full_name ?? 'Unknown',
-              reservation.reservation_date,
-              reservation.expires_at ?? '-',
-              formatCurrency(reservation.reservation_fee),
+              listing ? projectById.get(listing.project_id)?.name ?? '-' : '-',
+              userById.get(reservation.reserved_by)?.full_name ?? `User #${reservation.reserved_by}`,
+              reservation.reservation_date ? formatDate(reservation.reservation_date) : '-',
+              formatCurrency(Number(reservation.reservation_fee || 0)),
               <Badge key={`${reservation.id}-status`}>{titleCase(reservation.status)}</Badge>,
-              <div key={`${reservation.id}-actions`} className="flex flex-wrap gap-2">
-                {reservation.status === 'pending' && (
-                  <button onClick={() => setConfirmState({ action: 'confirm', reservation })} className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700 hover:bg-emerald-100">
-                    Confirm
-                  </button>
-                )}
-                {reservation.status === 'confirmed' && (
-                  <button onClick={() => setConfirmState({ action: 'convert', reservation })} className="rounded-md border border-[#C9A84C]/40 bg-[#FFF8E1] px-3 py-1.5 text-xs font-bold text-[#9A7A22] hover:bg-[#F2D77E]/30">
-                    Convert
-                  </button>
-                )}
-                {(reservation.status === 'pending' || reservation.status === 'confirmed') && (
-                  <button onClick={() => setConfirmState({ action: 'cancel', reservation })} className="rounded-md border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-bold text-rose-700 hover:bg-rose-100">
-                    Cancel
-                  </button>
-                )}
-              </div>,
+              <button key={reservation.id} onClick={() => setEditor(reservation)} className="rounded-md border border-[#1A1A2E]/20 px-3 py-1.5 text-xs font-semibold text-[#1A1A2E]">
+                Edit
+              </button>,
             ]
           })}
         />
-      </div>
+      </Panel>
 
-      <ConfirmModal
-        title={
-          confirmState?.action === 'convert'
-            ? 'Convert to Contract'
-            : confirmState?.action === 'cancel'
-              ? 'Cancel Reservation'
-              : 'Confirm Reservation'
-        }
-        message={
-          confirmState?.action === 'convert'
-            ? 'This will create a contract and mark the unit as Sold. Continue?'
-            : confirmState?.action === 'cancel'
-              ? 'Cancel this reservation and return the listing to available inventory?'
-              : 'Confirm this reservation?'
-        }
-        confirmLabel={confirmState?.action === 'convert' ? 'Create Contract' : 'Confirm'}
-        tone={confirmState?.action === 'cancel' ? 'danger' : 'primary'}
-        isOpen={confirmState !== null}
-        onClose={() => setConfirmState(null)}
-        onConfirm={runConfirmAction}
+      <ReservationModal
+        editor={editor}
+        clients={clients}
+        listings={listings}
+        projects={projects}
+        users={users}
+        isSaving={createReservation.isPending || updateReservation.isPending}
+        onClose={() => setEditor(null)}
+        onSubmit={saveReservation}
       />
-    </Panel>
+    </div>
   )
+}
+
+function ReservationModal({
+  editor,
+  clients,
+  listings,
+  projects,
+  users,
+  isSaving,
+  onClose,
+  onSubmit,
+}: {
+  editor: EditorState
+  clients: Array<{ id: number; buyer_name: string }>
+  listings: Array<{ id: number; project_id: number; unit_id: string }>
+  projects: Array<{ id: number; name: string }>
+  users: Array<{ id: number; full_name: string; role: string }>
+  isSaving: boolean
+  onClose: () => void
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void
+}) {
+  const reservation = editor === 'new' ? null : editor
+  const projectById = new Map(projects.map((project) => [project.id, project.name]))
+  const sellers = users.filter((user) => ['owner', 'admin', 'manager', 'broker', 'agent'].includes(user.role))
+
+  return (
+    <Modal title={editor === 'new' ? 'Add Reservation' : 'Edit Reservation'} isOpen={editor !== null} onClose={onClose}>
+      <form onSubmit={onSubmit} className="grid gap-4 md:grid-cols-2">
+        <FormField label="Client" name="client_id" defaultValue={String(reservation?.client_id ?? clients[0]?.id ?? '')} selectOptions={clients.map((client) => ({ label: client.buyer_name, value: String(client.id) }))} required />
+        <FormField label="Listing" name="listing_id" defaultValue={String(reservation?.listing_id ?? listings[0]?.id ?? '')} selectOptions={listings.map((listing) => ({ label: `${listing.unit_id} | ${projectById.get(listing.project_id) ?? 'Project'}`, value: String(listing.id) }))} required />
+        <FormField label="Reserved By" name="reserved_by" defaultValue={String(reservation?.reserved_by ?? sellers[0]?.id ?? '')} selectOptions={sellers.map((user) => ({ label: `${user.full_name} (${titleCase(user.role)})`, value: String(user.id) }))} required />
+        <FormField label="Reservation Fee" name="reservation_fee" type="number" defaultValue={String(reservation?.reservation_fee ?? 0)} />
+        <FormField label="Reservation Date" name="reservation_date" type="datetime-local" defaultValue={toDateTimeLocal(reservation?.reservation_date) || new Date().toISOString().slice(0, 16)} />
+        <FormField label="Expires At" name="expires_at" type="datetime-local" defaultValue={toDateTimeLocal(reservation?.expires_at)} />
+        <FormField label="Status" name="status" defaultValue={reservation?.status ?? 'pending'} selectOptions={reservationStatuses.map((status) => ({ label: titleCase(status), value: status }))} />
+        <FormField label="Remarks" name="remarks" defaultValue={reservation?.remarks ?? ''} textarea />
+        <div className="flex justify-end gap-2 border-t border-[#E8E4DC] pt-4 md:col-span-2">
+          <button type="button" onClick={onClose} className="rounded-lg border border-[#E8E4DC] px-4 py-2 text-sm font-semibold text-[#374151]">
+            Cancel
+          </button>
+          <button disabled={isSaving} className="rounded-lg bg-[#1A1A2E] px-4 py-2 text-sm font-bold text-white disabled:opacity-60">
+            {isSaving ? 'Saving...' : 'Save Reservation'}
+          </button>
+        </div>
+      </form>
+    </Modal>
+  )
+}
+
+function titleCase(value?: string | null) {
+  return String(value ?? '-').replace(/_/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase())
+}
+
+function toDateTimeLocal(value?: string | null) {
+  if (!value) return ''
+  return value.replace(' ', 'T').slice(0, 16)
+}
+
+function normalizeDateTime(value?: string | null) {
+  return value ? value.replace('T', ' ') : null
+}
+
+function clean(value: FormDataEntryValue | null) {
+  const text = String(value ?? '').trim()
+  return text || null
 }
 
 export default ReservationsPage

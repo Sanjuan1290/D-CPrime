@@ -1,34 +1,38 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
-import { company } from '../data/mockData'
+import { useAuth } from '../hooks/useAuth'
+import { company } from '../lib/brand'
 
 function LoginPage() {
   const [error, setError] = useState('')
   const navigate = useNavigate()
   const location = useLocation()
-  const isAdmin = localStorage.getItem('dcprime_role') === 'admin'
+  const { isAuthenticated, isLoading, login, role } = useAuth()
   const from = (location.state as { from?: string } | null)?.from ?? '/admin/dashboard'
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    setError('')
+
     const formData = new FormData(event.currentTarget)
     const email = String(formData.get('email'))
     const password = String(formData.get('password'))
 
-    if (email === 'admin@dcprime.com' && password === 'admin123') {
-      localStorage.setItem('dcprime_role', 'admin')
-      localStorage.setItem('dcprime_name', 'Admin')
-      localStorage.setItem('dcprime_token', 'mock-admin-jwt')
-      navigate(from, { replace: true })
-      return
+    try {
+      const user = await login({ email, password })
+      navigate(user.role === 'client' ? '/client/dashboard' : from, { replace: true })
+    } catch (err) {
+      const message =
+        err && typeof err === 'object' && 'response' in err
+          ? (err as { response?: { data?: { message?: string } } }).response?.data?.message
+          : null
+      setError(message ?? 'Unable to sign in. Check your email and password.')
     }
-
-    setError('Use admin@dcprime.com and admin123 for the mock admin login.')
   }
 
-  if (isAdmin) {
-    return <Navigate to="/admin/dashboard" replace />
+  if (isAuthenticated) {
+    return <Navigate to={role === 'client' ? '/client/dashboard' : '/admin/dashboard'} replace />
   }
 
   return (
@@ -51,8 +55,7 @@ function LoginPage() {
                 Manage clients, lots, payments, and SOA records.
               </h1>
               <p className="mt-5 text-sm leading-6 text-zinc-300">
-                Mock workspace using the sample masterlist, SOA installment records, commission tracker, and computation
-                values you provided.
+                Real API-backed access for D&C Prime Realty staff and client accounts.
               </p>
             </div>
           </div>
@@ -67,12 +70,13 @@ function LoginPage() {
           <form onSubmit={handleSubmit} className="w-full">
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#C9A84C]">Admin Login</p>
             <h2 className="mt-3 text-2xl font-bold">Welcome back</h2>
-            <p className="mt-2 text-sm text-zinc-400">Use the mock credentials to preview the admin panel.</p>
+            <p className="mt-2 text-sm text-zinc-400">Sign in with your D&C Prime Realty account.</p>
             <label className="mt-8 block text-sm font-semibold text-zinc-300">
               Email
               <input
                 name="email"
-                defaultValue="admin@dcprime.com"
+                type="email"
+                autoComplete="email"
                 className="mt-2 w-full rounded-md border border-white/10 bg-[#0A0A0A] px-4 py-3 text-sm text-white outline-none focus:border-[#C9A84C] focus:ring-2 focus:ring-[#C9A84C]/20"
               />
             </label>
@@ -81,17 +85,17 @@ function LoginPage() {
               <input
                 name="password"
                 type="password"
-                defaultValue="admin123"
+                autoComplete="current-password"
                 className="mt-2 w-full rounded-md border border-white/10 bg-[#0A0A0A] px-4 py-3 text-sm text-white outline-none focus:border-[#C9A84C] focus:ring-2 focus:ring-[#C9A84C]/20"
               />
             </label>
             {error && <p className="mt-4 rounded-md border border-rose-400/30 bg-rose-400/10 px-4 py-3 text-sm text-rose-300">{error}</p>}
-            <button className="mt-6 w-full rounded-md bg-[#C9A84C] px-4 py-3 text-sm font-bold text-black hover:bg-[#d8b95d]">
-              Login
+            <button
+              disabled={isLoading}
+              className="mt-6 w-full rounded-md bg-[#C9A84C] px-4 py-3 text-sm font-bold text-black hover:bg-[#d8b95d] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isLoading ? 'Signing in...' : 'Login'}
             </button>
-            <div className="mt-5 rounded-md border border-white/10 bg-white/5 p-3 text-xs text-zinc-400">
-              admin@dcprime.com / admin123
-            </div>
           </form>
         </div>
       </section>
