@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import ClientUnitSellersPanel from '../../components/admin/ClientUnitSellersPanel'
 import DataTable from '../../components/admin/DataTable'
 import FilterBar from '../../components/admin/FilterBar'
@@ -7,15 +7,17 @@ import Panel from '../../components/admin/Panel'
 import { formatCurrency } from '../../components/admin/formatters'
 import {
   getClientLifecycleStatus,
-  getClientUnitsForClient,
   getLotType,
   getScheduleSummary,
+  mockStorageKeys,
   mockDbClientUnitSellers,
   mockDbClientUnits,
   mockDbClients,
   mockDbListings,
   mockDbProjects,
   mockDbUsers,
+  readMockStorage,
+  writeMockStorage,
 } from '../../data/adminMockData'
 import type { MockDbClientUnit, MockDbClientUnitSeller } from '../../data/adminMockData'
 
@@ -29,22 +31,29 @@ function ColorBadge({ label, color }: { label: string; color: string }) {
 }
 
 function ViewClientsPage() {
+  const [clients] = useState(() => readMockStorage(mockStorageKeys.clients, mockDbClients))
+  const [storedClientUnits] = useState(() => readMockStorage(mockStorageKeys.clientUnits, mockDbClientUnits))
+  const [listings] = useState(() => readMockStorage(mockStorageKeys.listings, mockDbListings))
   const [search, setSearch] = useState('')
-  const [selectedClientId, setSelectedClientId] = useState(mockDbClients[0]?.id ?? 0)
-  const [selectedUnitId, setSelectedUnitId] = useState(mockDbClientUnits.find((unit) => unit.client_id === selectedClientId)?.id ?? 0)
-  const [sellers, setSellers] = useState<MockDbClientUnitSeller[]>(mockDbClientUnitSellers)
-  const listingById = new Map(mockDbListings.map((listing) => [listing.id, listing]))
+  const [selectedClientId, setSelectedClientId] = useState(clients[0]?.id ?? 0)
+  const [selectedUnitId, setSelectedUnitId] = useState(storedClientUnits.find((unit) => unit.client_id === selectedClientId)?.id ?? 0)
+  const [sellers, setSellers] = useState<MockDbClientUnitSeller[]>(() => readMockStorage(mockStorageKeys.clientUnitSellers, mockDbClientUnitSellers))
+  const listingById = new Map(listings.map((listing) => [listing.id, listing]))
   const projectById = new Map(mockDbProjects.map((project) => [project.id, project]))
-  const selectedClient = mockDbClients.find((client) => client.id === selectedClientId) ?? mockDbClients[0]
+  const selectedClient = clients.find((client) => client.id === selectedClientId) ?? clients[0]
+
+  useEffect(() => {
+    writeMockStorage(mockStorageKeys.clientUnitSellers, sellers)
+  }, [sellers])
 
   const filteredClients = useMemo(() => {
     const term = search.trim().toLowerCase()
-    if (!term) return mockDbClients
-    return mockDbClients.filter((client) => `${client.buyer_name} ${client.email ?? ''}`.toLowerCase().includes(term))
-  }, [search])
+    if (!term) return clients
+    return clients.filter((client) => `${client.buyer_name} ${client.email ?? ''}`.toLowerCase().includes(term))
+  }, [clients, search])
 
   const clientUnits: MockDbClientUnit[] = selectedClient
-    ? mockDbClientUnits.filter((unit) => unit.client_id === selectedClient.id)
+    ? storedClientUnits.filter((unit) => unit.client_id === selectedClient.id)
     : []
 
   const selectedUnit = clientUnits.find((unit) => unit.id === selectedUnitId) ?? clientUnits[0]
@@ -60,13 +69,13 @@ function ViewClientsPage() {
         />
         <div className="space-y-2">
           {filteredClients.slice(0, 24).map((client) => {
-            const status = getClientLifecycleStatus(client.id)
+            const status = getClientLifecycleStatus(client.id, storedClientUnits)
             return (
               <button
                 key={client.id}
                 onClick={() => {
                   setSelectedClientId(client.id)
-                  setSelectedUnitId(getClientUnitsForClient(client.id)[0]?.id ?? 0)
+                  setSelectedUnitId(storedClientUnits.find((unit) => unit.client_id === client.id)?.id ?? 0)
                 }}
                 className={`w-full rounded-lg border px-3 py-3 text-left transition ${
                   selectedClientId === client.id
@@ -92,7 +101,7 @@ function ViewClientsPage() {
               <InfoRow label="Email" value={selectedClient.email ?? '-'} />
               <InfoRow label="Contact" value={selectedClient.contact_no ?? '-'} />
               <InfoRow label="Address" value={selectedClient.address ?? '-'} />
-              <InfoRow label="Status" value={getClientLifecycleStatus(selectedClient.id).display_name} />
+              <InfoRow label="Status" value={getClientLifecycleStatus(selectedClient.id, storedClientUnits).display_name} />
             </div>
           </Panel>
 

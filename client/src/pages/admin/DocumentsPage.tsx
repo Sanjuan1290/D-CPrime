@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import Badge from '../../components/admin/Badge'
 import ConfirmModal from '../../components/admin/ConfirmModal'
@@ -7,7 +7,7 @@ import InfoRow from '../../components/admin/InfoRow'
 import Modal from '../../components/admin/Modal'
 import Panel from '../../components/admin/Panel'
 import { useToast } from '../../components/admin/Toast'
-import { clientDocuments, clientsV2, documentRequirements } from '../../data/adminMockData'
+import { clientDocuments, clientsV2, documentRequirements, mockStorageKeys, readMockStorage, writeMockStorage } from '../../data/adminMockData'
 
 type DocumentStatus = (typeof clientDocuments)[number]['status']
 type ClientDocument = {
@@ -35,8 +35,8 @@ const documentCategoryOptions = Array.from(new Set(documentRequirements.map((req
 
 function DocumentsPage() {
   const toast = useToast()
-  const [records, setRecords] = useState<ClientDocument[]>(clientDocuments)
-  const [requirements, setRequirements] = useState(initialRequirements)
+  const [records, setRecords] = useState<ClientDocument[]>(() => readMockStorage(mockStorageKeys.clientDocuments, clientDocuments))
+  const [requirements, setRequirements] = useState(() => readMockStorage(mockStorageKeys.documentRequirements, initialRequirements))
   const [isRequirementModalOpen, setIsRequirementModalOpen] = useState(false)
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null)
   const [requirementPendingDelete, setRequirementPendingDelete] = useState<string | null>(null)
@@ -48,6 +48,14 @@ function DocumentsPage() {
     : []
   const groupedSelectedDocuments = groupDocumentsByCategory(selectedDocuments)
   const pendingRequirement = requirementPendingDelete ? requirements.find((requirement) => requirement.id === requirementPendingDelete) : null
+
+  useEffect(() => {
+    writeMockStorage(mockStorageKeys.clientDocuments, records)
+  }, [records])
+
+  useEffect(() => {
+    writeMockStorage(mockStorageKeys.documentRequirements, requirements)
+  }, [requirements])
 
   const clientSummaries = useMemo(
     () =>

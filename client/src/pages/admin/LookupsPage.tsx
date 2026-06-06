@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import Badge from '../../components/admin/Badge'
 import DataTable from '../../components/admin/DataTable'
@@ -15,6 +15,9 @@ import {
   mockDbPaymentModes,
   mockDbPaymentTypes,
   mockDbUserRoles,
+  mockStorageKeys,
+  readMockStorage,
+  writeMockStorage,
 } from '../../data/adminMockData'
 import type { MockDbActiveStatus } from '../../data/adminMockData'
 
@@ -54,6 +57,17 @@ const lookupMeta: Array<{ key: LookupKey; label: string; hasColor?: boolean }> =
   { key: 'listing_statuses', label: 'Listing Statuses', hasColor: true },
 ]
 
+const initialLookupTables: Record<LookupKey, LookupRecord[]> = {
+  lot_types: mockDbLotTypes,
+  payment_methods: mockDbPaymentMethods,
+  payment_types: mockDbPaymentTypes,
+  payment_modes: mockDbPaymentModes,
+  commission_types: mockDbCommissionTypes,
+  user_roles: mockDbUserRoles,
+  client_statuses: mockDbClientStatuses,
+  listing_statuses: mockDbListingStatuses,
+}
+
 function slugify(value: string) {
   return value.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '')
 }
@@ -61,19 +75,14 @@ function slugify(value: string) {
 function LookupsPage() {
   const toast = useToast()
   const [activeKey, setActiveKey] = useState<LookupKey>('lot_types')
-  const [tables, setTables] = useState<Record<LookupKey, LookupRecord[]>>({
-    lot_types: mockDbLotTypes,
-    payment_methods: mockDbPaymentMethods,
-    payment_types: mockDbPaymentTypes,
-    payment_modes: mockDbPaymentModes,
-    commission_types: mockDbCommissionTypes,
-    user_roles: mockDbUserRoles,
-    client_statuses: mockDbClientStatuses,
-    listing_statuses: mockDbListingStatuses,
-  })
+  const [tables, setTables] = useState<Record<LookupKey, LookupRecord[]>>(() => readMockStorage(mockStorageKeys.lookups, initialLookupTables))
   const [editing, setEditing] = useState<EditingState | null>(null)
   const activeMeta = lookupMeta.find((item) => item.key === activeKey) ?? lookupMeta[0]
   const activeRows = [...tables[activeKey]].sort((a, b) => a.sort_order - b.sort_order)
+
+  useEffect(() => {
+    writeMockStorage(mockStorageKeys.lookups, tables)
+  }, [tables])
 
   function openAdd() {
     const rows = tables[activeKey]

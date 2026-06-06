@@ -12,16 +12,18 @@ import StatCard from '../../components/admin/StatCard'
 import { useToast } from '../../components/admin/Toast'
 import { formatCurrency, formatPercent } from '../../components/admin/formatters'
 import {
-  agents,
   commissionRules as initialCommissionRules,
   commissions,
   getNextMockId,
+  mockStorageKeys,
   mockDbCashAdvanceDeductions,
   mockDbCashAdvances,
   mockDbCommissions,
   mockDbCommissionReleases,
   mockDbUsers,
   projects,
+  readMockStorage,
+  writeMockStorage,
 } from '../../data/adminMockData'
 import type { CommissionRule, MockDbCashAdvance, MockDbCashAdvanceDeduction, MockDbCommissionRelease } from '../../data/adminMockData'
 import { commissionDetails } from '../../data/sourceDetails'
@@ -30,6 +32,14 @@ import type { CommissionDetail, CommissionPartyRelease } from '../../data/source
 const CASH_ADVANCES_STORAGE_KEY = 'dcprime_cash_advances'
 const CASH_ADVANCE_DEDUCTIONS_STORAGE_KEY = 'dcprime_cash_advance_deductions'
 const COMMISSION_RELEASES_STORAGE_KEY = 'dcprime_commission_releases'
+const COMMISSION_RULES_STORAGE_KEY = 'dcprime_commission_rules'
+
+type StoredCommissionRule = Omit<Partial<CommissionRule>, 'status'> & {
+  agentRate?: number
+  releaseThreshold?: number
+  retentionRate?: number
+  status?: string
+}
 
 function timestamp() {
   return new Date().toISOString().slice(0, 19).replace('T', ' ')
@@ -39,14 +49,33 @@ function titleCase(value: string) {
   return value.replace(/_/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase())
 }
 
+function normalizeCommissionRule(rule: StoredCommissionRule, index: number): CommissionRule {
+  return {
+    id: rule.id ?? `rule-${index + 1}`,
+    projectId: rule.projectId ?? projects[0]?.id ?? 'project-1',
+    name: rule.name?.trim() || `Standard Plan ${index + 1}`,
+    directAgentRate: rule.directAgentRate ?? rule.agentRate ?? 0.07,
+    distributedAgentRate: rule.distributedAgentRate ?? 0.02,
+    managerRate: rule.managerRate ?? 0.05,
+    status: rule.status === 'Inactive' || rule.status === 'Paused' ? 'Inactive' : 'Active',
+  }
+}
+
+function loadCommissionRules(): CommissionRule[] {
+  try {
+    const saved = localStorage.getItem(COMMISSION_RULES_STORAGE_KEY)
+    const source = saved ? JSON.parse(saved) : initialCommissionRules
+    return Array.isArray(source) ? source.map((rule, index) => normalizeCommissionRule(rule, index)) : initialCommissionRules
+  } catch {
+    return initialCommissionRules
+  }
+}
+
 function CommissionsPage() {
   const toast = useToast()
   const navigate = useNavigate()
-  const [tracker, setTracker] = useState(commissions)
-  const [rules, setRules] = useState<CommissionRule[]>(() => {
-    const saved = localStorage.getItem('dcprime_commission_rules')
-    return saved ? (JSON.parse(saved) as CommissionRule[]) : initialCommissionRules
-  })
+  const [tracker, setTracker] = useState(() => readMockStorage(mockStorageKeys.commissionTracker, commissions))
+  const [rules, setRules] = useState<CommissionRule[]>(loadCommissionRules)
   const [selectedRule, setSelectedRule] = useState<CommissionRule | null>(null)
   const [selectedDetail, setSelectedDetail] = useState<CommissionDetail | null>(null)
   const [rulePendingDelete, setRulePendingDelete] = useState<CommissionRule | null>(null)
@@ -78,8 +107,12 @@ function CommissionsPage() {
   const sellers = mockDbUsers.filter((user) => ['agent', 'broker', 'manager'].includes(user.role) && user.status === 'active')
 
   useEffect(() => {
-    localStorage.setItem('dcprime_commission_rules', JSON.stringify(rules))
+    localStorage.setItem(COMMISSION_RULES_STORAGE_KEY, JSON.stringify(rules))
   }, [rules])
+
+  useEffect(() => {
+    writeMockStorage(mockStorageKeys.commissionTracker, tracker)
+  }, [tracker])
 
   useEffect(() => {
     localStorage.setItem(CASH_ADVANCES_STORAGE_KEY, JSON.stringify(cashAdvances))
@@ -98,11 +131,10 @@ function CommissionsPage() {
       rule ?? {
         id: `rule-${Date.now()}`,
         projectId: projects[0].id,
-        agentId: agents[0].id,
-        agentRate: 0.05,
-        managerRate: 0.02,
-        releaseThreshold: 0.3,
-        retentionRate: 0.25,
+        name: 'Standard Plan',
+        directAgentRate: 0.07,
+        distributedAgentRate: 0.02,
+        managerRate: 0.05,
         status: 'Active',
       },
     )
@@ -116,11 +148,10 @@ function CommissionsPage() {
     const rule: CommissionRule = {
       ...selectedRule,
       projectId: String(formData.get('projectId')),
-      agentId: String(formData.get('agentId')),
-      agentRate: Number(formData.get('agentRate')) / 100,
+      name: String(formData.get('name')).trim() || 'Standard Plan',
+      directAgentRate: Number(formData.get('directAgentRate')) / 100,
+      distributedAgentRate: Number(formData.get('distributedAgentRate')) / 100,
       managerRate: Number(formData.get('managerRate')) / 100,
-      releaseThreshold: Number(formData.get('releaseThreshold')) / 100,
-      retentionRate: Number(formData.get('retentionRate')) / 100,
       status: String(formData.get('status')) as CommissionRule['status'],
     }
 
@@ -158,10 +189,6 @@ function CommissionsPage() {
 
   function getProjectName(projectId: string) {
     return projects.find((project) => project.id === projectId)?.name ?? projectId
-  }
-
-  function getAgentName(agentId: string) {
-    return agents.find((agent) => agent.id === agentId)?.fullName ?? agentId
   }
 
   function getCommissionDetail(unitId: string, buyer: string) {
@@ -303,21 +330,20 @@ function CommissionsPage() {
         <StatCard label="Cash Advance" value={formatCurrency(totalCashAdvance)} note={`${formatCurrency(totalCashAdvanceDeducted)} deducted`} />
       </div>
 
-      <Panel title="Commission Settings" subtitle="Admin-controlled commission rules by project and agent">
+      <Panel title="Commission Settings" subtitle="Admin-controlled commission plans by project">
         <div className="mb-5 flex justify-end">
           <button onClick={() => openRule()} className="rounded-lg bg-[#C9A84C] px-4 py-2 text-sm font-bold text-[#1A1A2E] shadow-sm hover:bg-[#B9973C]">
             Add Rule
           </button>
         </div>
         <DataTable
-          headers={['Project', 'Agent', 'Agent Rate', 'Manager Rate', 'Release Threshold', 'Retention', 'Status', 'Action']}
+          headers={['Project', 'Plan Name', 'Direct Agent %', 'Distributed Agent %', 'Manager %', 'Status', 'Action']}
           rows={rules.map((rule) => [
             getProjectName(rule.projectId),
-            getAgentName(rule.agentId),
-            formatPercent(rule.agentRate),
+            rule.name,
+            formatPercent(rule.directAgentRate),
+            formatPercent(rule.distributedAgentRate),
             formatPercent(rule.managerRate),
-            formatPercent(rule.releaseThreshold),
-            formatPercent(rule.retentionRate),
             <Badge key={`${rule.id}-status`}>{rule.status}</Badge>,
             <div key={`${rule.id}-actions`} className="flex gap-2">
               <button
@@ -451,24 +477,10 @@ function CommissionsPage() {
                 ))}
               </select>
             </label>
-            <label className="block font-semibold text-[#374151]">
-              Agent
-              <select
-                name="agentId"
-                defaultValue={selectedRule.agentId}
-                className="mt-2 w-full rounded-lg border border-[#E8E4DC] bg-white px-3 py-3 text-[#111827] outline-none focus:border-[#C9A84C]"
-              >
-                {agents.map((agent) => (
-                  <option key={agent.id} value={agent.id}>
-                    {agent.fullName}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <PercentInput label="Agent Rate" name="agentRate" value={selectedRule.agentRate} />
+            <FormField label="Plan Name" name="name" defaultValue={selectedRule.name} required />
+            <PercentInput label="Direct Agent Rate" name="directAgentRate" value={selectedRule.directAgentRate} />
+            <PercentInput label="Distributed Agent Rate" name="distributedAgentRate" value={selectedRule.distributedAgentRate} />
             <PercentInput label="Manager Rate" name="managerRate" value={selectedRule.managerRate} />
-            <PercentInput label="Release Threshold" name="releaseThreshold" value={selectedRule.releaseThreshold} />
-            <PercentInput label="Retention Rate" name="retentionRate" value={selectedRule.retentionRate} />
             <label className="block font-semibold text-[#374151]">
               Status
               <select
@@ -477,7 +489,7 @@ function CommissionsPage() {
                 className="mt-2 w-full rounded-lg border border-[#E8E4DC] bg-white px-3 py-3 text-[#111827] outline-none focus:border-[#C9A84C]"
               >
                 <option>Active</option>
-                <option>Paused</option>
+                <option>Inactive</option>
               </select>
             </label>
             <div className="flex items-end justify-end gap-2">
@@ -576,7 +588,7 @@ function CommissionsPage() {
 
       <ConfirmModal
         title="Delete Commission Rule"
-        message={`Delete the commission rule for ${rulePendingDelete ? getAgentName(rulePendingDelete.agentId) : 'this agent'}? This only changes the mock data in this browser.`}
+        message={`Delete ${rulePendingDelete?.name ?? 'this commission plan'}? This only changes the mock data in this browser.`}
         confirmLabel="Delete Rule"
         isOpen={rulePendingDelete !== null}
         onClose={() => setRulePendingDelete(null)}

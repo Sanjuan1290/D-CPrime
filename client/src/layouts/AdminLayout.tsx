@@ -18,7 +18,17 @@ import {
   UserGroup,
   Users,
 } from '../components/admin/Icons'
-import { agentRecords, auditLogsV2, brokerRecords, clientsV2, employeeRecords, listingsV2, paymentTracker } from '../data/adminMockData'
+import {
+  agentRecords,
+  auditLogsV2,
+  brokerRecords,
+  employeeRecords,
+  listingsV2,
+  mockDbClients,
+  mockStorageKeys,
+  paymentTracker,
+  readMockStorage,
+} from '../data/adminMockData'
 import { company } from '../data/mockData'
 import { adminNavGroups, getActiveAdminPage, getAdminRouteLabel, routeByKey } from '../routes/adminRoutes'
 import type { AdminPageKey } from '../routes/adminRoutes'
@@ -32,16 +42,17 @@ function AdminLayout() {
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false)
   const [globalSearch, setGlobalSearch] = useState('')
   const adminName = localStorage.getItem('dcprime_name') ?? 'Admin'
+  const clientSearchRows = readMockStorage(mockStorageKeys.clients, mockDbClients)
   const globalResults = useMemo(() => {
     const term = globalSearch.trim().toLowerCase()
     if (!term) return []
 
     const records = [
-      ...clientsV2.map((client) => ({
+      ...clientSearchRows.map((client) => ({
         type: 'Client',
-        label: client.buyer,
-        detail: `${client.unitId} | ${client.agent}`,
-        path: '/admin/clients',
+        label: client.buyer_name,
+        detail: `${client.email ?? 'No email'} | ${client.contact_no ?? 'No contact'}`,
+        path: `/admin/clients/${client.id}`,
       })),
       ...listingsV2.map((listing) => ({
         type: 'Listing',
@@ -60,7 +71,7 @@ function AdminLayout() {
     return records
       .filter((record) => `${record.type} ${record.label} ${record.detail}`.toLowerCase().includes(term))
       .slice(0, 6)
-  }, [globalSearch])
+  }, [clientSearchRows, globalSearch])
   const notificationItems = auditLogsV2.slice(0, 5)
 
   function handleNavigate(page: AdminPageKey) {
@@ -202,8 +213,9 @@ function AdminLayout() {
 
 function SidebarContent({ activePage, onNavigate }: { activePage: AdminPageKey; onNavigate: (page: AdminPageKey) => void }) {
   const peopleCount = agentRecords.length + brokerRecords.length + employeeRecords.length
+  const clientCount = readMockStorage(mockStorageKeys.clients, mockDbClients).length
   const navCountByKey: Partial<Record<AdminPageKey, number>> = {
-    clients: clientsV2.length,
+    clients: clientCount,
     people: peopleCount,
   }
 

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Badge from '../../components/admin/Badge'
 import ConfirmModal from '../../components/admin/ConfirmModal'
 import DataTable from '../../components/admin/DataTable'
@@ -10,6 +10,7 @@ import {
   createMockDbAuditLog,
   getListingStatusId,
   getNextMockId,
+  mockStorageKeys,
   mockDbAuditLogs,
   mockDbClients,
   mockDbClientUnitDocuments,
@@ -17,10 +18,13 @@ import {
   mockDbClientUnits,
   mockDbCommissionPlans,
   mockDbListings,
+  mockDbPaymentSchedules,
   mockDbProjectDocuments,
   mockDbProjects,
   mockDbReservations,
   mockDbUsers,
+  readMockStorage,
+  writeMockStorage,
 } from '../../data/adminMockData'
 import type {
   MockDbAuditLog,
@@ -29,6 +33,7 @@ import type {
   MockDbClientUnitDocument,
   MockDbClientUnitSeller,
   MockDbListing,
+  MockDbPaymentSchedule,
   MockDbReservation,
   MockDbReservationStatus,
 } from '../../data/adminMockData'
@@ -47,13 +52,16 @@ function titleCase(value: string) {
 
 function ReservationsPage() {
   const toast = useToast()
-  const [reservations, setReservations] = useState<MockDbReservation[]>(mockDbReservations)
-  const [listings, setListings] = useState<MockDbListing[]>(mockDbListings)
-  const [clients, setClients] = useState<MockDbClient[]>(mockDbClients)
-  const [clientUnits, setClientUnits] = useState<MockDbClientUnit[]>(mockDbClientUnits)
-  const [clientUnitSellers, setClientUnitSellers] = useState<MockDbClientUnitSeller[]>(mockDbClientUnitSellers)
-  const [clientUnitDocuments, setClientUnitDocuments] = useState<MockDbClientUnitDocument[]>(mockDbClientUnitDocuments)
-  const [, setAuditLogs] = useState<MockDbAuditLog[]>(mockDbAuditLogs)
+  const [reservations, setReservations] = useState<MockDbReservation[]>(() => readMockStorage(mockStorageKeys.reservations, mockDbReservations))
+  const [listings, setListings] = useState<MockDbListing[]>(() => readMockStorage(mockStorageKeys.listings, mockDbListings))
+  const [clients, setClients] = useState<MockDbClient[]>(() => readMockStorage(mockStorageKeys.clients, mockDbClients))
+  const [clientUnits, setClientUnits] = useState<MockDbClientUnit[]>(() => readMockStorage(mockStorageKeys.clientUnits, mockDbClientUnits))
+  const [clientUnitSellers, setClientUnitSellers] = useState<MockDbClientUnitSeller[]>(() => readMockStorage(mockStorageKeys.clientUnitSellers, mockDbClientUnitSellers))
+  const [clientUnitDocuments, setClientUnitDocuments] = useState<MockDbClientUnitDocument[]>(() =>
+    readMockStorage(mockStorageKeys.clientUnitDocuments, mockDbClientUnitDocuments),
+  )
+  const [paymentSchedules, setPaymentSchedules] = useState<MockDbPaymentSchedule[]>(() => readMockStorage(mockStorageKeys.paymentSchedules, mockDbPaymentSchedules))
+  const [auditLogs, setAuditLogs] = useState<MockDbAuditLog[]>(() => readMockStorage(mockStorageKeys.auditLogs, mockDbAuditLogs))
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [projectFilter, setProjectFilter] = useState('all')
@@ -62,6 +70,38 @@ function ReservationsPage() {
   const listingById = useMemo(() => new Map(listings.map((listing) => [listing.id, listing])), [listings])
   const clientById = useMemo(() => new Map(clients.map((client) => [client.id, client])), [clients])
   const projectById = useMemo(() => new Map(mockDbProjects.map((project) => [project.id, project])), [])
+
+  useEffect(() => {
+    writeMockStorage(mockStorageKeys.reservations, reservations)
+  }, [reservations])
+
+  useEffect(() => {
+    writeMockStorage(mockStorageKeys.listings, listings)
+  }, [listings])
+
+  useEffect(() => {
+    writeMockStorage(mockStorageKeys.clients, clients)
+  }, [clients])
+
+  useEffect(() => {
+    writeMockStorage(mockStorageKeys.clientUnits, clientUnits)
+  }, [clientUnits])
+
+  useEffect(() => {
+    writeMockStorage(mockStorageKeys.clientUnitSellers, clientUnitSellers)
+  }, [clientUnitSellers])
+
+  useEffect(() => {
+    writeMockStorage(mockStorageKeys.clientUnitDocuments, clientUnitDocuments)
+  }, [clientUnitDocuments])
+
+  useEffect(() => {
+    writeMockStorage(mockStorageKeys.paymentSchedules, paymentSchedules)
+  }, [paymentSchedules])
+
+  useEffect(() => {
+    writeMockStorage(mockStorageKeys.auditLogs, auditLogs)
+  }, [auditLogs])
 
   const filteredReservations = useMemo(() => {
     const term = search.trim().toLowerCase()
@@ -164,10 +204,36 @@ function ReservationsPage() {
       created_at: timestamp(),
       updated_at: timestamp(),
     }))
+    const nextScheduleId = getNextMockId(paymentSchedules)
+    const scheduleRows: MockDbPaymentSchedule[] = [
+      {
+        id: nextScheduleId,
+        client_unit_id: newClientUnitId,
+        due_date: reservation.reservation_date,
+        description: 'Reservation Fee',
+        due_amount: reservation.reservation_fee,
+        penalty: 0,
+        status: 'paid',
+        created_at: timestamp(),
+        updated_at: timestamp(),
+      },
+      {
+        id: nextScheduleId + 1,
+        client_unit_id: newClientUnitId,
+        due_date: new Date().toISOString().slice(0, 10),
+        description: 'Downpayment',
+        due_amount: Math.max(totalContractPrice * 0.2 - reservation.reservation_fee, 0),
+        penalty: 0,
+        status: 'unpaid',
+        created_at: timestamp(),
+        updated_at: timestamp(),
+      },
+    ]
 
     setClientUnits((current) => [newClientUnit, ...current])
     setClientUnitSellers((current) => [...sellerRows, ...current])
     setClientUnitDocuments((current) => [...documentRows, ...current])
+    setPaymentSchedules((current) => [...scheduleRows, ...current])
     setReservations((current) =>
       current.map((item) =>
         item.id === reservation.id

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import Badge from '../../components/admin/Badge'
 import DataTable from '../../components/admin/DataTable'
@@ -17,6 +17,7 @@ import {
   getListingStatusId,
   getLotType,
   getNextMockId,
+  mockStorageKeys,
   mockDbClients,
   mockDbListingStatuses,
   mockDbListings,
@@ -25,6 +26,8 @@ import {
   mockDbReservations,
   mockDbSettings,
   mockDbUsers,
+  readMockStorage,
+  writeMockStorage,
 } from '../../data/adminMockData'
 import type { MockDbClient, MockDbListing, MockDbReservation } from '../../data/adminMockData'
 
@@ -45,9 +48,9 @@ function ColorBadge({ label, color }: { label: string; color: string }) {
 
 function ListingsPage() {
   const toast = useToast()
-  const [listings, setListings] = useState<MockDbListing[]>(mockDbListings)
-  const [clients, setClients] = useState<MockDbClient[]>(mockDbClients)
-  const [reservations, setReservations] = useState<MockDbReservation[]>(mockDbReservations)
+  const [listings, setListings] = useState<MockDbListing[]>(() => readMockStorage(mockStorageKeys.listings, mockDbListings))
+  const [clients, setClients] = useState<MockDbClient[]>(() => readMockStorage(mockStorageKeys.clients, mockDbClients))
+  const [reservations, setReservations] = useState<MockDbReservation[]>(() => readMockStorage(mockStorageKeys.reservations, mockDbReservations))
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [projectFilter, setProjectFilter] = useState('all')
@@ -57,6 +60,18 @@ function ListingsPage() {
   const [reservationListing, setReservationListing] = useState<MockDbListing | null>(null)
 
   const projectById = useMemo(() => new Map(mockDbProjects.map((project) => [project.id, project])), [])
+
+  useEffect(() => {
+    writeMockStorage(mockStorageKeys.listings, listings)
+  }, [listings])
+
+  useEffect(() => {
+    writeMockStorage(mockStorageKeys.clients, clients)
+  }, [clients])
+
+  useEffect(() => {
+    writeMockStorage(mockStorageKeys.reservations, reservations)
+  }, [reservations])
   const statusTabs = [
     { label: 'All', value: 'all', count: listings.length },
     ...mockDbListingStatuses.map((status) => ({

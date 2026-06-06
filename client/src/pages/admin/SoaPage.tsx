@@ -1,9 +1,47 @@
 import { useParams } from 'react-router-dom'
+import Badge from '../../components/admin/Badge'
 import DataTable from '../../components/admin/DataTable'
 import InfoRow from '../../components/admin/InfoRow'
 import Panel from '../../components/admin/Panel'
 import { formatCurrency } from '../../components/admin/formatters'
 import { company, soaRecords } from '../../data/mockData'
+
+type ScheduleStatus = 'unpaid' | 'partial' | 'paid' | 'overdue'
+type SoaScheduleLine = {
+  dueDate?: string
+  dueAmount: number
+  datePaid?: string
+  amountPaid?: number
+  scheduleStatus?: ScheduleStatus
+}
+
+function formatScheduleStatus(value: ScheduleStatus) {
+  return value.replace(/\b\w/g, (letter) => letter.toUpperCase())
+}
+
+function parseScheduleDate(value?: string) {
+  if (!value) return null
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return new Date(`${value}T00:00:00`)
+  const match = value.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/)
+  if (match) {
+    const [, month, day, year] = match
+    return new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T00:00:00`)
+  }
+  const parsed = new Date(value)
+  return Number.isNaN(parsed.getTime()) ? null : parsed
+}
+
+function getScheduleStatus(line: SoaScheduleLine): ScheduleStatus {
+  if (line.scheduleStatus) return line.scheduleStatus
+  if (line.datePaid) return (line.amountPaid ?? 0) >= line.dueAmount ? 'paid' : 'partial'
+
+  const dueDate = parseScheduleDate(line.dueDate)
+  if (!dueDate) return 'unpaid'
+
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  return dueDate.getTime() < today.getTime() ? 'overdue' : 'unpaid'
+}
 
 function SoaPage() {
   const { clientId } = useParams()
@@ -36,12 +74,13 @@ function SoaPage() {
         </div>
         <div className="mt-5">
           <DataTable
-            headers={['Due Date', 'Description', 'Due Amount', 'Penalty', 'Date Paid', 'Amount Paid', 'Reference', 'Running Balance']}
+            headers={['Due Date', 'Description', 'Due Amount', 'Penalty', 'Status', 'Date Paid', 'Amount Paid', 'Reference', 'Running Balance']}
             rows={soa.schedule.map((line) => [
               line.dueDate,
               line.description,
               formatCurrency(line.dueAmount),
               formatCurrency(line.penalty),
+              <Badge key={`${line.description}-schedule-status`}>{formatScheduleStatus(getScheduleStatus(line))}</Badge>,
               line.datePaid ?? '-',
               line.amountPaid ? formatCurrency(line.amountPaid) : '-',
               line.reference ?? '-',

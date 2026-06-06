@@ -1,12 +1,15 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Panel from '../../components/admin/Panel'
 import { useToast } from '../../components/admin/Toast'
 import {
   createMockDbAuditLog,
   getNextMockId,
+  mockStorageKeys,
   mockDbAuditLogs,
   mockDbSettings,
   mockDbUsers,
+  readMockStorage,
+  writeMockStorage,
 } from '../../data/adminMockData'
 import type { MockDbAuditLog, MockDbSetting } from '../../data/adminMockData'
 
@@ -23,11 +26,19 @@ function timestamp() {
 
 function SettingsPage() {
   const toast = useToast()
-  const [settings, setSettings] = useState<MockDbSetting[]>(mockDbSettings)
-  const [, setAuditLogs] = useState<MockDbAuditLog[]>(mockDbAuditLogs)
+  const [settings, setSettings] = useState<MockDbSetting[]>(() => readMockStorage(mockStorageKeys.settings, mockDbSettings))
+  const [auditLogs, setAuditLogs] = useState<MockDbAuditLog[]>(() => readMockStorage(mockStorageKeys.auditLogs, mockDbAuditLogs))
   const [drafts, setDrafts] = useState<Record<number, string>>(() =>
-    Object.fromEntries(mockDbSettings.map((setting) => [setting.id, setting.setting_value])),
+    Object.fromEntries(readMockStorage(mockStorageKeys.settings, mockDbSettings).map((setting) => [setting.id, setting.setting_value])),
   )
+
+  useEffect(() => {
+    writeMockStorage(mockStorageKeys.settings, settings)
+  }, [settings])
+
+  useEffect(() => {
+    writeMockStorage(mockStorageKeys.auditLogs, auditLogs)
+  }, [auditLogs])
 
   const groups = useMemo(() => {
     return Array.from(new Set(settings.map((setting) => setting.module_group))).map((moduleGroup) => ({

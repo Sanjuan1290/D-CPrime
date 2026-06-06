@@ -5,6 +5,7 @@ import type { FeatureKey, Role } from '../data/mockData'
 
 const AuditLogsPage = lazy(() => import('../pages/admin/AuditLogsPage'))
 const BalancesPage = lazy(() => import('../pages/admin/BalancesPage'))
+const ClientDetailPage = lazy(() => import('../pages/admin/ClientDetailPage'))
 const ClientsPage = lazy(() => import('../pages/admin/ClientsPage'))
 const CommissionsPage = lazy(() => import('../pages/admin/CommissionsPage'))
 const DashboardPage = lazy(() => import('../pages/admin/DashboardPage'))
@@ -70,6 +71,9 @@ export const adminRoutes: AdminRoute[] = [
   { path: 'listings', label: 'Listings', element: <ListingsPage />, feature: 'listings', allowedRoles: adminOnly, activeKey: 'listings' },
   { path: 'reservations', label: 'Reservations', element: <ReservationsPage />, feature: 'reservations', allowedRoles: adminOnly, activeKey: 'reservations' },
   { path: 'clients', label: 'Clients', element: <ClientsPage />, feature: 'clients_manage', allowedRoles: adminOnly, activeKey: 'clients' },
+  { path: 'clients/new', label: 'New Client', element: <ClientDetailPage mode="new" />, feature: 'clients_manage', allowedRoles: adminOnly, activeKey: 'clients' },
+  { path: 'clients/:clientId/edit', label: 'Edit Client', element: <ClientDetailPage mode="edit" />, feature: 'clients_manage', allowedRoles: adminOnly, activeKey: 'clients' },
+  { path: 'clients/:clientId', label: 'Client Profile', element: <ClientDetailPage />, feature: 'clients_view', allowedRoles: adminOnly, activeKey: 'clients' },
   { path: 'people', label: 'People', element: <PeoplePage />, feature: 'clients_manage', allowedRoles: adminOnly, activeKey: 'people' },
   { path: 'payments', label: 'Payments', element: <PaymentsPage />, feature: 'payments_view', allowedRoles: adminOnly, activeKey: 'payments' },
   { path: 'payments/due', label: 'Due Payments', element: <PaymentsPage initialTab="due" />, feature: 'payments_view', allowedRoles: adminOnly, activeKey: 'payments' },

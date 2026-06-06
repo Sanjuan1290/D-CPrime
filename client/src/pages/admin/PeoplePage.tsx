@@ -17,6 +17,7 @@ import {
   brokerRecords,
   clientsV2,
   employeeRecords,
+  mockDbUsers,
   projects,
 } from '../../data/adminMockData'
 import type { AgentRecord, BrokerRecord, EmployeeRecord } from '../../data/adminMockData'
@@ -33,10 +34,77 @@ type AgentCommissionSummary = {
   pending: number
   advances: number
 }
+type StoredAgentRecord = Partial<Omit<AgentRecord, 'linkedUserId'>> & {
+  linkedUserId?: number | string | null
+  managerId?: string | null
+  hireDate?: string | null
+}
 
 const smallViewButton = 'inline-flex items-center gap-1 rounded-md border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs font-semibold text-[#374151] hover:bg-gray-100'
 const smallEditButton = 'inline-flex items-center gap-1 rounded-md border border-[#1A1A2E]/20 bg-[#1A1A2E]/5 px-3 py-1.5 text-xs font-semibold text-[#1A1A2E] hover:bg-[#1A1A2E]/10'
 const smallHoldButton = 'inline-flex items-center gap-1 rounded-md border border-amber-100 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-100'
+const defaultSupervisorUserId = mockDbUsers.find((user) => user.role === 'manager' && user.status === 'active')?.id ?? null
+
+function normalizeDateString(value?: string | null) {
+  if (!value) return null
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value
+  const match = value.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/)
+  if (!match) return value
+  const [, month, day, year] = match
+  return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+}
+
+function nullableNumber(value: number | string | null | undefined) {
+  if (typeof value === 'number') return Number.isFinite(value) ? value : null
+  if (typeof value !== 'string') return null
+  const trimmed = value.trim()
+  if (!trimmed) return null
+  const parsed = Number(trimmed)
+  if (Number.isFinite(parsed)) return parsed
+  const match = trimmed.match(/\d+/)
+  return match ? Number(match[0]) : null
+}
+
+function normalizeAgentStatus(value: AgentRecord['status'] | undefined): AgentRecord['status'] {
+  return value === 'Inactive' || value === 'Suspended' ? value : 'Active'
+}
+
+function normalizeAgentRecord(agent: StoredAgentRecord): AgentRecord {
+  return {
+    id: agent.id ?? `agent-${Date.now()}`,
+    employeeId: agent.employeeId ?? '',
+    fullName: agent.fullName ?? '',
+    licenseType: agent.licenseType ?? 'Accredited Seller',
+    licenseNumber: agent.licenseNumber ?? '',
+    prcNumber: agent.prcNumber ?? '',
+    contactNumber: agent.contactNumber ?? '',
+    email: agent.email ?? '',
+    address: agent.address ?? '',
+    assignedProjects: agent.assignedProjects?.length ? agent.assignedProjects : [projects[0]?.id ?? 'project-1'],
+    supervisorUserId: nullableNumber(agent.supervisorUserId) ?? (agent.managerId ? defaultSupervisorUserId : null),
+    status: normalizeAgentStatus(agent.status),
+    accreditationDate: normalizeDateString(agent.accreditationDate ?? agent.hireDate),
+    commissionRate: agent.commissionRate ?? 0.05,
+    linkedUserId: nullableNumber(agent.linkedUserId),
+    notes: agent.notes ?? '',
+  }
+}
+
+function loadAgentRecords() {
+  try {
+    const saved = localStorage.getItem('dcprime_people_agents')
+    const source = saved ? JSON.parse(saved) : agentRecords
+    return Array.isArray(source) ? source.map((agent) => normalizeAgentRecord(agent)) : agentRecords
+  } catch {
+    return agentRecords
+  }
+}
+
+function getUserDisplayName(userId: number | null) {
+  if (!userId) return null
+  const user = mockDbUsers.find((item) => item.id === userId)
+  return user ? `${user.full_name} (#${user.id})` : `User #${userId}`
+}
 
 function PeoplePage() {
   const toast = useToast()
@@ -44,10 +112,7 @@ function PeoplePage() {
   const [agentStatus, setAgentStatus] = useState('All')
   const [agentProject, setAgentProject] = useState('All')
   const [agentProfileTab, setAgentProfileTab] = useState<AgentProfileTab>('Profile')
-  const [agents, setAgents] = useState<AgentRecord[]>(() => {
-    const saved = localStorage.getItem('dcprime_people_agents')
-    return saved ? (JSON.parse(saved) as AgentRecord[]) : agentRecords
-  })
+  const [agents, setAgents] = useState<AgentRecord[]>(loadAgentRecords)
   const [brokers] = useState<BrokerRecord[]>(() => {
     const saved = localStorage.getItem('dcprime_people_brokers')
     return saved ? (JSON.parse(saved) as BrokerRecord[]) : brokerRecords
@@ -60,6 +125,13 @@ function PeoplePage() {
   const [selectedBroker, setSelectedBroker] = useState<BrokerRecord | null>(null)
   const [selectedEmployee, setSelectedEmployee] = useState<EmployeeRecord | null>(null)
   const [editingAgent, setEditingAgent] = useState<AgentRecord | null>(null)
+  const supervisorOptions = useMemo(
+    () =>
+      mockDbUsers
+        .filter((user) => ['manager', 'broker'].includes(user.role) && user.status === 'active')
+        .map((user) => ({ label: `${user.full_name} (${user.role})`, value: String(user.id) })),
+    [],
+  )
 
   const visibleAgents = useMemo(
     () =>
@@ -86,9 +158,9 @@ function PeoplePage() {
         email: String(formData.get('email')),
         address: String(formData.get('address')),
         assignedProjects: [String(formData.get('assignedProject'))],
-        managerId: String(formData.get('managerId')) || null,
+        supervisorUserId: Number(formData.get('supervisorUserId')) || null,
         status: String(formData.get('status')) as AgentRecord['status'],
-        hireDate: String(formData.get('hireDate')),
+        accreditationDate: String(formData.get('accreditationDate')).trim() || null,
         commissionRate: Number(formData.get('commissionRate')) / 100,
         notes: String(formData.get('notes')),
       }
@@ -118,9 +190,9 @@ function PeoplePage() {
         email: '',
         address: '',
         assignedProjects: [projects[0]?.id ?? 'project-1'],
-        managerId: brokers[0]?.id ?? null,
+        supervisorUserId: defaultSupervisorUserId,
         status: 'Active',
-        hireDate: '06/04/2026',
+        accreditationDate: '2026-06-04',
         commissionRate: 0.05,
         linkedUserId: null,
         notes: '',
@@ -321,10 +393,10 @@ function PeoplePage() {
               selectOptions={projects.map((project) => ({ label: project.name, value: project.id }))}
             />
             <FormField
-              label="Manager"
-              name="managerId"
-              defaultValue={editingAgent.managerId ?? ''}
-              selectOptions={[{ label: 'No manager', value: '' }, ...brokers.map((broker) => ({ label: broker.fullName, value: broker.id }))]}
+              label="Supervisor User"
+              name="supervisorUserId"
+              defaultValue={editingAgent.supervisorUserId ? String(editingAgent.supervisorUserId) : ''}
+              selectOptions={[{ label: 'No supervisor', value: '' }, ...supervisorOptions]}
             />
             <FormField
               label="Status"
@@ -332,7 +404,7 @@ function PeoplePage() {
               defaultValue={editingAgent.status}
               selectOptions={['Active', 'Inactive', 'Suspended'].map((item) => ({ label: item, value: item }))}
             />
-            <FormField label="Hire Date" name="hireDate" defaultValue={editingAgent.hireDate} required />
+            <FormField label="Accreditation Date" name="accreditationDate" type="date" defaultValue={editingAgent.accreditationDate ?? ''} />
             <FormField label="Commission Rate %" name="commissionRate" type="number" step="0.01" defaultValue={(editingAgent.commissionRate * 100).toFixed(2)} />
             <FormField label="Address" name="address" defaultValue={editingAgent.address} textarea className="md:col-span-2" />
             <FormField label="Notes" name="notes" defaultValue={editingAgent.notes} textarea className="md:col-span-2" />
@@ -393,6 +465,8 @@ function AgentDrawer({
           <InfoRow label="Contact" value={agent.contactNumber} />
           <InfoRow label="Email" value={agent.email} />
           <InfoRow label="Projects" value={agent.assignedProjects.map(getProjectName).join(', ')} />
+          <InfoRow label="Supervisor" value={getUserDisplayName(agent.supervisorUserId) ?? '-'} />
+          <InfoRow label="Accreditation Date" value={agent.accreditationDate ?? '-'} />
           <InfoRow label="Commission Rate" value={formatPercent(agent.commissionRate)} />
           <InfoRow label="System User" value={agent.linkedUserId ? 'Linked' : 'No user account'} />
           <p className="mt-4 rounded-lg border border-[#E8E4DC] bg-[#F8F7F4] p-3 text-sm text-[#374151]">{agent.notes || 'No notes.'}</p>

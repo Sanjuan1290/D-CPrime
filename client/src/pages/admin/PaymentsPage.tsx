@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import Badge from '../../components/admin/Badge'
 import DataTable from '../../components/admin/DataTable'
@@ -8,10 +8,10 @@ import Modal from '../../components/admin/Modal'
 import Panel from '../../components/admin/Panel'
 import { useToast } from '../../components/admin/Toast'
 import { formatCurrency, formatPercent } from '../../components/admin/formatters'
-import { company, paymentTracker, soaRecords } from '../../data/adminMockData'
+import { company, mockStorageKeys, paymentTracker, readMockStorage, soaRecords, writeMockStorage } from '../../data/adminMockData'
 import type { Payment } from '../../data/adminMockData'
 import { paymentDetails } from '../../data/sourceDetails'
-import type { PaymentDetail } from '../../data/sourceDetails'
+import type { PaymentDetail, PaymentScheduleStatus } from '../../data/sourceDetails'
 
 type PaymentsPageProps = {
   initialTab?: 'all' | 'due' | 'overdue'
@@ -23,6 +23,17 @@ type PaymentIdentity = {
 }
 
 type MonthlyPayment = PaymentDetail['monthlyPayments'][number]
+type StoredMonthlyPayment = Partial<MonthlyPayment>
+type StoredPaymentDetail = Partial<Omit<PaymentDetail, 'monthlyPayments'>> & {
+  monthlyPayments?: StoredMonthlyPayment[]
+}
+type SoaScheduleLine = {
+  dueDate?: string
+  dueAmount: number
+  datePaid?: string
+  amountPaid?: number
+  scheduleStatus?: PaymentScheduleStatus
+}
 
 type ReceiptTarget = {
   detailKey: string
@@ -37,10 +48,75 @@ type ReceiptPreview = {
 }
 
 const PAYMENT_DETAILS_STORAGE_KEY = 'dcprime_payment_details_v2'
+const scheduleStatusOptions: PaymentScheduleStatus[] = ['unpaid', 'partial', 'paid', 'overdue']
+
+function normalizePaymentScheduleStatus(value: unknown): PaymentScheduleStatus {
+  return scheduleStatusOptions.includes(value as PaymentScheduleStatus) ? (value as PaymentScheduleStatus) : 'unpaid'
+}
+
+function formatScheduleStatus(value: PaymentScheduleStatus) {
+  return value.replace(/\b\w/g, (letter) => letter.toUpperCase())
+}
+
+function parseScheduleDate(value?: string) {
+  if (!value) return null
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return new Date(`${value}T00:00:00`)
+  const match = value.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/)
+  if (match) {
+    const [, month, day, year] = match
+    return new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T00:00:00`)
+  }
+  const parsed = new Date(value)
+  return Number.isNaN(parsed.getTime()) ? null : parsed
+}
+
+function getSoaScheduleStatus(line: SoaScheduleLine): PaymentScheduleStatus {
+  if (line.scheduleStatus) return normalizePaymentScheduleStatus(line.scheduleStatus)
+  if (line.datePaid) return (line.amountPaid ?? 0) >= line.dueAmount ? 'paid' : 'partial'
+
+  const dueDate = parseScheduleDate(line.dueDate)
+  if (!dueDate) return 'unpaid'
+
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  return dueDate.getTime() < today.getTime() ? 'overdue' : 'unpaid'
+}
+
+function normalizeMonthlyPayment(payment: StoredMonthlyPayment): MonthlyPayment {
+  return {
+    period: payment.period ?? 'Monthly amortization',
+    dueDate: payment.dueDate,
+    amount: Number(payment.amount) || 0,
+    penalty: Number(payment.penalty) || 0,
+    scheduleStatus: normalizePaymentScheduleStatus(payment.scheduleStatus ?? (payment.datePaid ? 'paid' : 'unpaid')),
+    datePaid: payment.datePaid,
+    reference: payment.reference,
+    receiptImage: payment.receiptImage,
+    receiptFileName: payment.receiptFileName,
+  }
+}
+
+function normalizePaymentDetail(detail: StoredPaymentDetail): PaymentDetail {
+  return {
+    unitId: detail.unitId ?? '',
+    lotType: detail.lotType,
+    unitVariant: detail.unitVariant,
+    buyer: detail.buyer ?? '',
+    mode: detail.mode ?? 'INSTALLMENT',
+    dueDay: detail.dueDay,
+    monthlyPayments: Array.isArray(detail.monthlyPayments) ? detail.monthlyPayments.map(normalizeMonthlyPayment) : [],
+    paymentMade: Number(detail.paymentMade) || 0,
+    totalContractPrice: Number(detail.totalContractPrice) || 0,
+    balance: Number(detail.balance) || 0,
+    paymentPercentage: Number(detail.paymentPercentage) || 0,
+    commissionReleasedPercent: Number(detail.commissionReleasedPercent) || 0,
+    fr: detail.fr,
+  }
+}
 
 function PaymentsPage({ initialTab = 'all' }: PaymentsPageProps) {
   const toast = useToast()
-  const [payments, setPayments] = useState(paymentTracker)
+  const [payments, setPayments] = useState(() => readMockStorage(mockStorageKeys.paymentTracker, paymentTracker))
   const [paymentRecords, setPaymentRecords] = useState<PaymentDetail[]>(loadPaymentRecords)
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null)
   const [editingPayment, setEditingPayment] = useState<Payment | null>(null)
@@ -59,6 +135,10 @@ function PaymentsPage({ initialTab = 'all' }: PaymentsPageProps) {
     if (initialTab === 'overdue') return payment.balance > 0 && payment.dueDay !== undefined
     return true
   })
+
+  useEffect(() => {
+    writeMockStorage(mockStorageKeys.paymentTracker, payments)
+  }, [payments])
 
   function commitPaymentRecords(getNext: (current: PaymentDetail[]) => PaymentDetail[]) {
     setPaymentRecords((current) => {
@@ -187,7 +267,10 @@ function PaymentsPage({ initialTab = 'all' }: PaymentsPageProps) {
 
     const monthlyPayment: MonthlyPayment = {
       period: String(formData.get('period')).trim(),
+      dueDate: String(formData.get('dueDate')).trim() || undefined,
       amount,
+      penalty: Number(formData.get('penalty')) || 0,
+      scheduleStatus: normalizePaymentScheduleStatus(String(formData.get('scheduleStatus'))),
       datePaid: String(formData.get('datePaid')).trim() || undefined,
       reference: String(formData.get('reference')).trim() || undefined,
       ...(receiptData
@@ -357,12 +440,13 @@ function PaymentsPage({ initialTab = 'all' }: PaymentsPageProps) {
           </div>
           <div className="mt-5">
             <DataTable
-              headers={['Due Date', 'Description', 'Due Amount', 'Penalty', 'Date Paid', 'Amount Paid', 'Reference', 'Running Balance']}
+              headers={['Due Date', 'Description', 'Due Amount', 'Penalty', 'Status', 'Date Paid', 'Amount Paid', 'Reference', 'Running Balance']}
               rows={soa.schedule.map((line) => [
                 line.dueDate,
                 line.description,
                 formatCurrency(line.dueAmount),
                 formatCurrency(line.penalty),
+                <Badge key={`${line.description}-schedule-status`}>{formatScheduleStatus(getSoaScheduleStatus(line))}</Badge>,
                 line.datePaid ?? '-',
                 line.amountPaid ? formatCurrency(line.amountPaid) : '-',
                 line.reference ?? '-',
@@ -413,11 +497,14 @@ function PaymentsPage({ initialTab = 'all' }: PaymentsPageProps) {
               </div>
               {selectedPaymentDetail?.monthlyPayments.length ? (
                 <DataTable
-                  headers={['Period', 'Date Paid', 'Amount', 'Reference', 'Receipt Status', 'Action']}
+                  headers={['Period', 'Due Date', 'Status', 'Date Paid', 'Amount', 'Penalty', 'Reference', 'Receipt Status', 'Action']}
                   rows={selectedPaymentDetail.monthlyPayments.map((payment, index) => [
                     payment.period,
+                    payment.dueDate ?? '-',
+                    <Badge key={`${payment.period}-schedule-status`}>{formatScheduleStatus(payment.scheduleStatus)}</Badge>,
                     payment.datePaid ?? '-',
                     formatCurrency(payment.amount),
+                    formatCurrency(payment.penalty),
                     payment.reference ?? '-',
                     <Badge key={`${payment.period}-receipt-status`}>{payment.receiptImage ? 'Uploaded' : 'Missing'}</Badge>,
                     <div key={`${payment.period}-receipt-actions`} className="flex flex-wrap gap-2">
@@ -528,7 +615,15 @@ function PaymentsPage({ initialTab = 'all' }: PaymentsPageProps) {
               </div>
             </div>
             <FormField label="Period / Description" name="period" defaultValue="Monthly amortization" required />
+            <FormField label="Due Date" name="dueDate" type="date" />
             <FormField label="Amount Paid" name="amount" type="number" defaultValue="10000" min="0" step="0.01" required />
+            <FormField label="Penalty" name="penalty" type="number" defaultValue="0" min="0" step="0.01" />
+            <FormField
+              label="Schedule Status"
+              name="scheduleStatus"
+              defaultValue="paid"
+              selectOptions={scheduleStatusOptions.map((status) => ({ label: formatScheduleStatus(status), value: status }))}
+            />
             <FormField label="Date Paid" name="datePaid" type="date" />
             <FormField label="Reference No." name="reference" placeholder="Bank ref, OR no., or cash note" />
             <FormField label="Receipt Image" name="receiptImage" type="file" accept="image/*" className="file:mr-3 file:rounded-md file:border-0 file:bg-[#1A1A2E] file:px-3 file:py-1.5 file:text-xs file:font-bold file:text-white" />
@@ -612,11 +707,11 @@ function upsertPaymentDetail(
 function loadPaymentRecords(): PaymentDetail[] {
   try {
     const stored = window.localStorage.getItem(PAYMENT_DETAILS_STORAGE_KEY)
-    if (!stored) return paymentDetails
+    if (!stored) return paymentDetails.map(normalizePaymentDetail)
     const parsed = JSON.parse(stored)
-    return Array.isArray(parsed) ? parsed : paymentDetails
+    return Array.isArray(parsed) ? parsed.map(normalizePaymentDetail) : paymentDetails.map(normalizePaymentDetail)
   } catch {
-    return paymentDetails
+    return paymentDetails.map(normalizePaymentDetail)
   }
 }
 
